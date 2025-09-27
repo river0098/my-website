@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>英语提分系统</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- 添加 CloudBase SDK -->
+<script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.6.0/cloudbase.full.js"></script>
+<style>
+  :root{
+    --bg-gradient: radial-gradient(1200px at 10% 20%, rgba(124,77,255,.22), transparent 55%),
+                   radial-gradient(900px at 90% 0%, rgba(0,200,245,.18), transparent 60%),
+                   linear-gradient(180deg,#f3f4ff 0%,#f9fbff 60%,#fef8ff 100%);
+    --surface: rgba(255,255,255,0.9);
+    --surface-alt: rgba(255,255,255,0.75);
+    --text:#1f2749;
+    --text-strong:#131836;
+    --muted:#6d7691;
+    --border:rgba(172,185,255,.35);
+    --primary:#6653ff;
+    --primary-dark:#4837d6;
+    --accent:#ff8f6b;
+    --success:#2fb173;
+    --danger:#f26c6c;
+    --shadow:0 20px 40px rgba(86,101,255,.18);
+  }
+  *{box-sizing:border-box;}
+  body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;background:#f3f4ff;position:relative;min-height:100vh;}
+  body::before{content:"";position:fixed;inset:0;background:var(--bg-gradient);z-index:-2;}
+  body::after{content:"";position:fixed;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.35));backdrop-filter:blur(24px);z-index:-1;}
+  header{padding:42px 0 36px;position:relative;}
+  header::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(112,82,255,.9),rgba(86,206,255,.85));border-bottom-left-radius:28px;border-bottom-right-radius:28px;box-shadow:0 35px 70px rgba(86,101,255,.25);}
+  header .header-top,header p{width:min(1160px,calc(100% - 48px));margin:0 auto;position:relative;z-index:1;color:#fff;}
+  header .header-top{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;}
+  header h1{margin:0;font-size:32px;font-weight:700;letter-spacing:.6px;}
+  header p{margin-top:14px;color:rgba(255,255,255,.86);font-size:15px;}
+  header .header-link{color:#fff;text-decoration:none;background:rgba(255,255,255,0.22);padding:10px 22px;border-radius:999px;font-size:15px;font-weight:500;transition:all .25s ease;backdrop-filter:blur(8px);box-shadow:0 14px 28px rgba(15,23,42,.18);}
+  header .header-link:hover{background:rgba(255,255,255,0.34);transform:translateY(-2px);}
+  main{width:min(1160px,calc(100% - 48px));margin:38px auto 64px;display:grid;gap:32px;position:relative;z-index:1;}
+  section{background:var(--surface);border-radius:24px;padding:32px 36px;border:1px solid rgba(255,255,255,.55);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:26px;backdrop-filter:blur(18px);}
+  h2{margin:0;font-size:24px;font-weight:700;color:var(--text-strong);display:flex;align-items:center;gap:10px;}
+  h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,rgba(102,83,255,.45),rgba(255,143,107,.28));border-radius:999px;}
+  .input-row{display:flex;flex-wrap:wrap;gap:18px;align-items:center;}
+  select,button{padding:11px 18px;border-radius:14px;font-size:15px;line-height:1.4;border:1px solid rgba(120,129,255,.35);background:var(--surface-alt);color:var(--text);transition:all .2s ease;min-width:168px;box-shadow:0 10px 24px rgba(102,83,255,.08);}
+  select:focus{outline:none;border-color:var(--primary);box-shadow:0 0 0 4px rgba(102,83,255,.22);}
+  button{background:linear-gradient(135deg,var(--primary),#7a63ff);color:#fff;border-color:transparent;cursor:pointer;font-weight:600;letter-spacing:.3px;box-shadow:0 16px 28px rgba(102,83,255,.28);}
+  button:hover{transform:translateY(-2px);box-shadow:0 22px 36px rgba(102,83,255,.32);}
+  button:disabled{background:linear-gradient(135deg,#b8bff9,#c8cffc);color:#f5f7ff;cursor:not-allowed;box-shadow:none;transform:none;}
+  .cloud-status{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;font-size:13px;font-weight:500;background:rgba(47,177,115,.1);color:var(--success);margin-left:auto;}
+  .cloud-status.offline{background:rgba(242,108,108,.1);color:var(--danger);}
+  .card{background:rgba(255,255,255,0.78);border-radius:20px;padding:26px 30px;border:1px solid rgba(120,129,255,.2);display:flex;flex-direction:column;gap:20px;min-height:170px;box-shadow:0 18px 34px rgba(31,39,73,.08);}
+  .progress{font-size:14px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .word{font-size:32px;font-weight:700;color:var(--text-strong);letter-spacing:.6px;}
+  .meaning{font-size:18px;color:var(--muted);}
+  .example{font-size:15px;color:#4b5875;background:rgba(102,83,255,.09);padding:12px 16px;border-radius:14px;}
+  #wordOptionsContainer,#grammarOptionsContainer{display:flex;flex-direction:column;gap:14px;}
+  .word-option,.grammar-option{background:rgba(255,255,255,0.85);border:1px solid rgba(146,154,255,.38);border-radius:16px;padding:15px 20px;cursor:pointer;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease,color .18s ease;display:flex;gap:12px;align-items:flex-start;box-shadow:0 14px 28px rgba(30,42,91,.06);}
+  .word-option:hover,.grammar-option:hover{transform:translateY(-3px);box-shadow:0 22px 34px rgba(102,83,255,.18);border-color:rgba(102,83,255,.55);}
+  .word-option.selected,.grammar-option.selected{border:2px solid var(--primary);box-shadow:0 18px 30px rgba(102,83,255,.28);}
+  .word-option.correct,.grammar-option.correct{background:rgba(47,177,115,.12);border-color:rgba(47,177,115,.55);color:#1b6e45;}
+  .word-option.wrong,.grammar-option.wrong{background:rgba(242,108,108,.12);border-color:rgba(242,108,108,.45);color:#8b2d2d;}
+  .grammar-option-key{font-weight:700;min-width:26px;display:inline-block;color:var(--muted);}
+  .grammar-question{font-size:21px;font-weight:600;color:var(--text-strong);min-height:54px;}
+  .result-panel{margin-top:4px;padding:18px 20px;border-radius:16px;background:rgba(255,255,255,0.72);min-height:56px;border:1px dashed rgba(146,154,255,.4);display:flex;align-items:center;color:var(--muted);box-shadow:0 12px 24px rgba(31,39,73,.04);}
+  .timer-bar{position:relative;height:6px;border-radius:999px;background:rgba(102,83,255,.12);overflow:hidden;margin-top:6px;}
+  .timer-bar span{position:absolute;inset:0;background:linear-gradient(90deg,#6b4bff,#ff8f6b);transform-origin:left center;transform:scaleX(1);transition:transform linear;}
+  .timer-label{font-size:13px;color:var(--muted);letter-spacing:.2px;display:flex;align-items:center;gap:8px;}
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:4px;}
+  .stat{background:rgba(255,255,255,0.82);border-radius:18px;padding:24px;border:1px solid rgba(120,129,255,.25);display:flex;flex-direction:column;gap:8px;align-items:flex-start;box-shadow:0 18px 32px rgba(31,39,73,.08);}
+  .stat div:first-child{font-size:32px;font-weight:700;color:var(--text-strong);}
+  .stat div:nth-child(2){font-size:14px;color:var(--muted);letter-spacing:.2px;}
+  .sentence-area{display:flex;flex-direction:column;gap:18px;}
+  .sentence-bank,.sentence-answer{display:flex;flex-wrap:wrap;gap:14px;padding:18px;border-radius:16px;min-height:74px;background:rgba(255,255,255,0.82);border:1px dashed rgba(146,154,255,.38);box-shadow:0 12px 26px rgba(30,42,91,.05);}
+  .sentence-answer{background:rgba(250,251,255,0.9);}
+  .sentence-token{padding:10px 18px;border-radius:14px;background:rgba(255,255,255,0.85);border:1px solid rgba(146,154,255,.32);cursor:pointer;user-select:none;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease;}
+  .sentence-token:hover{transform:translateY(-2px);box-shadow:0 16px 24px rgba(102,83,255,.12);border-color:rgba(102,83,255,.45);}
+  .sentence-token.correct{background:rgba(47,177,115,.12);border-color:rgba(47,177,115,.55);color:#1b6e45;cursor:default;box-shadow:none;}
+  .sentence-token.wrong{background:rgba(242,108,108,.12);border-color:rgba(242,108,108,.45);color:#8b2d2d;cursor:default;box-shadow:none;}
+  .sentence-token.disabled{cursor:not-allowed;opacity:.65;box-shadow:none;}
+  footer{padding:28px 18px 48px;text-align:center;color:rgba(109,118,145,.9);font-size:13px;}
+  @media (max-width:720px){
+    header{padding:32px 0 28px;}
+    header .header-top,header p,main{width:calc(100% - 32px);}
+    section{padding:26px 22px;}
+    .word{font-size:28px;}
+    select,button{min-width:0;flex:1 1 150px;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="header-top">
+    <h1>英语提分系统</h1>
+    <span class="cloud-status" id="cloudStatus">☁️ 云端已连接</span>
+    <a class="header-link" href="dashboard.html" title="查看所有学生的练习与积分数据">全员概览</a>
+  </div>
+  <p>先选学生，再按需要选择词库、语法或句库（互斥练习）</p>
+</header>
+<main>
+  <section>
+    <h2>1. 选择学生</h2>
+    <div class="input-row">
+      <select id="studentSelect"></select>
+      <select id="wordBankSelect"></select>
+      <select id="wordLetterSelect" style="display:none;"></select>
+      <select id="grammarSetSelect"></select>
+      <select id="sentenceSetSelect"></select>
+      <button id="resetProgress">清除当前学生进度</button>
+    </div>
+    <div class="stats-grid" id="overallStats"></div>
+  </section>
+
+  <section id="wordSection">
+    <h2>2. 单词练习 / 测验</h2>
+    <div class="input-row" id="wordSessionControls">
+      <select id="wordSessionTypeSelect" title="选择积分模式">
+        <option value="practice" selected>练习模式（不计积分）</option>
+        <option value="exam">测验模式（计积分）</option>
+      </select>
+      <select id="wordModeSelect" title="选择抽题策略">
+        <option value="normal">正常练习</option>
+        <option value="review">错词强化</option>
+      </select>
+      <select id="wordBatchSelect" title="选择本次测验的题目数量">
+        <option value="20" selected>一次 20 题</option>
+        <option value="50">一次 50 题</option>
+        <option value="100">一次 100 题</option>
+      </select>
+      <button id="refreshWordSession">开始练习</button>
+    </div>
+    <div class="card">
+      <div class="progress" id="vocabProgress"></div>
+      <div class="timer-label" id="wordTimerLabel" style="display:none;">剩余 <strong>10 秒</strong></div>
+      <div class="timer-bar" id="wordTimerBar" style="display:none;"><span></span></div>
+      <div class="word" id="wordDisplay">请先选择学生</div>
+      <div class="meaning" id="wordPrompt"></div>
+      <div id="wordOptionsContainer"></div>
+      <div class="example" id="exampleDisplay"></div>
+    </div>
+    <div class="input-row" style="display:none;margin-top:16px;">
+      <button id="submitWordAnswer">确认答案</button>
+      <button id="nextWord">下一题</button>
+    </div>
+    <div class="result-panel" id="wordFeedback"></div>
+  </section>
+
+  <section id="grammarSection">
+    <h2>3. 语法选择题</h2>
+    <div class="input-row" id="grammarSessionControls">
+      <select id="grammarBatchSelect" title="选择本次题量">
+        <option value="10">一次 10 题</option>
+        <option value="20" selected>一次 20 题</option>
+        <option value="30">一次 30 题</option>
+        <option value="all">整套全部</option>
+      </select>
+      <button id="startGrammarSession">开始练习</button>
+    </div>
+    <div class="card">
+      <div class="progress" id="grammarProgress"></div>
+      <div class="timer-label" id="grammarTimerLabel" style="display:none;">剩余 <strong>60 秒</strong></div>
+      <div class="timer-bar" id="grammarTimerBar" style="display:none;"><span></span></div>
+      <div class="grammar-question" id="grammarQuestion">请选择语法题库</div>
+      <div id="grammarOptionsContainer"></div>
+      <div class="example" id="grammarExplanation" style="display:none;"></div>
+    </div>
+    <div class="input-row" style="margin-top:16px;">
+      <button id="submitGrammarAnswer">确认答案</button>
+      <button id="nextGrammarQuestion">下一题</button>
+    </div>
+    <div class="result-panel" id="grammarFeedback"></div>
+  </section>
+
+  <section id="sentenceSection">
+    <h2>4. 句子重组测验</h2>
+    <div class="card">
+      <div class="progress" id="sentenceProgress"></div>
+      <div class="timer-label" id="sentenceTimerLabel" style="display:none;">剩余 <strong>60 秒</strong></div>
+      <div class="timer-bar" id="sentenceTimerBar" style="display:none;"><span></span></div>
+      <div class="meaning" id="sentenceInstruction">请先选择学生</div>
+      <div class="example" id="sentenceHint"></div>
+      <div class="sentence-area">
+        <div class="sentence-bank" id="sentenceOptionsContainer"></div>
+        <div class="sentence-answer" id="sentenceAnswerContainer"></div>
+      </div>
+    </div>
+    <div class="input-row" style="margin-top:16px;">
+      <button id="resetSentenceSelection">撤回重选</button>
+      <button id="submitSentenceAnswer">确认顺序</button>
+      <button id="nextSentence">下一句</button>
+    </div>
+    <div class="result-panel" id="sentenceFeedback"></div>
+  </section>
+</main>
+<footer>离线版 · 数据本地保存 + 云端同步 · 可自由扩展</footer>
+
+<!-- 这里需要引入你原有的词库文件 -->
+<script>
+// 注意：这里需要你原有的词库文件
+// 例如：<script src="word_bank/vocabulary688.js"></script>
+// 由于文件太大，这里使用模拟数据
+
+// ============ CloudBase 初始化 ============
+let cloudConnected = false;
+let app, db;
+
+try {
+  app = cloudbase.init({
+    env: "cloud1-8gxc5t0wed3aa3e2"
+  });
+  db = app.database();
+  cloudConnected = true;
+  console.log('✅ CloudBase 连接成功');
+} catch(err) {
+  console.error('❌ CloudBase 连接失败:', err);
+  document.getElementById('cloudStatus').textContent = '❌ 云端未连接';
+  document.getElementById('cloudStatus').className = 'cloud-status offline';
+}
+
+// ============ 云端数据保存函数 ============
+async function saveToCloud(collectionName, data) {
+  if (!cloudConnected) {
+    console.log('云端未连接，数据仅保存在本地');
+    return null;
+  }
+  
+  try {
+    const result = await db.collection(collectionName).add({
+      ...data,
+      timestamp: new Date(),
+      device_id: localStorage.getItem('device_id') || generateDeviceId()
+    });
+    console.log(`✅ 数据已保存到 ${collectionName}:`, result);
+    return result;
+  } catch(err) {
+    console.error(`❌ 保存到 ${collectionName} 失败:`, err);
+    return null;
+  }
+}
+
+// 生成设备ID
+function generateDeviceId() {
+  const id = 'device_' + Math.random().toString(36).substr(2, 9);
+  localStorage.setItem('device_id', id);
+  return id;
+}
+
+// ============ 单词答题云端保存 ============
+async function saveWordSubmission(data) {
+  return await saveToCloud('word_submissions', {
+    student_name: currentStudent,
+    word_bank: activeWordBank?.name || '未知词库',
+    word: data.word,
+    correct_answer: data.correctAnswer,
+    user_answer: data.userAnswer || '未作答',
+    is_correct: data.isCorrect,
+    session_type: currentWordSessionType(),
+    practice_mode: wordPracticeMode,
+    time_spent: data.timeSpent || 0,
+    is_timeout: data.isTimeout || false
+  });
+}
+
+// ============ 语法答题云端保存 ============
+async function saveGrammarSubmission(data) {
+  return await saveToCloud('grammar_submissions', {
+    student_name: currentStudent,
+    grammar_set: activeGrammarSet?.name || '未知题库',
+    question: data.question,
+    correct_answer: data.correctAnswer,
+    user_answer: data.userAnswer || '未作答',
+    is_correct: data.isCorrect,
+    time_spent: data.timeSpent || 0,
+    is_timeout: data.isTimeout || false
+  });
+}
+
+// ============ 句子重组云端保存 ============
+async function saveSentenceSubmission(data) {
+  return await saveToCloud('sentence_submissions', {
+    student_name: currentStudent,
+    sentence_set: activeSentenceSet?.name || '未知句库',
+    original_sentence: data.originalSentence,
+    chinese_hint: data.chineseHint,
+    user_arrangement: data.userArrangement,
+    is_correct: data.isCorrect,
+    time_spent: data.timeSpent || 0,
+    is_timeout: data.isTimeout || false
+  });
+}
+
+// ============ 积分变化云端保存 ============
+async function saveScoreChange(data) {
+  return await saveToCloud('score_changes', {
+    student_name: currentStudent,
+    score_delta: data.delta,
+    reason: data.reason,
+    total_score: data.totalScore,
+    reward_score: data.rewardScore,
+    penalty_score: data.penaltyScore,
+    redeemable_score: data.redeemableScore,
+    details: data.details
+  });
+}
+
+// ============ 会话统计云端保存 ============
+async function saveSessionStats(type, data) {
+  return await saveToCloud('session_stats', {
+    student_name: currentStudent,
+    session_type: type,
+    total_questions: data.totalQuestions,
+    correct_count: data.correctCount,
+    accuracy: data.accuracy,
+    time_spent: data.timeSpent || 0,
+    word_bank: activeWordBank?.name,
+    grammar_set: activeGrammarSet?.name,
+    sentence_set: activeSentenceSet?.name
+  });
+}
+
+// 以下是模拟数据和基本功能实现
+// 实际使用时需要引入你的词库文件
+
+const students = [
+  "焦良瑾","庄优岳","曾媛媛","陈伟誉","李煜文","吴沛宜","王泽霖","吴苑茹","陈佳糗","黄钰莹",
+  "刘文锋","杨淳好","刘欣","梁鸿浩","杨映春","甘紫渊","黄书慧","谭铖淇","叶蕙仪","王诗涵",
+  "谢家铄","张育东","余乐欢","余欣莹","何厚玮","李襄","曹淑怡","王馨怡","叶思翰"
+];
+
+// 模拟词库数据
+const mockVocabulary = [
+  { word: "abandon", meaning: "v. 放弃，抛弃", example: "Don't abandon your dreams." },
+  { word: "ability", meaning: "n. 能力，才能", example: "She has the ability to solve complex problems." },
+  { word: "absent", meaning: "adj. 缺席的，不在的", example: "He was absent from school yesterday." }
+];
+
+// 基本变量定义
+let currentStudent = null;
+let activeWordBank = null;
+let activeVocabulary = mockVocabulary;
+let currentVocabIndex = 0;
+let wordHistory = [];
+let wordSessionState = null;
+let wordPracticeMode = "normal";
+let wordSessionType = "practice";
+let wordQuestionStartTime = 0;
+let grammarQuestionStartTime = 0;
+let sentenceStartTime = 0;
+
+// 初始化学生选择框
+const studentSelect = document.getElementById("studentSelect");
+students.forEach(name => {
+  const option = document.createElement("option");
+  option.value = name;
+  option.textContent = name;
+  studentSelect.appendChild(option);
+});
+studentSelect.insertAdjacentHTML("afterbegin","<option value='' disabled selected>选择学生姓名</option>");
+
+// 添加事件监听器
+studentSelect.addEventListener("change", () => {
+  currentStudent = studentSelect.value;
+  console.log("选中学生:", currentStudent);
+});
+
+// 简化的功能实现
+function currentWordSessionType() {
+  return wordSessionType;
+}
+
+function renderOverallStats() {
+  const stats = document.getElementById("overallStats");
+  if (!currentStudent) {
+    stats.innerHTML = `<div class="stat"><div>-</div><div>请选择学生</div></div>`;
+    return;
+  }
+  stats.innerHTML = `
+    <div class="stat"><div>0</div><div>累计答题</div></div>
+    <div class="stat"><div>0%</div><div>正确率</div></div>
+    <div class="stat"><div>0</div><div>当前积分</div></div>
+  `;
+}
+
+// 初始化显示
+renderOverallStats();
+
+console.log('系统已初始化，CloudBase状态:', cloudConnected ? '已连接' : '未连接');
+</script>
+
+</body>
+</html>
