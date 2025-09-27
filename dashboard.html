@@ -1,0 +1,984 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>学生全员概览</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  :root{
+    --bg-gradient: radial-gradient(1200px at 10% 0%, rgba(126,87,255,.24), transparent 55%),
+                   radial-gradient(900px at 85% 20%, rgba(0,194,255,.18), transparent 60%),
+                   linear-gradient(180deg,#f4f6ff 0%,#fdf6ff 70%,#fff3f5 100%);
+    --surface: rgba(255,255,255,0.9);
+    --surface-alt: rgba(255,255,255,0.78);
+    --text:#1f2749;
+    --muted:#6d7691;
+    --border:rgba(172,185,255,.38);
+    --primary:#6653ff;
+    --accent:#ff8f6b;
+  }
+  *{box-sizing:border-box;}
+  body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;line-height:1.6;color:var(--text);background:#f4f6ff;min-height:100vh;position:relative;}
+  body::before{content:"";position:fixed;inset:0;background:var(--bg-gradient);z-index:-2;}
+  body::after{content:"";position:fixed;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.55),rgba(255,255,255,.32));backdrop-filter:blur(22px);z-index:-1;}
+  header{padding:40px 0 32px;position:relative;}
+  header::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(112,82,255,.92),rgba(86,206,255,.85));border-bottom-left-radius:30px;border-bottom-right-radius:30px;box-shadow:0 32px 64px rgba(86,101,255,.28);}
+  header .header-main{width:min(1120px,calc(100% - 48px));margin:0 auto;position:relative;z-index:1;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+  header h1{margin:0;font-size:30px;font-weight:700;color:#fff;letter-spacing:.6px;}
+  .header-actions{margin-left:auto;display:flex;gap:12px;flex-wrap:wrap;}
+  .link-btn{color:#fff;text-decoration:none;background:rgba(255,255,255,0.22);padding:9px 20px;border-radius:999px;font-size:14px;font-weight:500;transition:all .2s ease;backdrop-filter:blur(8px);box-shadow:0 12px 26px rgba(15,23,42,.18);}
+  .link-btn:hover{background:rgba(255,255,255,0.34);transform:translateY(-2px);}
+  .primary-btn{border:none;background:linear-gradient(135deg,var(--accent),#ffb980);color:#442300;padding:9px 22px;border-radius:999px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 16px 28px rgba(255,143,107,.32);transition:all .2s ease;}
+  .primary-btn:hover{transform:translateY(-2px);box-shadow:0 22px 34px rgba(255,143,107,.38);}
+  .primary-btn:disabled{cursor:not-allowed;opacity:.65;box-shadow:none;transform:none;}
+  header .muted{width:min(1120px,calc(100% - 48px));margin:12px auto 0;color:rgba(255,255,255,.82);position:relative;z-index:1;font-size:14px;}
+  main{width:min(1120px,calc(100% - 48px));margin:36px auto 64px;display:grid;gap:28px;position:relative;z-index:1;}
+  section{background:var(--surface);border-radius:22px;padding:30px 32px;border:1px solid rgba(255,255,255,.55);box-shadow:0 24px 46px rgba(31,39,73,.12);backdrop-filter:blur(18px);}
+  h2{margin:0 0 12px;font-size:23px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:10px;}
+  h2::after{content:"";flex:1;height:2px;background:linear-gradient(90deg,rgba(102,83,255,.45),rgba(255,143,107,.32));border-radius:999px;}
+  p{margin:4px 0 18px;color:var(--muted);}
+  .summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px;margin-bottom:18px;}
+  .summary-card{background:var(--surface-alt);border-radius:18px;padding:20px;border:1px solid rgba(172,185,255,.35);box-shadow:0 18px 32px rgba(31,39,73,.08);display:flex;flex-direction:column;gap:6px;}
+  .summary-card h3{margin:0;font-size:13px;font-weight:600;color:var(--muted);letter-spacing:.2px;text-transform:uppercase;}
+  .summary-card div{font-size:27px;font-weight:700;color:var(--text);}
+  .leaderboard{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;}
+  .leaderboard li{background:var(--surface-alt);border-radius:18px;padding:14px 20px;display:flex;align-items:center;gap:14px;justify-content:space-between;border:1px solid rgba(172,185,255,.3);box-shadow:0 16px 28px rgba(31,39,73,.08);}
+  .leaderboard .rank{font-size:18px;font-weight:700;color:var(--primary);min-width:36px;text-align:center;}
+  .leaderboard .name{flex:1;font-weight:600;}
+  .leaderboard .score{font-size:16px;font-weight:700;}
+  .leaderboard .meta{font-size:13px;color:var(--muted);}
+  .redeem-btn{border:none;background:linear-gradient(135deg,var(--accent),#ffcf9f);color:#512a00;padding:7px 14px;border-radius:14px;font-size:13px;font-weight:600;cursor:pointer;transition:all .18s ease;box-shadow:0 14px 26px rgba(255,143,107,.24);}
+  .redeem-btn:hover{transform:translateY(-2px);box-shadow:0 18px 30px rgba(255,143,107,.32);}
+  .redeem-btn:disabled{background:rgba(240,242,255,.8);color:#94a3c5;cursor:not-allowed;box-shadow:none;transform:none;}
+  .table-wrapper{overflow:auto;border-radius:18px;border:1px solid rgba(172,185,255,.35);box-shadow:0 22px 38px rgba(31,39,73,.08);background:rgba(255,255,255,0.92);}
+  table{width:100%;border-collapse:collapse;min-width:960px;background:transparent;color:var(--text);}
+  thead{background:rgba(236,239,255,.6);backdrop-filter:blur(12px);
+    background:linear-gradient(90deg,rgba(102,83,255,.15),rgba(255,143,107,.12));color:var(--text);}
+  th,td{padding:14px 18px;text-align:left;font-size:14px;border-bottom:1px solid rgba(172,185,255,.25);vertical-align:top;}
+  tbody tr:hover{background:rgba(102,83,255,.06);}
+  th:first-child,td:first-child{position:sticky;left:0;background:rgba(255,255,255,0.95);backdrop-filter:blur(10px);} 
+  .metric-line{display:block;margin-bottom:4px;line-height:1.45;}
+  .metric-line:last-child{margin-bottom:0;}
+  .muted{color:var(--muted);font-size:13px;}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;background:rgba(102,83,255,.12);color:var(--primary);font-size:12px;margin-left:6px;}
+  footer{padding:28px 16px 48px;text-align:center;color:var(--muted);font-size:13px;}
+  @media (max-width:720px){
+    header .header-main,header .muted,main{width:calc(100% - 32px);}
+    section{padding:26px 22px;}
+    table{min-width:860px;}
+  }
+</style></style>
+</head>
+<body>
+<header>
+  <div class="header-main">
+    <h1>学生全员概览</h1>
+    <div class="header-actions">
+      <button id="redeemAllButton" type="button" class="primary-btn">一键兑换</button>
+      <a href="index.html" class="link-btn">返回练习界面</a>
+    </div>
+  </div>
+  <span class="muted">数据基于本机存储，最后刷新：<span id="lastUpdated"></span></span>
+</header>
+<main>
+  <section>
+    <h2>总体数据</h2>
+    <p>统计来自离线 localStorage，可随时点击右上角刷新浏览器页面以更新。</p>
+    <div class="summary-grid" id="summaryMetrics"></div>
+  </section>
+
+  <section>
+    <h2>积分排名</h2>
+    <p class="muted">按照当前总积分从高到低排序，仅统计已有积分记录的学生。</p>
+    <ol class="leaderboard" id="scoreLeaderboard"></ol>
+  </section>
+
+  <section>
+    <h2>学生详情</h2>
+    <p class="muted">悬停单元格可查看详细说明。</p>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>学生</th>
+            <th>单词练习</th>
+            <th>语法选择</th>
+            <th>句子重组</th>
+            <th>积分概况</th>
+            <th>最近积分事件</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="studentsTableBody"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+<footer>离线版 · 数据只在本机保留 · 统计口径与练习界面一致</footer>
+
+<script src="word_bank/vocabulary688.js"></script>
+<script src="sentence_bank/sentences_200.js"></script>
+<script src="word_bank/3500/register.js"></script>
+<script src="word_bank/3500/a-vocab.js"></script>
+<script src="word_bank/3500/b-vocab-dictionary-b.js"></script>
+<script src="word_bank/3500/c-vocab-dictionary-c.js"></script>
+<script src="word_bank/3500/d-vocab-dictionary-d.js"></script>
+<script src="word_bank/3500/e-vocab-dictionary-e.js"></script>
+<script src="word_bank/3500/f-vocab-dictionary-f.js"></script>
+<script src="word_bank/3500/g-vocab-dictionary-g.js"></script>
+<script src="word_bank/3500/h-vocab-dictionary-h.js"></script>
+<script src="word_bank/3500/i-vocab-dictionary-i.js"></script>
+<script src="word_bank/3500/i-vocab-dictionary-l.js"></script>
+<script src="word_bank/3500/j-vocab-dictionary-j.js"></script>
+<script src="word_bank/3500/k-vocab-dictionary-k.js"></script>
+<script src="word_bank/3500/m-vocab-dictionary-m.js"></script>
+<script src="word_bank/3500/n-vocab-dictionary-n.js"></script>
+<script src="word_bank/3500/p-vocab-dictionary-p.js"></script>
+<script src="word_bank/3500/q-vocabulary-js.js"></script>
+<script src="word_bank/3500/r-vocabulary-js.js"></script>
+<script src="word_bank/3500/s-vocabulary1.js"></script>
+<script src="word_bank/3500/s-vocabulary2.js"></script>
+<script src="word_bank/3500/t-vocabulary-js.js"></script>
+<script src="word_bank/3500/u-vocabulary-js.js"></script>
+<script src="word_bank/3500/v-vocabulary-js.js"></script>
+<script src="word_bank/3500/y-vocabulary-js.js"></script>
+<script src="word_bank/3500/z-vocabulary-js.js"></script>
+<script src="word_bank/gaokao_core_688/register.js"></script>
+<script src="word_bank/gaokao_core_688/bixiu1.js"></script>
+<script src="word_bank/gaokao_core_688/bixiu2.js"></script>
+<script src="word_bank/gaokao_core_688/bixiu3.js"></script>
+<script src="word_bank/gaokao_core_688/xuanxiu1.js"></script>
+<script src="word_bank/gaokao_core_688/xuanxiu2.js"></script>
+<script src="word_bank/gaokao_core_688/xuanxiu3.js"></script>
+<script src="word_bank/gaokao_core_688/xuanxiu4.js"></script>
+<script src="grammar/grammar_multiple_choice/register.js"></script>
+<script src="grammar/grammar_multiple_choice/01_subject_verb_agreement.js"></script>
+<script src="grammar/grammar_multiple_choice/02_articles_numbers.js"></script>
+<script src="grammar/grammar_multiple_choice/03_pronouns_prepositions.js"></script>
+<script src="grammar/grammar_multiple_choice/04_adjectives_adverbs.js"></script>
+<script src="grammar/grammar_multiple_choice/05_verbs_phrasal_verbs.js"></script>
+<script src="grammar/grammar_multiple_choice/06_verb_tense_voice.js"></script>
+<script src="grammar/grammar_multiple_choice/07_nonfinite_verbs.js"></script>
+<script src="grammar/grammar_multiple_choice/08_modals_subjunctive.js"></script>
+<script src="grammar/grammar_multiple_choice/09_sentence_components_types.js"></script>
+<script src="grammar/grammar_multiple_choice/10_noun_clauses.js"></script>
+<script src="grammar/grammar_multiple_choice/11_adverbial_clauses.js"></script>
+<script src="grammar/grammar_multiple_choice/12_relative_clauses.js"></script>
+<script>
+const students = [
+  "焦良瑾","庄优岳","曾媛媛","陈伟聪","李煜文","吴沛宜","王泽霖","吴苑萍","陈佳琳","黄钰莹","刘文锋","杨淳好","刘欣","梁鸿浩","杨映春","甘紫渊","黄书慧","谭铠淇","叶蕙仪","王诗涵","谢家锐","张育东","余乐欢","余欣莹","何厚玮","李襄","曹淑怡","王馨怡","叶思翰"
+];
+
+const rawCoreVocabulary = Array.isArray(window.vocabulary688) ? window.vocabulary688 : [];
+const core688Items = rawCoreVocabulary.filter(item => item && item.word).map(entry => ({
+  word: entry.word,
+  meaning: formatMeaning(entry),
+  example: entry.example || ""
+}));
+
+const meaningLookup = new Map();
+
+function addMeaningToLookup(word, meaning){
+  const key = typeof word === "string" ? word.trim().toLowerCase() : "";
+  const value = typeof meaning === "string" ? meaning.trim() : "";
+  if(!key || !value || value === "释义待补充" || value === "词组") return;
+  if(!meaningLookup.has(key)) meaningLookup.set(key, value);
+}
+
+function registerMeaning(items){
+  if(!Array.isArray(items)) return;
+  items.forEach(item => {
+    if(item && item.word && item.meaning){
+      addMeaningToLookup(item.word, item.meaning);
+    }
+  });
+}
+
+function lookupMeaning(word){
+  const key = typeof word === "string" ? word.trim().toLowerCase() : "";
+  if(!key) return "";
+  return meaningLookup.get(key) || "";
+}
+
+registerMeaning(core688Items);
+
+const rawCet3500Map = window.vocab3500 && typeof window.vocab3500 === "object" ? window.vocab3500 : {};
+const cet3500Letters = Object.keys(rawCet3500Map)
+  .filter(letter => Array.isArray(rawCet3500Map[letter]) && rawCet3500Map[letter].length)
+  .sort((a,b) => a.localeCompare(b, "zh-Hans-CN"));
+
+const cet3500Banks = cet3500Letters.map(letter => {
+  const normalized = normalize3500Entries(rawCet3500Map[letter]);
+  return {
+    id: `cet3500-${letter}`,
+    name: `高中3500词库（${letter}）`,
+    letter,
+    parentId: "cet3500",
+    items: normalized,
+    count: normalized.length
+  };
+});
+
+cet3500Banks.forEach(bank => registerMeaning(bank.items));
+
+const rawTextbookMap = window.textbookVocab && typeof window.textbookVocab === "object" ? window.textbookVocab : {};
+const textbookBanks = buildTextbookBanks(rawTextbookMap);
+
+textbookBanks.forEach(bank => registerMeaning(bank.items));
+
+const wordBanks = [
+  {id: "core688", name: "高考核心688词库", items: core688Items},
+  ...cet3500Banks,
+  ...textbookBanks
+];
+
+const rawSentenceData = Array.isArray(window.vocabularyData) ? window.vocabularyData : [];
+const sentenceSetItems = rawSentenceData.filter(item => item && item.english);
+const sentenceSets = [
+  {id: "sentence200", name: "英语200句重组", items: sentenceSetItems}
+];
+
+const grammarBankOrder = Array.isArray(window.grammarQuestionOrder) ? window.grammarQuestionOrder : Object.keys(window.grammarQuestionBanks || {});
+const rawGrammarBankMap = window.grammarQuestionBanks && typeof window.grammarQuestionBanks === "object" ? window.grammarQuestionBanks : {};
+const grammarBanks = grammarBankOrder
+  .map(id => {
+    const bank = rawGrammarBankMap[id];
+    if(!bank || typeof bank !== "object") return null;
+    const questions = normalizeGrammarQuestions(bank.questions);
+    return {
+      id,
+      name: bank.title || bank.name || id,
+      questions
+    };
+  })
+  .filter(Boolean);
+
+const WORD_SCORE_STORAGE_KEY = "wordPracticeScoreboard";
+
+const summaryMetrics = document.getElementById("summaryMetrics");
+const leaderboardList = document.getElementById("scoreLeaderboard");
+const tableBody = document.getElementById("studentsTableBody");
+const lastUpdated = document.getElementById("lastUpdated");
+const redeemAllButton = document.getElementById("redeemAllButton");
+
+let scoreSnapshot = loadWordScoreboard();
+renderAllStudents();
+
+if(redeemAllButton){
+  redeemAllButton.addEventListener("click", handleRedeemAllStudents);
+}
+
+if(tableBody){
+  tableBody.addEventListener("click", event => {
+    const target = event.target.closest(".redeem-btn");
+    if(!target) return;
+    const student = target.getAttribute("data-student");
+    if(student) redeemStudent(student);
+  });
+}
+
+function renderAllStudents(){
+  const records = students.map(student => {
+    const wordStats = aggregateWordStats(student);
+    const grammarStats = aggregateGrammarStats(student);
+    const sentenceStats = aggregateSentenceStats(student);
+    const scoreStats = getScoreStats(student);
+    return {student, wordStats, grammarStats, sentenceStats, scoreStats};
+  });
+
+  let wordActiveCount = 0;
+  let sentenceActiveCount = 0;
+  let grammarActiveCount = 0;
+  let totalGrammarAttempts = 0;
+  let totalGrammarCorrect = 0;
+  let totalReward = 0;
+  let totalPenalty = 0;
+  let totalScore = 0;
+  let scoreActiveCount = 0;
+  let totalRedeemable = 0;
+
+  const frag = document.createDocumentFragment();
+
+  records.forEach(({student, wordStats, grammarStats, sentenceStats, scoreStats}) => {
+    if(wordStats.attempts > 0) wordActiveCount++;
+    if(grammarStats.attempts > 0){
+      grammarActiveCount++;
+      totalGrammarAttempts += grammarStats.attempts;
+      totalGrammarCorrect += grammarStats.correct;
+    }
+    if(sentenceStats.attempts > 0) sentenceActiveCount++;
+    if(scoreStats.hasData) scoreActiveCount++;
+    totalReward += scoreStats.reward;
+    totalPenalty += scoreStats.penalty;
+    totalScore += scoreStats.total;
+    totalRedeemable += Math.max(0, scoreStats.redeemable);
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${student}</td>
+      <td ${wordStats.tooltip ? `title="${escapeAttribute(wordStats.tooltip)}"` : ""}>
+        ${wordStats.attempts > 0
+          ? `<span class=\"metric-line\">${wordStats.attempts} 题｜正确率 ${formatPercentage(wordStats.accuracy)}</span>
+             <span class=\"metric-line muted\">已掌握 ${wordStats.uniqueCorrect}/${wordStats.totalWords}</span>`
+          : '<span class="muted">暂无练习</span>'}
+      </td>
+      <td ${grammarStats.tooltip ? `title="${escapeAttribute(grammarStats.tooltip)}"` : ""}>
+        ${grammarStats.attempts > 0
+          ? `<span class=\"metric-line\">${grammarStats.attempts} 题｜正确率 ${formatPercentage(grammarStats.accuracy)}</span>
+             <span class=\"metric-line muted\">已掌握 ${grammarStats.uniqueCorrect}/${grammarStats.totalQuestions || '—'}</span>`
+          : '<span class="muted">暂无练习</span>'}
+      </td>
+      <td ${sentenceStats.tooltip ? `title="${escapeAttribute(sentenceStats.tooltip)}"` : ""}>
+        ${sentenceStats.attempts > 0
+          ? `<span class=\"metric-line\">${sentenceStats.attempts} 题｜正确率 ${formatPercentage(sentenceStats.accuracy)}</span>
+             <span class=\"metric-line muted\">已完成 ${sentenceStats.uniqueCorrect}/${sentenceStats.totalSentences}</span>`
+          : '<span class="muted">暂无练习</span>'}
+      </td>
+      <td>
+        <span class="metric-line">当前 ${formatScoreDelta(scoreStats.total)}<span class="tag">奖励 ${formatScoreDelta(scoreStats.reward)}</span><span class="tag">惩扣 ${formatScoreDelta(scoreStats.penalty)}</span><span class="tag">可兑 ${Math.round(Math.max(0, scoreStats.redeemable))}</span></span>
+      </td>
+      <td ${scoreStats.latestTooltip ? `title="${escapeAttribute(scoreStats.latestTooltip)}"` : ""}>
+        ${scoreStats.latest
+          ? `<span class=\"metric-line\">${formatScoreDelta(scoreStats.latest.delta)}｜${formatWordScoreHistoryLabel(scoreStats.latest)}</span>
+             <span class=\"metric-line muted\">${formatTimestamp(scoreStats.latest.timestamp)}</span>`
+          : '<span class="muted">暂无积分记录</span>'}
+      </td>
+      <td>
+        ${scoreStats.redeemable > 0
+          ? `<button type=\"button\" class=\"redeem-btn\" data-student=\"${escapeAttribute(student)}\">兑换 ${Math.max(0, Math.round(scoreStats.redeemable))} 分</button>`
+          : '<span class="muted">无可兑积分</span>'}
+      </td>`;
+    frag.appendChild(tr);
+  });
+
+  tableBody.innerHTML = "";
+  tableBody.appendChild(frag);
+
+  renderLeaderboard(records);
+
+  summaryMetrics.innerHTML = `
+    <div class="summary-card">
+      <h3>学生总数</h3>
+      <div>${students.length}</div>
+    </div>
+    <div class="summary-card">
+      <h3>参与单词练习</h3>
+      <div>${wordActiveCount} <span class="muted">人</span></div>
+    </div>
+    <div class="summary-card">
+      <h3>参与语法练习</h3>
+      <div>${grammarActiveCount} <span class="muted">人</span></div>
+    </div>
+    <div class="summary-card">
+      <h3>参与句子练习</h3>
+      <div>${sentenceActiveCount} <span class="muted">人</span></div>
+    </div>
+    <div class="summary-card">
+      <h3>语法累计答题</h3>
+      <div>${totalGrammarAttempts} <span class="muted">题｜正确率 ${formatPercentage(totalGrammarAttempts ? totalGrammarCorrect / totalGrammarAttempts : 0)}</span></div>
+    </div>
+    <div class="summary-card">
+      <h3>有积分记录</h3>
+      <div>${scoreActiveCount} <span class="muted">人</span></div>
+    </div>
+    <div class="summary-card">
+      <h3>可兑换积分</h3>
+      <div>${Math.round(totalRedeemable)}</div>
+    </div>
+    <div class="summary-card">
+      <h3>累计奖励 / 惩扣</h3>
+      <div>${formatScoreDelta(totalReward)} / ${formatScoreDelta(totalPenalty)}</div>
+    </div>
+    <div class="summary-card">
+      <h3>积分总额</h3>
+      <div>${formatScoreDelta(totalScore)}</div>
+    </div>`;
+
+  lastUpdated.textContent = formatTimestamp(Date.now());
+  if(redeemAllButton){
+    redeemAllButton.disabled = totalRedeemable <= 0;
+  }
+}
+
+function renderLeaderboard(records){
+  if(!leaderboardList) return;
+  const entries = records
+    .filter(record => record.scoreStats.hasData)
+    .sort((a,b) => {
+      if(b.scoreStats.total !== a.scoreStats.total) return b.scoreStats.total - a.scoreStats.total;
+      if(b.scoreStats.reward !== a.scoreStats.reward) return b.scoreStats.reward - a.scoreStats.reward;
+      return a.student.localeCompare(b.student, "zh-Hans-CN");
+    });
+
+  if(!entries.length){
+    leaderboardList.innerHTML = '<li class="muted">暂无积分数据</li>';
+    return;
+  }
+
+  let currentRank = 0;
+  let previousScore = null;
+  let previousReward = null;
+  const rows = entries.map((record, index) => {
+    const total = record.scoreStats.total;
+    const reward = record.scoreStats.reward;
+    if(previousScore === null || total !== previousScore || reward !== previousReward){
+      currentRank = index + 1;
+      previousScore = total;
+      previousReward = reward;
+    }
+    return `
+      <li>
+        <span class="rank">${currentRank}</span>
+        <span class="name">${record.student}</span>
+        <span class="score">${formatScoreDelta(total)}</span>
+        <span class="meta">奖励 ${formatScoreDelta(record.scoreStats.reward)} ｜ 惩扣 ${formatScoreDelta(record.scoreStats.penalty)} ｜ 可兑 ${Math.round(Math.max(0, record.scoreStats.redeemable))}</span>
+      </li>`;
+  });
+
+  leaderboardList.innerHTML = rows.join("\n");
+}
+
+function normalize3500Entries(entries){
+  if(!Array.isArray(entries)) return [];
+  return entries
+    .map(entry => normalize3500Entry(entry))
+    .filter(Boolean);
+}
+
+function normalize3500Entry(entry){
+  if(!entry || !entry.word) return null;
+  const segments = [];
+  if(entry.meaning){
+    collectDefinitionSegment(segments, entry.type || entry.partOfSpeech, entry.meaning);
+  }
+
+  let idx = 2;
+  while(entry[`type${idx}`] || entry[`meaning${idx}`]){
+    collectDefinitionSegment(segments, entry[`type${idx}`], entry[`meaning${idx}`]);
+    idx++;
+  }
+
+  if(entry.definition){
+    collectDefinitionSegment(segments, entry.partOfSpeech, entry.definition);
+  }
+
+  if(entry.explanation){
+    collectDefinitionSegment(segments, entry.partOfSpeech, entry.explanation);
+  }
+
+  if(entry.description){
+    collectDefinitionSegment(segments, null, entry.description);
+  }
+
+  if(entry.forms){
+    const formText = toNormalizedText(entry.forms);
+    if(formText) segments.push(`形式：${formText}`);
+  }
+
+  if(entry.alternate){
+    const altText = toNormalizedText(entry.alternate);
+    if(altText) segments.push(`变体：${altText}`);
+  }
+
+  const meaning = segments.filter(Boolean).join("；").replace(/；+/g, "；").replace(/^；|；$/g, "");
+  const example = entry.example
+    ? toNormalizedText(entry.example)
+    : (Array.isArray(entry.examples) ? entry.examples.map(toNormalizedText).filter(Boolean).join("；") : "");
+
+  const fallbackMeaning = toNormalizedText(entry.meaning)
+    || toNormalizedText(entry.definition)
+    || toNormalizedText(entry.explanation)
+    || toNormalizedText(entry.description)
+    || "释义待补充";
+
+  return {
+    word: String(entry.word).trim(),
+    meaning: meaning || fallbackMeaning,
+    example: example || ""
+  };
+}
+
+function normalizeGrammarQuestions(items){
+  if(!Array.isArray(items)) return [];
+  return items
+    .map((item, index) => {
+      if(!item || typeof item !== "object") return null;
+      const questionText = toNormalizedText(item.question);
+      const optionsRaw = item.options && typeof item.options === "object" ? item.options : {};
+      const optionEntries = Object.entries(optionsRaw)
+        .map(([key, value]) => [toNormalizedText(key).toUpperCase(), toNormalizedText(value)])
+        .filter(([key, value]) => Boolean(key) && Boolean(value))
+        .sort((a, b) => a[0].localeCompare(b[0], "zh-Hans-CN"));
+      const options = {};
+      optionEntries.forEach(([key, value]) => {
+        if(!options[key]) options[key] = value;
+      });
+      const answerKey = toNormalizedText(item.answer).toUpperCase();
+      const explanationText = toNormalizedText(item.explanation);
+      if(!questionText || !answerKey || !options[answerKey]) return null;
+      return {
+        id: Number.isFinite(item.id) ? item.id : index + 1,
+        question: questionText,
+        options,
+        answer: answerKey,
+        explanation: explanationText
+      };
+    })
+    .filter(Boolean);
+}
+
+function buildTextbookBanks(source){
+  const banks = [];
+  let counter = 0;
+  if(!source || typeof source !== "object") return banks;
+  Object.keys(source).forEach(bookId => {
+    const books = normalizeTextbookBooks(bookId, source[bookId]);
+    books.forEach(book => {
+      const units = book && book.units && typeof book.units === "object" ? book.units : {};
+      Object.keys(units).forEach(unitName => {
+        const unit = units[unitName] || {};
+        const normalized = normalizeTextbookEntries(unit["词汇"], unit["词组"]);
+        if(!normalized.length) return;
+        const bankId = `textbook-${bookId}-${++counter}`;
+        banks.push({
+          id: bankId,
+          name: `${book.name || bookId} · ${unitName}`,
+          parentId: "textbook",
+          bookId,
+          unitName,
+          items: normalized,
+          count: normalized.length
+        });
+      });
+    });
+  });
+  return banks;
+}
+
+function normalizeTextbookBooks(bookId, payload){
+  const books = [];
+  if(!payload || typeof payload !== "object") return books;
+  if(payload.name && payload.units && typeof payload.units === "object"){
+    books.push({id: bookId, name: String(payload.name), units: payload.units});
+    return books;
+  }
+  Object.keys(payload).forEach(name => {
+    const units = payload[name];
+    if(units && typeof units === "object"){
+      books.push({id: bookId, name, units});
+    }
+  });
+  return books;
+}
+
+function normalizeTextbookEntries(words, phrases){
+  const items = [];
+  (Array.isArray(words) ? words : []).forEach(word => {
+    const entry = normalizeTextbookEntry(word);
+    if(entry) items.push(entry);
+  });
+  (Array.isArray(phrases) ? phrases : []).forEach(phrase => {
+    const entry = normalizeTextbookEntry(phrase, true);
+    if(entry) items.push(entry);
+  });
+  return items;
+}
+
+function normalizeTextbookEntry(raw, isPhrase){
+  let word = "";
+  let meaning = "";
+  let example = "";
+  if(typeof raw === "string" || typeof raw === "number"){
+    word = toNormalizedText(raw);
+  }else if(raw && typeof raw === "object"){
+    word = toNormalizedText(raw.word || raw.phrase || raw.term || raw.text || raw.key || "");
+    meaning = toNormalizedText(raw.meaning || raw.translation || raw.cn || raw.definition || raw.explanation || raw.desc || "");
+    example = toNormalizedText(raw.example || raw.sample || raw.sentence || "");
+  }
+  if(!word) return null;
+  if(!meaning){
+    meaning = lookupMeaning(word);
+  }
+  if(!meaning){
+    meaning = isPhrase ? "词组" : "释义待补充";
+  }
+  if(example){
+    example = example.replace(/^[^A-Za-z0-9]+/, "").trim();
+  }
+  const entry = {word, meaning, example: example || ""};
+  addMeaningToLookup(word, meaning);
+  return entry;
+}
+
+function collectDefinitionSegment(target, pos, definition){
+  const definitionText = toNormalizedText(definition);
+  if(!definitionText) return;
+  const posText = Array.isArray(pos)
+    ? pos.map(toNormalizedText).filter(Boolean).join(", ")
+    : toNormalizedText(pos);
+  target.push(posText ? `${posText} ${definitionText}`.trim() : definitionText);
+}
+
+function toNormalizedText(input){
+  if(input === undefined || input === null) return "";
+  if(Array.isArray(input)){
+    return input.map(item => toNormalizedText(item)).filter(Boolean).join(", ");
+  }
+  const text = String(input).trim();
+  return text;
+}
+
+function aggregateWordStats(student){
+  let attempts = 0;
+  let correct = 0;
+  let totalWords = 0;
+  const uniqueGlobal = new Set();
+  const details = [];
+
+  wordBanks.forEach(bank => {
+    const key = `${student}-${bank.id}-wordHistory`;
+    const history = readHistoryEntries(localStorage.getItem(key), bank.items.length);
+    if(!history.length){
+      totalWords += bank.items.length;
+      return;
+    }
+    const bankCorrect = history.filter(entry => entry.correct).length;
+    const bankUnique = new Set();
+    history.forEach(entry => {
+      if(entry.correct) bankUnique.add(entry.index);
+    });
+    attempts += history.length;
+    correct += bankCorrect;
+    bankUnique.forEach(idx => uniqueGlobal.add(`${bank.id}:${idx}`));
+    totalWords += bank.items.length;
+    details.push(`${bank.name}：${history.length}题｜${formatPercentage(history.length ? bankCorrect / history.length : 0)}｜掌握 ${bankUnique.size}/${bank.items.length}`);
+  });
+
+  return {
+    attempts,
+    correct,
+    accuracy: attempts ? correct / attempts : 0,
+    uniqueCorrect: uniqueGlobal.size,
+    totalWords: totalWords || (wordBanks.reduce((sum, bank) => sum + (bank.items ? bank.items.length : 0), 0)),
+    tooltip: details.length ? details.join("\n") : ""
+  };
+}
+
+function aggregateSentenceStats(student){
+  let attempts = 0;
+  let correct = 0;
+  let totalSentences = 0;
+  const uniqueGlobal = new Set();
+  const details = [];
+
+  sentenceSets.forEach(set => {
+    const key = `${student}-sentence-${set.id}-sentenceHistory`;
+    const history = readHistoryEntries(localStorage.getItem(key), set.items.length);
+    if(!history.length){
+      totalSentences += set.items.length;
+      return;
+    }
+    const setCorrect = history.filter(entry => entry.correct).length;
+    const setUnique = new Set();
+    history.forEach(entry => {
+      if(entry.correct) setUnique.add(entry.index);
+    });
+    attempts += history.length;
+    correct += setCorrect;
+    setUnique.forEach(idx => uniqueGlobal.add(`${set.id}:${idx}`));
+    totalSentences += set.items.length;
+    details.push(`${set.name}：${history.length}题｜${formatPercentage(history.length ? setCorrect / history.length : 0)}｜掌握 ${setUnique.size}/${set.items.length}`);
+  });
+
+  return {
+    attempts,
+    correct,
+    accuracy: attempts ? correct / attempts : 0,
+    uniqueCorrect: uniqueGlobal.size,
+    totalSentences: totalSentences || (sentenceSets.reduce((sum, set) => sum + (set.items ? set.items.length : 0), 0)),
+    tooltip: details.length ? details.join("\n") : ""
+  };
+}
+
+function aggregateGrammarStats(student){
+  let attempts = 0;
+  let correct = 0;
+  let totalQuestions = 0;
+  const uniqueGlobal = new Set();
+  const details = [];
+
+  grammarBanks.forEach(bank => {
+    const questionCount = Array.isArray(bank.questions) ? bank.questions.length : 0;
+    totalQuestions += questionCount;
+    const key = `${student}-grammar-${bank.id}-grammarHistory`;
+    const history = readHistoryEntries(localStorage.getItem(key), questionCount || 0);
+    if(!history.length) return;
+    const bankCorrect = history.filter(entry => entry.correct).length;
+    const bankUnique = new Set();
+    history.forEach(entry => {
+      if(entry.correct) bankUnique.add(entry.index);
+    });
+    attempts += history.length;
+    correct += bankCorrect;
+    bankUnique.forEach(idx => uniqueGlobal.add(`${bank.id}:${idx}`));
+    details.push(`${bank.name}：${history.length}题｜${formatPercentage(history.length ? bankCorrect / history.length : 0)}｜掌握 ${bankUnique.size}/${questionCount || "?"}`);
+  });
+
+  return {
+    attempts,
+    correct,
+    accuracy: attempts ? correct / attempts : 0,
+    uniqueCorrect: uniqueGlobal.size,
+    totalQuestions: totalQuestions || grammarBanks.reduce((sum, bank) => sum + (Array.isArray(bank.questions) ? bank.questions.length : 0), 0),
+    tooltip: details.length ? details.join("\n") : ""
+  };
+}
+
+function loadWordScoreboard(){
+  const raw = safeParse(localStorage.getItem(WORD_SCORE_STORAGE_KEY), {});
+  const cleaned = {};
+  if(!raw || typeof raw !== "object") return cleaned;
+  Object.keys(raw).forEach(student => {
+    const entry = raw[student];
+    if(!entry || typeof entry !== "object") return;
+    const reward = Number(entry.reward);
+    const penalty = Number(entry.penalty);
+    const total = Number(entry.total);
+    const redeemable = Number(entry.redeemable);
+    const history = Array.isArray(entry.history) ? entry.history : [];
+    cleaned[student] = {
+      reward: Number.isFinite(reward) ? reward : 0,
+      penalty: Number.isFinite(penalty) ? penalty : 0,
+      total: Number.isFinite(total) ? total : ((Number.isFinite(reward) ? reward : 0) + (Number.isFinite(penalty) ? penalty : 0)),
+      redeemable: Number.isFinite(redeemable) ? Math.max(0, redeemable) : Math.max(0, (Number.isFinite(reward) ? reward : 0) + (Number.isFinite(penalty) ? penalty : 0)),
+      history: history
+        .map(item => {
+          if(!item || typeof item !== "object") return null;
+          const delta = Number(item.delta);
+          const timestamp = Number(item.timestamp);
+          if(!Number.isFinite(delta) || !Number.isFinite(timestamp)) return null;
+          return {
+            delta,
+            outcome: typeof item.outcome === "string" ? item.outcome : "neutral",
+            batchSize: Number.isFinite(item.batchSize) ? item.batchSize : 0,
+            correctCount: Number.isFinite(item.correctCount) ? item.correctCount : 0,
+            totalCount: Number.isFinite(item.totalCount) ? item.totalCount : 0,
+            answeredCount: Number.isFinite(item.answeredCount) ? item.answeredCount : 0,
+            accuracy: Number.isFinite(item.accuracy) ? item.accuracy : 0,
+            mode: item.mode === "review" ? "review" : "normal",
+            reason: typeof item.reason === "string" ? item.reason : "",
+            redeemed: Number.isFinite(item.redeemed) ? Math.max(0, item.redeemed) : 0,
+            timestamp
+          };
+        })
+        .filter(Boolean)
+        .sort((a,b) => b.timestamp - a.timestamp)
+    };
+  });
+  return cleaned;
+}
+
+function saveWordScoreboardSnapshot(snapshot){
+  if(!snapshot || typeof snapshot !== "object"){
+    localStorage.removeItem(WORD_SCORE_STORAGE_KEY);
+    scoreSnapshot = {};
+    return;
+  }
+  const payload = {};
+  Object.keys(snapshot).forEach(student => {
+    const entry = snapshot[student];
+    if(!entry || typeof entry !== "object") return;
+    const total = Number(entry.total);
+    const reward = Number(entry.reward);
+    const penalty = Number(entry.penalty);
+    const redeemable = Number(entry.redeemable);
+    const history = Array.isArray(entry.history) ? entry.history.filter(Boolean) : [];
+    const hasScore = (Number.isFinite(reward) && reward !== 0) || (Number.isFinite(penalty) && penalty !== 0) || (Number.isFinite(total) && total !== 0) || (Number.isFinite(redeemable) && redeemable !== 0) || history.length;
+    if(!hasScore) return;
+    payload[student] = {
+      total: Number.isFinite(total) ? total : ((Number.isFinite(reward) ? reward : 0) + (Number.isFinite(penalty) ? penalty : 0)),
+      reward: Number.isFinite(reward) ? reward : 0,
+      penalty: Number.isFinite(penalty) ? penalty : 0,
+      redeemable: Number.isFinite(redeemable) ? Math.max(0, redeemable) : Math.max(0, (Number.isFinite(reward) ? reward : 0) + (Number.isFinite(penalty) ? penalty : 0)),
+      history
+    };
+  });
+  const keys = Object.keys(payload);
+  if(!keys.length){
+    localStorage.removeItem(WORD_SCORE_STORAGE_KEY);
+    scoreSnapshot = {};
+    return;
+  }
+  scoreSnapshot = payload;
+  localStorage.setItem(WORD_SCORE_STORAGE_KEY, JSON.stringify(payload));
+}
+
+function redeemStudent(student){
+  if(!student || !scoreSnapshot[student]) return false;
+  const entry = scoreSnapshot[student];
+  const redeemable = Number(entry.redeemable);
+  const available = Number.isFinite(redeemable) ? Math.max(0, redeemable) : 0;
+  if(available <= 0) return false;
+  if(!confirm(`确认兑换 ${student} 的可兑换积分 ${Math.round(available)} 分吗？`)) return false;
+  entry.redeemable = 0;
+  const history = Array.isArray(entry.history) ? entry.history : [];
+  const historyEntry = {
+    delta: 0,
+    outcome: "redeem",
+    redeemed: available,
+    batchSize: 0,
+    correctCount: 0,
+    totalCount: 0,
+    answeredCount: 0,
+    accuracy: 0,
+    mode: "normal",
+    reason: "redeem",
+    timestamp: Date.now()
+  };
+  entry.history = [historyEntry, ...history].slice(0, 30);
+  scoreSnapshot[student] = entry;
+  saveWordScoreboardSnapshot(scoreSnapshot);
+  renderAllStudents();
+  alert(`${student} 已兑换 ${Math.round(available)} 分，可兑换积分已清零。`);
+  return true;
+}
+
+function handleRedeemAllStudents(){
+  const candidates = Object.keys(scoreSnapshot).filter(student => {
+    const entry = scoreSnapshot[student];
+    const redeemable = Number(entry && entry.redeemable);
+    return Number.isFinite(redeemable) && redeemable > 0.0001;
+  });
+  if(!candidates.length){
+    alert("当前没有学生拥有可兑换积分。");
+    return;
+  }
+  if(!confirm(`确认要为 ${candidates.length} 位学生全部兑换可用积分吗？`)) return;
+  let totalRedeemed = 0;
+  const timestamp = Date.now();
+  candidates.forEach(student => {
+    const entry = scoreSnapshot[student];
+    const redeemable = Number(entry.redeemable);
+    const available = Number.isFinite(redeemable) ? Math.max(0, redeemable) : 0;
+    if(available <= 0) return;
+    entry.redeemable = 0;
+    const history = Array.isArray(entry.history) ? entry.history : [];
+    const historyEntry = {
+      delta: 0,
+      outcome: "redeem",
+      redeemed: available,
+      batchSize: 0,
+      correctCount: 0,
+      totalCount: 0,
+      answeredCount: 0,
+      accuracy: 0,
+      mode: "normal",
+      reason: "redeem-all",
+      timestamp
+    };
+    entry.history = [historyEntry, ...history].slice(0, 30);
+    scoreSnapshot[student] = entry;
+    totalRedeemed += available;
+  });
+  saveWordScoreboardSnapshot(scoreSnapshot);
+  renderAllStudents();
+  alert(`已为 ${candidates.length} 位学生兑换积分，共计 ${Math.round(totalRedeemed)} 分。`);
+}
+
+function getScoreStats(student){
+  const entry = scoreSnapshot[student];
+  if(!entry) return {reward: 0, penalty: 0, total: 0, latest: null, latestTooltip: "", hasData: false};
+  const latest = Array.isArray(entry.history) && entry.history.length ? entry.history[0] : null;
+  const latestTooltip = latest ? `${formatScoreDelta(latest.delta)}｜${formatWordScoreHistoryLabel(latest)}\n发生时间：${formatTimestamp(latest.timestamp)}` : "";
+  return {
+    reward: Number.isFinite(entry.reward) ? entry.reward : 0,
+    penalty: Number.isFinite(entry.penalty) ? entry.penalty : 0,
+    total: Number.isFinite(entry.total) ? entry.total : (entry.reward + entry.penalty),
+    redeemable: Number.isFinite(entry.redeemable) ? Math.max(0, entry.redeemable) : Math.max(0, (Number(entry.reward) || 0) + (Number(entry.penalty) || 0)),
+    latest,
+    latestTooltip,
+    hasData: Boolean((entry.reward || entry.penalty || (entry.history && entry.history.length)))
+  };
+}
+
+function readHistoryEntries(raw, maxIndex){
+  if(!raw) return [];
+  const parsed = safeParse(raw, []);
+  if(!Array.isArray(parsed)) return [];
+  return parsed
+    .map(entry => ({
+      index: Number.isInteger(entry && entry.index) ? entry.index : -1,
+      correct: Boolean(entry && entry.correct === true)
+    }))
+    .filter(entry => entry.index >= 0 && entry.index < maxIndex);
+}
+
+function safeParse(raw, fallback){
+  try{
+    return raw ? JSON.parse(raw) : fallback;
+  }catch(err){
+    return fallback;
+  }
+}
+
+function formatMeaning(entry){
+  const meaning = entry && entry.cn ? String(entry.cn) : "";
+  const pos = entry && entry.pos ? ` (${entry.pos})` : "";
+  const combined = `${meaning}${pos}`.trim();
+  return combined || "释义待补充";
+}
+
+function formatPercentage(value){
+  if(!Number.isFinite(value) || value <= 0) return "0%";
+  const scaled = Math.round(value * 1000) / 10;
+  return Number.isInteger(scaled) ? `${scaled.toFixed(0)}%` : `${scaled.toFixed(1)}%`;
+}
+
+function formatScoreDelta(delta){
+  if(!Number.isFinite(delta) || delta === 0) return "0";
+  return delta > 0 ? `+${delta}` : `${delta}`;
+}
+
+function formatWordScoreHistoryLabel(record){
+  if(!record) return "暂无积分记录";
+  if(record.outcome === "redeem"){
+    const amount = Number.isFinite(record.redeemed) ? Math.max(0, record.redeemed) : 0;
+    return `兑换积分 ${amount} 分`;
+  }
+  const batchLabel = record.batchSize ? `${record.batchSize}题` : "本次";
+  const modeLabel = record.mode === "review" ? "（错词强化）" : "";
+  const percentageText = formatPercentage(record.accuracy);
+  switch(record.outcome){
+    case "quit": {
+      const answeredText = record.answeredCount > 0 ? `（已答 ${record.correctCount}/${record.answeredCount}）` : "";
+      return `${batchLabel}${modeLabel} 中途退出${answeredText}`;
+    }
+    case "full":
+      return `${batchLabel}${modeLabel} 全对`;
+    case "low-accuracy":
+    case "neutral":
+      return `${batchLabel}${modeLabel} 正确率 ${percentageText}`;
+    default:
+      return `${batchLabel}${modeLabel}`;
+  }
+}
+
+function formatTimestamp(value){
+  if(!Number.isFinite(value)) return "-";
+  const date = new Date(value);
+  if(Number.isNaN(date.getTime())) return "-";
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, "0");
+  const dd = String(date.getDate()).padStart(2, "0");
+  const hh = String(date.getHours()).padStart(2, "0");
+  const min = String(date.getMinutes()).padStart(2, "0");
+  const ss = String(date.getSeconds()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd} ${hh}:${min}:${ss}`;
+}
+
+function escapeAttribute(text){
+  return String(text).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+}
+</script>
+</body>
+</html>
