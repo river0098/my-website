@@ -2,16 +2,12 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>英语提分系统（双SDK容错版）</title>
+<title>英语提分系统（双固定SDK版）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 主用 SDK 地址 -->
+<!-- 主用 SDK 地址（腾讯官方） -->
 <script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/2.9.0/cloudbase.full.js"></script>
-<!-- 备用 SDK 地址，如果主用失败则加载 -->
-<script>
-if (typeof cloudbase === 'undefined') {
-  document.write('<script src="https://cdn.jsdelivr.net/npm/cloudbase-js-sdk@2.9.0/dist/cloudbase.full.min.js"><\/script>');
-}
-</script>
+<!-- 备用 SDK 地址（BootCDN） -->
+<script src="https://cdn.bootcdn.net/ajax/libs/cloudbase-js-sdk/2.9.0/cloudbase.full.js"></script>
 <style>
   body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;background:#f3f4ff;color:#1f2749}
   header{background:#6653ff;color:#fff;padding:20px;text-align:center}
@@ -40,6 +36,9 @@ let app, db, auth;
 
 function initCloudBase() {
   try {
+    if (typeof cloudbase === "undefined") {
+      throw new Error("CloudBase SDK 未加载成功");
+    }
     app = cloudbase.init({ env: CLOUD_ENV_ID });
     auth = app.auth({ persistence: "local" });
     db = app.database();
