@@ -2,10 +2,16 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>英语提分系统（SDK修复版）</title>
+<title>英语提分系统（双SDK容错版）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 使用 CloudBase JS SDK v2.9.0 (来自 jsdelivr) -->
-<script src="https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@2.9.0/dist/cloudbase.full.min.js"></script>
+<!-- 主用 SDK 地址 -->
+<script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/2.9.0/cloudbase.full.js"></script>
+<!-- 备用 SDK 地址，如果主用失败则加载 -->
+<script>
+if (typeof cloudbase === 'undefined') {
+  document.write('<script src="https://cdn.jsdelivr.net/npm/cloudbase-js-sdk@2.9.0/dist/cloudbase.full.min.js"><\/script>');
+}
+</script>
 <style>
   body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;background:#f3f4ff;color:#1f2749}
   header{background:#6653ff;color:#fff;padding:20px;text-align:center}
@@ -32,16 +38,18 @@ const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2"; // ⚠️ 替换为你的环境I
 
 let app, db, auth;
 
-try {
-  app = cloudbase.init({ env: CLOUD_ENV_ID });
-  auth = app.auth({ persistence: "local" });
-  db = app.database();
-  document.getElementById('cloudStatus').textContent = '✅ 云端已初始化';
-} catch (err) {
-  console.error('❌ CloudBase 初始化失败:', err);
-  const cs = document.getElementById('cloudStatus');
-  cs.textContent = '❌ 云端未连接';
-  cs.classList.add('offline');
+function initCloudBase() {
+  try {
+    app = cloudbase.init({ env: CLOUD_ENV_ID });
+    auth = app.auth({ persistence: "local" });
+    db = app.database();
+    document.getElementById('cloudStatus').textContent = '✅ 云端已初始化';
+  } catch (err) {
+    console.error('❌ CloudBase 初始化失败:', err);
+    const cs = document.getElementById('cloudStatus');
+    cs.textContent = '❌ 云端未连接';
+    cs.classList.add('offline');
+  }
 }
 
 // 匿名登录函数
@@ -90,6 +98,7 @@ async function loadStudents() {
 
 // 页面加载时
 window.addEventListener("DOMContentLoaded", async () => {
+  initCloudBase();
   try {
     await ensureAnonymousLogin();
     await loadStudents();
