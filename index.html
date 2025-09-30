@@ -2,129 +2,110 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>英语提分系统</title>
+<title>英语提分系统（匿名登录版）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- CloudBase SDK -->
 <script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.6.0/cloudbase.full.js"></script>
 <style>
-  :root{
-    --bg-gradient: radial-gradient(1200px at 10% 20%, rgba(124,77,255,.22), transparent 55%),
-                   radial-gradient(900px at 90% 0%, rgba(0,200,245,.18), transparent 60%),
-                   linear-gradient(180deg,#f3f4ff 0%,#f9fbff 60%,#fef8ff 100%);
-    --surface: rgba(255,255,255,0.9);
-    --surface-alt: rgba(255,255,255,0.75);
-    --text:#1f2749;
-    --text-strong:#131836;
-    --muted:#6d7691;
-    --primary:#6653ff;
-    --success:#2fb173;
-  }
-  *{box-sizing:border-box}
-  body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;color:var(--text);background:#f3f4ff;min-height:100vh}
-  body::before{content:"";position:fixed;inset:0;background:var(--bg-gradient);z-index:-1}
-  header{padding:42px 0 36px;color:#fff;text-align:center;background:linear-gradient(135deg,rgba(112,82,255,.9),rgba(86,206,255,.85))}
-  main{width:min(1160px,calc(100% - 48px));margin:24px auto 64px;display:grid;gap:24px}
-  section{background:var(--surface);border-radius:16px;padding:24px;border:1px solid rgba(255,255,255,.55)}
-  .input-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-  select,button{padding:10px 14px;border-radius:12px;border:1px solid rgba(120,129,255,.35);background:var(--surface-alt)}
-  button{background:var(--primary);color:#fff;border:none;cursor:pointer}
-  .cloud-status{display:inline-flex;gap:6px;align-items:center;font-size:14px;margin-left:8px}
-  .cloud-status.offline{color:#f26c6c}
-  .hint{font-size:13px;color:var(--muted)}
+  body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;background:#f3f4ff;color:#1f2749}
+  header{background:#6653ff;color:#fff;padding:20px;text-align:center}
+  main{max-width:800px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+  select,button{padding:10px 14px;margin:5px;border-radius:8px;border:1px solid #ccc;font-size:15px}
+  button{background:#6653ff;color:#fff;border:none;cursor:pointer}
+  .cloud-status{font-size:14px;margin-left:10px}
+  .cloud-status.offline{color:red}
 </style>
 </head>
 <body>
 <header>
   <h1>英语提分系统 <span class="cloud-status" id="cloudStatus">☁️ 正在连接…</span></h1>
-  <div class="hint">先选学生，再按需要选择词库、语法或句库（互斥练习）</div>
 </header>
 <main>
-  <section>
-    <h2>1. 选择学生</h2>
-    <div class="input-row">
-      <select id="studentSelect" title="学生名单将从 CloudBase 加载"></select>
-      <button id="reloadStudents">重新加载学生</button>
-    </div>
-    <div id="studentLoadMsg" class="hint"></div>
-  </section>
-
-  <section>
-    <h2>2. 单词练习 / 测验（占位）</h2>
-    <div id="overallStats" class="hint">请选择学生</div>
-  </section>
+  <h2>选择学生</h2>
+  <select id="studentSelect"></select>
+  <button id="reloadStudents">重新加载学生</button>
+  <div id="studentLoadMsg"></div>
 </main>
 
 <script>
-/** ================= CloudBase 初始化 ================= */
-let cloudConnected = false;
+const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2"; // ⚠️ 替换为你的环境ID
 let app, db;
-
-// ⚠️ 用你的真实环境ID
-const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2";
 
 try {
   app = cloudbase.init({ env: CLOUD_ENV_ID });
   db = app.database();
-  cloudConnected = true;
-  document.getElementById('cloudStatus').textContent = '✅ 云端已连接';
-  console.log('✅ CloudBase 连接成功');
+  document.getElementById('cloudStatus').textContent = '✅ 云端已初始化';
 } catch (err) {
-  console.error('❌ CloudBase 连接失败:', err);
+  console.error('❌ CloudBase 初始化失败:', err);
   const cs = document.getElementById('cloudStatus');
   cs.textContent = '❌ 云端未连接';
   cs.classList.add('offline');
 }
 
-/** ============== 从 CloudBase 拉取学生名单 ============== */
+// 设置持久化
+app.auth({ persistence: "local" });
+
+// 匿名登录函数
+async function ensureAnonymousLogin() {
+  try {
+    const loginState = await app.auth().getLoginState();
+    if (!loginState) {
+      await app.auth().anonymousAuthProvider().signIn();
+      console.log("✅ 匿名登录成功");
+    } else {
+      console.log("✅ 已有匿名登录态");
+    }
+  } catch (err) {
+    console.error("❌ 匿名登录失败:", err);
+    throw err;
+  }
+}
+
+// 加载学生名单
 async function loadStudents() {
   const select = document.getElementById('studentSelect');
   const msg = document.getElementById('studentLoadMsg');
   select.innerHTML = '<option value="" disabled selected>加载中…</option>';
   msg.textContent = '';
-
-  if (!cloudConnected) {
-    msg.textContent = '⚠️ 未连接云端，无法加载学生名单';
-    select.innerHTML = '<option value="" disabled selected>无法加载</option>';
-    return;
-  }
-
   try {
-    // 建议权限：所有用户可读取（或仅创建者可写）
-    const res = await db.collection('students').get();
-    const list = (res && res.data) ? res.data : [];
-
-    if (!Array.isArray(list) || list.length === 0) {
-      select.innerHTML = '<option value="" disabled selected>暂无学生，请在 CloudBase 添加</option>';
-      msg.textContent = '提示：到 CloudBase → students 集合添加形如 {"name":"张三"} 的文档';
-      console.log('ℹ️ students 集合返回为空:', res);
+    const res = await db.collection("students").get();
+    if (!res.data || res.data.length === 0) {
+      select.innerHTML = '<option value="" disabled selected>暂无学生</option>';
+      msg.textContent = '提示：请在 CloudBase → students 集合添加 {"name":"张三"}';
       return;
     }
-
-    list.sort((a,b) => (a.name || '').localeCompare(b.name || '','zh-Hans-CN'));
     select.innerHTML = '<option value="" disabled selected>选择学生姓名</option>';
-    list.forEach(item => {
-      if (!item || !item.name) return;
-      const opt = document.createElement('option');
-      opt.value = item.name;
-      opt.textContent = item.name;
-      select.appendChild(opt);
+    res.data.forEach(item => {
+      const option = document.createElement("option");
+      option.value = item.name;
+      option.textContent = item.name;
+      select.appendChild(option);
     });
-    console.log('✅ 学生名单已加载:', list.map(s=>s.name));
+    console.log("✅ 学生名单已加载:", res.data.map(s => s.name));
   } catch (err) {
-    console.error('❌ 加载学生名单失败:', err);
-    select.innerHTML = '<option value="" disabled selected>加载失败，请重试</option>';
-    msg.textContent = '错误：' + (err.message || err);
+    console.error("❌ 加载学生失败:", err);
+    select.innerHTML = '<option value="" disabled selected>加载失败</option>';
+    msg.textContent = "错误：" + (err.message || err);
   }
 }
 
-document.getElementById('reloadStudents').addEventListener('click', loadStudents);
-window.addEventListener('DOMContentLoaded', loadStudents);
+// 页面加载时
+window.addEventListener("DOMContentLoaded", async () => {
+  try {
+    await ensureAnonymousLogin();
+    await loadStudents();
+  } catch (e) {
+    document.getElementById("studentLoadMsg").textContent = "登录失败: " + (e.message || e);
+  }
+});
 
-/** ============== 选择学生后的简单展示 ============== */
-const studentSelect = document.getElementById('studentSelect');
-studentSelect.addEventListener('change', (e) => {
-  const name = e.target.value;
-  document.getElementById('overallStats').innerHTML = '当前学生：<b>' + name + '</b>';
+// 重新加载按钮
+document.getElementById("reloadStudents").addEventListener("click", async () => {
+  try {
+    await ensureAnonymousLogin();
+    await loadStudents();
+  } catch (e) {
+    document.getElementById("studentLoadMsg").textContent = "登录失败: " + (e.message || e);
+  }
 });
 </script>
 </body>
