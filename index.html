@@ -2,12 +2,14 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>英语提分系统(SDK 2.0版)</title>
+<title>英语提分系统</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 使用 CloudBase SDK 2.0 -->
-<script src="https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@2.0.1/dist/index.umd.js"></script>
+
+<!-- 使用腾讯云官方 CDN，适合中国大陆访问 -->
+<script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.5.0/cloudbase.full.js"></script>
+
 <style>
-  body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;background:#f3f4ff;color:#1f2749}
+  body{font-family:"Microsoft YaHei",Arial;margin:0;background:#f3f4ff;color:#1f2749}
   header{background:#6653ff;color:#fff;padding:20px;text-align:center}
   nav{margin-top:10px}
   nav a{color:#fff;text-decoration:none;margin:0 8px}
@@ -48,23 +50,23 @@ window.addEventListener('DOMContentLoaded', async () => {
   const studentSelect = document.getElementById('studentSelect');
   const msg = document.getElementById('studentLoadMsg');
   
-  // 检查 SDK
-  if (typeof window.cloudbase === 'undefined') {
+  // 检查 SDK - 注意：腾讯云 SDK 使用 cloudbase 对象
+  if (typeof cloudbase === 'undefined') {
     cs.textContent = 'SDK未加载';
     cs.classList.add('offline');
     messageDisplay.innerHTML = '<div class="error-msg">SDK 未加载,请检查网络连接</div>';
     return;
   }
   
-  console.log('SDK版本:', window.cloudbase.version || '未知');
+  console.log('SDK已加载');
   cs.textContent = 'SDK已加载';
   
   const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2";
   let app, db, auth;
   
   try {
-    // 使用新版SDK初始化方式
-    app = window.cloudbase.init({
+    // 使用腾讯云SDK初始化方式
+    app = cloudbase.init({
       env: CLOUD_ENV_ID
     });
     
@@ -125,11 +127,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       
       if (!list.length) {
         studentSelect.innerHTML = '<option value="" disabled selected>暂无学生</option>';
-        msg.textContent = '提示: 在 CloudBase → students 集合添加数据';
+        msg.textContent = '提示: 请先在教师端添加学生数据';
         messageDisplay.innerHTML = `
           <div class="error-msg">
             暂无学生数据<br>
-            请在腾讯云控制台的 students 集合中添加数据,格式: {"name":"张三"}
+            请在教师端添加学生，或在腾讯云控制台的 students 集合中添加数据
           </div>
         `;
         return;
@@ -164,13 +166,13 @@ window.addEventListener('DOMContentLoaded', async () => {
           解决方法:<br>
           1. 进入腾讯云 CloudBase 控制台<br>
           2. 数据库 → students 集合 → 权限设置<br>
-          3. 选择"所有用户-读取全部数据,修改本人数据"
+          3. 选择"所有用户可读，仅创建者可写"
         `;
       } else if (err.code && err.code.includes('AUTH')) {
         solution = `
           <strong>这是认证问题!</strong><br>
           解决方法:<br>
-          CloudBase 控制台 → 用户管理 → 登录授权 → 开启"匿名登录"
+          CloudBase 控制台 → 登录授权 → 开启"匿名登录"
         `;
       }
       

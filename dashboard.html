@@ -2,12 +2,14 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>教师端 Dashboard(SDK 2.0版)</title>
+<title>教师端 Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 使用 CloudBase SDK 2.0 -->
-<script src="https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@2.0.1/dist/index.umd.js"></script>
+
+<!-- 使用腾讯云官方 CDN，适合中国大陆访问 -->
+<script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.5.0/cloudbase.full.js"></script>
+
 <style>
-  body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;background:#f9faff;color:#1f2749}
+  body{font-family:"Microsoft YaHei",Arial;margin:0;background:#f9faff;color:#1f2749}
   header{background:#333;color:#fff;padding:20px;text-align:center}
   nav{margin-top:10px}
   nav a{color:#fff;text-decoration:none;margin:0 8px}
@@ -46,13 +48,14 @@
 window.addEventListener('DOMContentLoaded', async () => {
   const statusMsg = document.getElementById('statusMsg');
   
-  if (typeof window.cloudbase === 'undefined') {
+  // 检查 SDK - 注意：腾讯云 SDK 使用 cloudbase 对象
+  if (typeof cloudbase === 'undefined') {
     statusMsg.textContent = "SDK 未加载,请检查网络连接";
     statusMsg.classList.add('error');
     return;
   }
   
-  console.log('SDK版本:', window.cloudbase.version || '未知');
+  console.log('SDK已加载');
   statusMsg.textContent = "SDK 已加载";
   statusMsg.classList.add('success');
   
@@ -60,7 +63,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   let app, auth, db;
   
   try {
-    app = window.cloudbase.init({ env: CLOUD_ENV_ID });
+    app = cloudbase.init({ env: CLOUD_ENV_ID });
     auth = app.auth({ persistence: "local" });
     db = app.database();
     statusMsg.textContent = "云开发已初始化";
