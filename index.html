@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>英语提分系统（本地SDK最终版）</title>
+<title>英语提分系统（最终修复版）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="./vendor/cloudbase.full.min.js"></script>
 <style>
@@ -43,6 +43,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   cs.textContent = '✅ SDK 已加载';
+
   const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2";
   let app, db, auth;
   try {
@@ -56,6 +57,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.error(e);
     return;
   }
+
   async function ensureAnonymousLogin() {
     try {
       const loginState = await auth.getLoginState();
@@ -71,6 +73,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       throw err;
     }
   }
+
   async function loadStudents() {
     const select = document.getElementById('studentSelect');
     const msg    = document.getElementById('studentLoadMsg');
@@ -100,6 +103,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       console.error('❌ 加载学生失败:', err);
     }
   }
+
   try { await ensureAnonymousLogin(); await loadStudents(); } catch(e){}
   document.getElementById('reloadStudents').addEventListener('click', async () => {
     try { await ensureAnonymousLogin(); await loadStudents(); } catch(e){}

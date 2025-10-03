@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>教师端 Dashboard</title>
+<title>教师端 Dashboard（最终修复版）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <script src="./vendor/cloudbase.full.min.js"></script>
 <style>
@@ -47,12 +47,14 @@ window.addEventListener('DOMContentLoaded', async () => {
   const app = cloudbase.init({ env: CLOUD_ENV_ID });
   const auth = app.auth({ persistence: "local" });
   const db = app.database();
+
   async function ensureLogin() {
     const loginState = await auth.getLoginState();
     if (!loginState) {
       await auth.anonymousAuthProvider().signIn();
     }
   }
+
   async function loadStudents() {
     await ensureLogin();
     const res = await db.collection("students").get();
@@ -67,6 +69,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       list.appendChild(li);
     });
   }
+
   window.addStudent = async function() {
     const name = document.getElementById("studentName").value.trim();
     if (!name) return alert("请输入姓名");
@@ -75,12 +78,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById("studentName").value = "";
     loadStudents();
   }
+
   window.deleteStudent = async function(id) {
     if (!confirm("确定删除该学生？")) return;
     await ensureLogin();
     await db.collection("students").doc(id).remove();
     loadStudents();
   }
+
   loadStudents();
 });
 </script>
