@@ -5,7 +5,7 @@
 <title>英语提分系统</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- 使用腾讯云官方 CDN，适合中国大陆访问 -->
+<!-- 方案1: 腾讯云官方 CDN -->
 <script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.5.0/cloudbase.full.js"></script>
 
 <style>
@@ -25,6 +25,7 @@
   .box{padding:16px;border:1px solid #eee;border-radius:10px}
   .error-msg{background:#ffebee;border-left:4px solid #f44336;padding:15px;margin:10px 0;border-radius:5px}
   .success-msg{background:#e8f5e9;border-left:4px solid #4caf50;padding:15px;margin:10px 0;border-radius:5px}
+  .warning-msg{background:#fff3cd;border-left:4px solid #ffc107;padding:15px;margin:10px 0;border-radius:5px}
 </style>
 </head>
 <body>
@@ -40,33 +41,133 @@
   <div id="messageDisplay"></div>
   <select id="studentSelect"></select>
   <button id="reloadStudents">重新加载学生</button>
+  <button onclick="testSDK()">测试SDK</button>
   <div id="studentLoadMsg" class="hint"></div>
 </main>
 
 <script>
-window.addEventListener('DOMContentLoaded', async () => {
+// 等待页面加载完成
+window.addEventListener('DOMContentLoaded', function() {
+  console.log('页面加载完成，开始检测SDK...');
+  
+  // 延迟500ms确保SDK加载
+  setTimeout(function() {
+    initializeApp();
+  }, 500);
+});
+
+// 测试SDK函数
+function testSDK() {
+  const messageDisplay = document.getElementById('messageDisplay');
+  let testResults = '<div class="warning-msg"><strong>SDK 检测结果：</strong><br>';
+  
+  // 检测所有可能的SDK对象
+  const checks = {
+    'cloudbase': typeof cloudbase !== 'undefined' ? '✓ 存在' : '✗ 不存在',
+    'window.cloudbase': typeof window.cloudbase !== 'undefined' ? '✓ 存在' : '✗ 不存在',
+    'tcb': typeof tcb !== 'undefined' ? '✓ 存在' : '✗ 不存在',
+    'window.tcb': typeof window.tcb !== 'undefined' ? '✓ 存在' : '✗ 不存在'
+  };
+  
+  for (let key in checks) {
+    testResults += key + ': ' + checks[key] + '<br>';
+  }
+  
+  testResults += '</div>';
+  messageDisplay.innerHTML = testResults;
+  
+  // 如果找不到SDK，尝试动态加载
+  if (typeof cloudbase === 'undefined' && typeof tcb === 'undefined') {
+    loadBackupSDK();
+  }
+}
+
+// 动态加载备用SDK
+function loadBackupSDK() {
+  console.log('尝试加载备用SDK...');
+  const messageDisplay = document.getElementById('messageDisplay');
+  
+  // 尝试列表
+  const cdnList = [
+    'https://imgcache.qq.com/qcloud/tcbjs/1.10.10/tcb.js',
+    'https://web.sdk.qcloud.com/cloudbase/2.5.1/cloudbase.full.js',
+    'https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.5.1/cloudbase.full.js'
+  ];
+  
+  let currentIndex = 0;
+  
+  function tryNextCDN() {
+    if (currentIndex >= cdnList.length) {
+      messageDisplay.innerHTML += '<div class="error-msg">所有CDN都无法加载，请下载SDK到本地服务器</div>';
+      return;
+    }
+    
+    const script = document.createElement('script');
+    script.src = cdnList[currentIndex];
+    script.onload = function() {
+      console.log('备用CDN加载成功: ' + cdnList[currentIndex]);
+      messageDisplay.innerHTML += '<div class="success-msg">备用CDN加载成功！</div>';
+      setTimeout(initializeApp, 100);
+    };
+    script.onerror = function() {
+      console.log('CDN加载失败: ' + cdnList[currentIndex]);
+      currentIndex++;
+      tryNextCDN();
+    };
+    document.head.appendChild(script);
+  }
+  
+  tryNextCDN();
+}
+
+// 初始化应用
+function initializeApp() {
   const cs = document.getElementById('cloudStatus');
   const messageDisplay = document.getElementById('messageDisplay');
   const studentSelect = document.getElementById('studentSelect');
   const msg = document.getElementById('studentLoadMsg');
   
-  // 检查 SDK - 注意：腾讯云 SDK 使用 cloudbase 对象
-  if (typeof cloudbase === 'undefined') {
-    cs.textContent = 'SDK未加载';
+  // 查找SDK对象
+  let sdk = null;
+  if (typeof cloudbase !== 'undefined') {
+    sdk = cloudbase;
+    console.log('使用 cloudbase 对象');
+  } else if (typeof window.cloudbase !== 'undefined') {
+    sdk = window.cloudbase;
+    console.log('使用 window.cloudbase 对象');
+  } else if (typeof tcb !== 'undefined') {
+    sdk = tcb;
+    console.log('使用 tcb 对象');
+  } else if (typeof window.tcb !== 'undefined') {
+    sdk = window.tcb;
+    console.log('使用 window.tcb 对象');
+  }
+  
+  if (!sdk) {
+    cs.textContent = 'SDK未找到';
     cs.classList.add('offline');
-    messageDisplay.innerHTML = '<div class="error-msg">SDK 未加载,请检查网络连接</div>';
+    messageDisplay.innerHTML = `
+      <div class="error-msg">
+        <strong>SDK 未能加载</strong><br>
+        请尝试以下方法：<br>
+        1. 点击"测试SDK"按钮<br>
+        2. 刷新页面（Ctrl+F5）<br>
+        3. 下载SDK文件到本地服务器
+      </div>
+    `;
     return;
   }
   
-  console.log('SDK已加载');
   cs.textContent = 'SDK已加载';
+  cs.classList.add('success');
+  console.log('SDK加载成功，开始初始化...');
   
   const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2";
   let app, db, auth;
   
   try {
-    // 使用腾讯云SDK初始化方式
-    app = cloudbase.init({
+    // 初始化
+    app = sdk.init({
       env: CLOUD_ENV_ID
     });
     
@@ -76,18 +177,30 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     db = app.database();
     
-    cs.textContent = '云端已初始化';
+    cs.textContent = '云端已连接';
     cs.classList.add('success');
     console.log('CloudBase初始化成功');
+    
+    // 开始加载数据
+    startLoadingData(auth, db, messageDisplay, studentSelect, msg);
     
   } catch (e) {
     cs.textContent = '初始化失败';
     cs.classList.add('offline');
-    messageDisplay.innerHTML = `<div class="error-msg">云端初始化失败: ${e.message}</div>`;
+    messageDisplay.innerHTML = `
+      <div class="error-msg">
+        <strong>云端初始化失败</strong><br>
+        错误: ${e.message}<br>
+        请检查环境ID是否正确
+      </div>
+    `;
     console.error('初始化失败:', e);
-    return;
   }
+}
 
+// 加载数据
+async function startLoadingData(auth, db, messageDisplay, studentSelect, msg) {
+  // 确保登录
   async function ensureAnonymousLogin() {
     try {
       const loginState = await auth.getLoginState();
@@ -95,53 +208,55 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.log('开始匿名登录...');
         await auth.anonymousAuthProvider().signIn();
         console.log('匿名登录成功');
+        return true;
       } else {
         console.log('已有登录态');
+        return true;
       }
     } catch (err) {
       console.error('登录失败:', err);
       messageDisplay.innerHTML = `
         <div class="error-msg">
           <strong>登录失败</strong><br>
-          ${err.message}<br><br>
-          请确认已在腾讯云控制台开启"匿名登录"
+          ${err.message}<br>
+          请确认腾讯云控制台已开启"匿名登录"
         </div>
       `;
-      throw err;
+      return false;
     }
   }
-
+  
+  // 加载学生数据
   async function loadStudents() {
     studentSelect.innerHTML = '<option value="" disabled selected>加载中...</option>';
     msg.textContent = '';
-    messageDisplay.innerHTML = '';
     
     try {
-      await ensureAnonymousLogin();
+      const loginSuccess = await ensureAnonymousLogin();
+      if (!loginSuccess) return;
       
       console.log('开始读取students集合...');
       const res = await db.collection('students').get();
-      console.log('数据读取成功:', res);
+      console.log('数据读取结果:', res);
       
       const list = res && res.data ? res.data : [];
       
       if (!list.length) {
         studentSelect.innerHTML = '<option value="" disabled selected>暂无学生</option>';
-        msg.textContent = '提示: 请先在教师端添加学生数据';
+        msg.textContent = '请在教师端添加学生数据';
         messageDisplay.innerHTML = `
-          <div class="error-msg">
+          <div class="warning-msg">
             暂无学生数据<br>
-            请在教师端添加学生，或在腾讯云控制台的 students 集合中添加数据
+            请访问教师端添加学生
           </div>
         `;
         return;
       }
       
-      list.sort((a,b)=>(a.name||'').localeCompare(b.name||'','zh-Hans-CN'));
-      studentSelect.innerHTML = '<option value="" disabled selected>选择学生姓名</option>';
+      studentSelect.innerHTML = '<option value="" disabled selected>请选择学生</option>';
       
-      list.forEach(item=>{
-        if(!item || !item.name) return;
+      list.forEach(item => {
+        if (!item || !item.name) return;
         const opt = document.createElement('option');
         opt.value = item.name;
         opt.textContent = item.name;
@@ -151,58 +266,53 @@ window.addEventListener('DOMContentLoaded', async () => {
       messageDisplay.innerHTML = `<div class="success-msg">成功加载 ${list.length} 个学生</div>`;
       msg.textContent = `已加载 ${list.length} 个学生`;
       msg.style.color = '#0a0';
-      console.log('学生列表已显示:', list.map(s=>s.name));
       
     } catch (err) {
       console.error('加载失败:', err);
       studentSelect.innerHTML = '<option value="" disabled selected>加载失败</option>';
       
-      let errorMsg = err.message || err;
       let solution = '';
-      
-      if (err.code === 'DATABASE_PERMISSION_DENIED' || errorMsg.includes('permission')) {
-        solution = `
-          <strong>这是权限问题!</strong><br>
-          解决方法:<br>
-          1. 进入腾讯云 CloudBase 控制台<br>
-          2. 数据库 → students 集合 → 权限设置<br>
-          3. 选择"所有用户可读，仅创建者可写"
-        `;
+      if (err.code === 'DATABASE_PERMISSION_DENIED' || err.message.includes('permission')) {
+        solution = '请检查数据库权限设置';
       } else if (err.code && err.code.includes('AUTH')) {
-        solution = `
-          <strong>这是认证问题!</strong><br>
-          解决方法:<br>
-          CloudBase 控制台 → 登录授权 → 开启"匿名登录"
-        `;
+        solution = '请检查匿名登录设置';
       }
       
       messageDisplay.innerHTML = `
         <div class="error-msg">
           <strong>数据加载失败</strong><br>
-          错误: ${errorMsg}<br>
-          错误代码: ${err.code || '无'}<br><br>
+          错误: ${err.message}<br>
           ${solution}
         </div>
       `;
     }
   }
-
-  // 初始加载
-  try {
-    await loadStudents();
-  } catch (e) {
-    console.error('初始加载失败:', e);
-  }
   
-  // 重新加载按钮
-  document.getElementById('reloadStudents').addEventListener('click', async () => {
-    try {
-      await loadStudents();
-    } catch (e) {
-      console.error('重新加载失败:', e);
-    }
-  });
-});
+  // 绑定重新加载按钮
+  document.getElementById('reloadStudents').onclick = loadStudents;
+  
+  // 开始加载
+  await loadStudents();
+}
 </script>
+
+<!-- 备用方案：如果主CDN失败，自动尝试其他CDN -->
+<script>
+setTimeout(function() {
+  if (typeof cloudbase === 'undefined' && typeof tcb === 'undefined') {
+    console.log('主CDN加载失败，尝试备用CDN...');
+    var script = document.createElement('script');
+    script.src = 'https://imgcache.qq.com/qcloud/tcbjs/1.10.10/tcb.js';
+    script.onload = function() {
+      console.log('备用CDN加载成功');
+      if (typeof initializeApp === 'function') {
+        initializeApp();
+      }
+    };
+    document.head.appendChild(script);
+  }
+}, 2000);
+</script>
+
 </body>
 </html>
