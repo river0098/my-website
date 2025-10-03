@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>批量导入学生名单</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@2.0.1/dist/index.umd.js"></script>
+<style>
+  body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;background:#f3f4ff;color:#1f2749}
+  header{background:#6653ff;color:#fff;padding:20px;text-align:center}
+  main{max-width:880px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+  textarea{width:100%;min-height:300px;padding:10px;border:1px solid #ccc;border-radius:8px;font-size:14px;font-family:inherit}
+  button{padding:10px 20px;margin:10px 5px;border-radius:8px;border:none;cursor:pointer;font-size:15px}
+  .primary-btn{background:#6653ff;color:#fff}
+  .primary-btn:hover{background:#4a3dd9}
+  .danger-btn{background:#e33;color:#fff}
+  .danger-btn:hover{background:#c11}
+  .status{padding:15px;margin:10px 0;border-radius:8px;border-left:4px solid}
+  .success{background:#e8f5e9;border-color:#4caf50;color:#2e7d32}
+  .error{background:#ffebee;border-color:#f44336;color:#c62828}
+  .warning{background:#fff3e0;border-color:#ff9800;color:#e65100}
+  .info{background:#e3f2fd;border-color:#2196f3;color:#1565c0}
+  .log{background:#f5f5f5;padding:10px;border-radius:5px;max-height:200px;overflow-y:auto;font-size:13px;margin-top:10px}
+  .hint{font-size:13px;color:#666;margin:10px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>批量导入学生名单</h1>
+</header>
+<main>
+  <div id="statusDisplay"></div>
+  
+  <h2>步骤1: 输入学生名单</h2>
+  <p class="hint">每行一个学生姓名,系统会自动过滤空行</p>
+  <textarea id="studentNames" placeholder="焦良瑾
+庄优岳
+曾媛媛
+...">焦良瑾
+庄优岳
+曾媛媛
+陈伟聪
+李煜文
+吴沛宜
+王泽霖
+吴苑萍
+陈佳琳
+黄钰莹
+刘文锋
+杨淳好
+刘欣
+梁鸿浩
+杨映春
+甘紫渊
+黄书慧
+谭铠淇
+叶蕙仪
+王诗涵
+谢家锐
+张育东
+余乐欢
+余欣莹
+何厚玮
+李襄
+曹淑怡
+王馨怡
+叶思翰</textarea>
+  
+  <h2>步骤2: 导入操作</h2>
+  <button class="primary-btn" onclick="importStudents()">开始导入</button>
+  <button class="danger-btn" onclick="clearAll()">清空所有学生(危险)</button>
+  
+  <div id="importLog"></div>
+</main>
+
+<script>
+const statusDisplay = document.getElementById('statusDisplay');
+const importLog = document.getElementById('importLog');
+
+let app, db, auth;
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (typeof window.cloudbase === 'undefined') {
+    statusDisplay.innerHTML = '<div class="status error">SDK未加载,请检查网络连接</div>';
+    return;
+  }
+  
+  const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2";
+  
+  try {
+    app = window.cloudbase.init({ env: CLOUD_ENV_ID });
+    auth = app.auth({ persistence: "local" });
+    db = app.database();
+    
+    await ensureLogin();
+    statusDisplay.innerHTML = '<div class="status success">系统初始化成功,可以开始导入</div>';
+    
+  } catch (e) {
+    statusDisplay.innerHTML = `<div class="status error">初始化失败: ${e.message}</div>`;
+    console.error(e);
+  }
+});
+
+async function ensureLogin() {
+  const loginState = await auth.getLoginState();
+  if (!loginState) {
+    await auth.anonymousAuthProvider().signIn();
+    console.log('匿名登录成功');
+  }
+}
+
+async function importStudents() {
+  const textarea = document.getElementById('studentNames');
+  const text = textarea.value.trim();
+  
+  if (!text) {
+    statusDisplay.innerHTML = '<div class="status warning">请输入学生名单</div>';
+    return;
+  }
+  
+  // 分割并过滤空行
+  const names = text.split('\n')
+    .map(name => name.trim())
+    .filter(name => name.length > 0);
+  
+  if (names.length === 0) {
+    statusDisplay.innerHTML = '<div class="status warning">没有有效的学生姓名</div>';
+    return;
+  }
+  
+  statusDisplay.innerHTML = `<div class="status info">准备导入 ${names.length} 个学生...</div>`;
+  importLog.innerHTML = '<div class="log">开始导入...<br></div>';
+  
+  let successCount = 0;
+  let failCount = 0;
+  const logDiv = importLog.querySelector('.log');
+  
+  try {
+    await ensureLogin();
+    
+    for (let i = 0; i < names.length; i++) {
+      const name = names[i];
+      try {
+        await db.collection('students').add({ name: name });
+        successCount++;
+        logDiv.innerHTML += `✓ [${i+1}/${names.length}] 成功: ${name}<br>`;
+        console.log(`导入成功: ${name}`);
+      } catch (err) {
+        failCount++;
+        logDiv.innerHTML += `✗ [${i+1}/${names.length}] 失败: ${name} (${err.message})<br>`;
+        console.error(`导入失败: ${name}`, err);
+      }
+      
+      // 滚动到底部
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+    
+    const resultHTML = `
+      <div class="status ${failCount > 0 ? 'warning' : 'success'}">
+        导入完成!<br>
+        成功: ${successCount} 个<br>
+        失败: ${failCount} 个<br>
+        总计: ${names.length} 个
+      </div>
+    `;
+    statusDisplay.innerHTML = resultHTML;
+    logDiv.innerHTML += '<br>===== 导入完成 =====';
+    
+  } catch (err) {
+    statusDisplay.innerHTML = `<div class="status error">导入过程出错: ${err.message}</div>`;
+    console.error('导入失败:', err);
+  }
+}
+
+async function clearAll() {
+  if (!confirm('确定要删除所有学生吗?此操作不可恢复!')) {
+    return;
+  }
+  
+  if (!confirm('再次确认:真的要删除所有学生数据吗?')) {
+    return;
+  }
+  
+  statusDisplay.innerHTML = '<div class="status warning">正在删除所有学生...</div>';
+  
+  try {
+    await ensureLogin();
+    
+    // 获取所有学生
+    const res = await db.collection('students').get();
+    const students = res.data;
+    
+    if (students.length === 0) {
+      statusDisplay.innerHTML = '<div class="status info">数据库中没有学生数据</div>';
+      return;
+    }
+    
+    // 逐个删除
+    let deleteCount = 0;
+    for (const student of students) {
+      await db.collection('students').doc(student._id).remove();
+      deleteCount++;
+    }
+    
+    statusDisplay.innerHTML = `<div class="status success">已删除 ${deleteCount} 个学生</div>`;
+    importLog.innerHTML = '';
+    
+  } catch (err) {
+    statusDisplay.innerHTML = `<div class="status error">删除失败: ${err.message}</div>`;
+    console.error('删除失败:', err);
+  }
+}
+</script>
+</body>
+</html>
