@@ -2,9 +2,10 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>英语提分系统（最终修复版）</title>
+<title>英语提分系统(最终修复版)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="./vendor/cloudbase.full.min.js"></script>
+<!-- 使用腾讯云 CDN 引入 CloudBase SDK -->
+<script src="https://web.sdk.qcloud.com/cloudbase-js-sdk/latest/cloudbase.full.js"></script>
 <style>
   body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;background:#f3f4ff;color:#1f2749}
   header{background:#6653ff;color:#fff;padding:20px;text-align:center}
@@ -14,6 +15,7 @@
   main{max-width:880px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
   select,button{padding:10px 14px;margin:5px;border-radius:8px;border:1px solid #ccc;font-size:15px}
   button{background:#6653ff;color:#fff;border:none;cursor:pointer}
+  button:hover{background:#4a3dd9}
   .cloud-status{font-size:14px;margin-left:10px}
   .cloud-status.offline{color:#e33}
   .hint{font-size:13px;color:#6d7691}
@@ -38,7 +40,7 @@
 window.addEventListener('DOMContentLoaded', async () => {
   const cs = document.getElementById('cloudStatus');
   if (typeof window.cloudbase === 'undefined') {
-    cs.textContent = '❌ SDK未加载，请确认 vendor/cloudbase.full.min.js 已上传且路径正确';
+    cs.textContent = '❌ SDK未加载,请检查网络连接';
     cs.classList.add('offline');
     return;
   }
@@ -68,7 +70,7 @@ window.addEventListener('DOMContentLoaded', async () => {
         console.log('✅ 已有匿名登录态');
       }
     } catch (err) {
-      document.getElementById('studentLoadMsg').textContent = '登录失败：' + (err.message || err);
+      document.getElementById('studentLoadMsg').textContent = '登录失败:' + (err.message || err);
       console.error('❌ 匿名登录失败:', err);
       throw err;
     }
@@ -84,7 +86,7 @@ window.addEventListener('DOMContentLoaded', async () => {
       const list = res && res.data ? res.data : [];
       if (!list.length) {
         select.innerHTML = '<option value="" disabled selected>暂无学生</option>';
-        msg.textContent = '提示：在 CloudBase → students 集合添加 {"name":"张三"}';
+        msg.textContent = '提示:在 CloudBase → students 集合添加 {"name":"张三"}';
         return;
       }
       list.sort((a,b)=>(a.name||'').localeCompare(b.name||'','zh-Hans-CN'));
@@ -96,10 +98,10 @@ window.addEventListener('DOMContentLoaded', async () => {
         opt.textContent = item.name;
         select.appendChild(opt);
       });
-      console.log('✅ 学生名单已加载：', list.map(s=>s.name));
+      console.log('✅ 学生名单已加载:', list.map(s=>s.name));
     } catch (err) {
       select.innerHTML = '<option value="" disabled selected>加载失败</option>';
-      msg.textContent  = '错误：' + (err.message || err);
+      msg.textContent  = '错误:' + (err.message || err);
       console.error('❌ 加载学生失败:', err);
     }
   }
