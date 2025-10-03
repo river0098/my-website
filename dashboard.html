@@ -5,7 +5,7 @@
 <title>教师端 Dashboard</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- 使用腾讯云官方 CDN，适合中国大陆访问 -->
+<!-- 腾讯云 CloudBase SDK -->
 <script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.5.0/cloudbase.full.js"></script>
 
 <style>
@@ -15,16 +15,21 @@
   nav a{color:#fff;text-decoration:none;margin:0 8px}
   nav a:hover{text-decoration:underline}
   main{max-width:880px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
-  input,button{padding:8px 12px;margin:5px;border-radius:8px;border:1px solid #ccc;font-size:14px}
-  button{cursor:pointer;background:#6653ff;color:#fff;border:none}
+  .status-box{background:#f8f9fa;padding:15px;border-radius:8px;margin:10px 0}
+  .success{color:#28a745;font-weight:bold}
+  .error{color:#dc3545;font-weight:bold}
+  .warning{color:#ffc107;font-weight:bold}
+  .info{color:#17a2b8}
+  input,button{padding:10px 14px;margin:5px;border-radius:6px;border:1px solid #ced4da;font-size:14px}
+  button{background:#6653ff;color:#fff;border:none;cursor:pointer}
   button:hover{background:#4a3dd9}
-  ul{list-style:none;padding:0}
-  li{padding:6px 0;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
-  .delete-btn{background:#e33}
-  .delete-btn:hover{background:#c11}
-  .status{font-size:14px;padding:10px;margin:10px 0;border-radius:5px}
-  .status.success{background:#e8f5e9;color:#2e7d32}
-  .status.error{background:#ffebee;color:#c62828}
+  ul{list-style:none;padding:0;margin-top:20px}
+  li{padding:12px;border:1px solid #e9ecef;margin:8px 0;border-radius:6px;display:flex;justify-content:space-between;align-items:center;background:#fff}
+  li:hover{background:#f8f9fa;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+  .delete-btn{background:#dc3545;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px}
+  .delete-btn:hover{background:#c82333}
+  .student-name{font-size:16px;color:#495057}
+  .empty-state{text-align:center;padding:40px;color:#6c757d}
 </style>
 </head>
 <body>
@@ -35,130 +40,233 @@
     <a href="dashboard.html">教师端</a>
   </nav>
 </header>
+
 <main>
-  <div id="statusMsg" class="status">正在初始化...</div>
-  <h2>学生管理</h2>
-  <div>
-    <input type="text" id="studentName" placeholder="输入学生姓名">
-    <button onclick="addStudent()">添加学生</button>
+  <div class="status-box">
+    <h3>系统状态</h3>
+    <div id="statusMsg">正在初始化...</div>
   </div>
-  <ul id="studentList"></ul>
+  
+  <div class="status-box">
+    <h3>学生管理</h3>
+    <div style="display:flex;align-items:center">
+      <input type="text" id="studentName" placeholder="输入学生姓名" style="flex:1">
+      <button onclick="addStudent()">添加学生</button>
+    </div>
+  </div>
+  
+  <div id="listContainer">
+    <h3>学生列表</h3>
+    <ul id="studentList">
+      <li class="empty-state">加载中...</li>
+    </ul>
+  </div>
 </main>
+
 <script>
-window.addEventListener('DOMContentLoaded', async () => {
+// 全局变量
+let app = null;
+let auth = null;
+let db = null;
+
+// 页面加载完成后初始化
+window.addEventListener('DOMContentLoaded', function() {
+  setTimeout(initApp, 500);
+});
+
+// 初始化应用
+async function initApp() {
   const statusMsg = document.getElementById('statusMsg');
   
-  // 检查 SDK - 注意：腾讯云 SDK 使用 cloudbase 对象
+  // 检查SDK
   if (typeof cloudbase === 'undefined') {
-    statusMsg.textContent = "SDK 未加载,请检查网络连接";
-    statusMsg.classList.add('error');
+    statusMsg.innerHTML = '<span class="error">✗ SDK 未加载，请检查网络连接</span>';
     return;
   }
   
-  console.log('SDK已加载');
-  statusMsg.textContent = "SDK 已加载";
-  statusMsg.classList.add('success');
-  
-  const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2";
-  let app, auth, db;
+  statusMsg.innerHTML = '<span class="success">✓ SDK 已加载</span>';
   
   try {
-    app = cloudbase.init({ env: CLOUD_ENV_ID });
-    auth = app.auth({ persistence: "local" });
+    // 初始化CloudBase
+    app = cloudbase.init({
+      env: 'cloud1-8gxc5t0wed3aa3e2'
+    });
+    
+    // 设置认证
+    auth = app.auth({
+      persistence: 'local'
+    });
+    
+    // 获取数据库引用
     db = app.database();
-    statusMsg.textContent = "云开发已初始化";
-    console.log('初始化成功');
-  } catch (e) {
-    statusMsg.textContent = "云开发初始化失败: " + (e.message || e);
-    statusMsg.classList.remove('success');
-    statusMsg.classList.add('error');
-    console.error(e);
-    return;
+    
+    statusMsg.innerHTML = '<span class="success">✓ 云开发已初始化</span>';
+    
+    // 确保登录
+    await ensureLogin();
+    
+    // 加载学生列表
+    await loadStudents();
+    
+  } catch (error) {
+    statusMsg.innerHTML = '<span class="error">✗ 初始化失败: ' + error.message + '</span>';
+    console.error('初始化失败:', error);
   }
+}
 
-  async function ensureLogin() {
+// 确保登录
+async function ensureLogin() {
+  const statusMsg = document.getElementById('statusMsg');
+  
+  try {
     const loginState = await auth.getLoginState();
+    
     if (!loginState) {
+      statusMsg.innerHTML = '<span class="info">正在进行匿名登录...</span>';
       await auth.anonymousAuthProvider().signIn();
-      console.log('匿名登录成功');
+      statusMsg.innerHTML = '<span class="success">✓ 匿名登录成功</span>';
+    } else {
+      statusMsg.innerHTML = '<span class="success">✓ 已登录</span>';
     }
-  }
-
-  async function loadStudents() {
-    try {
-      await ensureLogin();
-      const res = await db.collection("students").get();
-      const list = document.getElementById("studentList");
-      list.innerHTML = "";
-      
-      if (!res.data || res.data.length === 0) {
-        list.innerHTML = '<li style="color:#999">暂无学生数据</li>';
-        statusMsg.textContent = '暂无学生数据';
-        statusMsg.classList.add('error');
-        return;
-      }
-      
-      res.data.forEach(item => {
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <span>${item.name}</span>
-          <button class="delete-btn" onclick="deleteStudent('${item._id}')">删除</button>
-        `;
-        list.appendChild(li);
-      });
-      
-      statusMsg.textContent = `已加载 ${res.data.length} 个学生`;
-      statusMsg.classList.remove('error');
-      statusMsg.classList.add('success');
-    } catch (err) {
-      statusMsg.textContent = "加载失败: " + (err.message || err);
-      statusMsg.classList.remove('success');
-      statusMsg.classList.add('error');
-      console.error('加载学生失败:', err);
+    
+    return true;
+    
+  } catch (error) {
+    statusMsg.innerHTML = '<span class="error">✗ 登录失败: ' + error.message + '</span>';
+    
+    if (error.message && error.message.includes('ACCESS_TOKEN_DISABLED')) {
+      statusMsg.innerHTML += '<br><span class="warning">请在腾讯云控制台开启匿名登录</span>';
     }
+    
+    console.error('登录失败:', error);
+    return false;
   }
+}
 
-  window.addStudent = async function() {
-    const name = document.getElementById("studentName").value.trim();
-    if (!name) {
-      alert("请输入姓名");
+// 加载学生列表
+async function loadStudents() {
+  const list = document.getElementById('studentList');
+  const statusMsg = document.getElementById('statusMsg');
+  
+  try {
+    // 确保已登录
+    const loginSuccess = await ensureLogin();
+    if (!loginSuccess) return;
+    
+    // 读取学生数据
+    const res = await db.collection('students').get();
+    
+    // 清空列表
+    list.innerHTML = '';
+    
+    if (!res.data || res.data.length === 0) {
+      list.innerHTML = '<li class="empty-state">暂无学生数据，请添加学生</li>';
+      statusMsg.innerHTML = '<span class="warning">暂无学生数据</span>';
       return;
     }
     
-    try {
-      await ensureLogin();
-      await db.collection("students").add({ name });
-      document.getElementById("studentName").value = "";
-      statusMsg.textContent = `已添加学生: ${name}`;
-      statusMsg.classList.add('success');
-      loadStudents();
-    } catch (err) {
-      statusMsg.textContent = "添加失败: " + (err.message || err);
-      statusMsg.classList.remove('success');
-      statusMsg.classList.add('error');
-      console.error('添加学生失败:', err);
-    }
-  }
-
-  window.deleteStudent = async function(id) {
-    if (!confirm("确定删除该学生?")) return;
+    // 显示学生列表
+    res.data.forEach(student => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span class="student-name">📚 ${student.name}</span>
+        <button class="delete-btn" onclick="deleteStudent('${student._id}')">删除</button>
+      `;
+      list.appendChild(li);
+    });
     
-    try {
-      await ensureLogin();
-      await db.collection("students").doc(id).remove();
-      statusMsg.textContent = "已删除学生";
-      statusMsg.classList.add('success');
-      loadStudents();
-    } catch (err) {
-      statusMsg.textContent = "删除失败: " + (err.message || err);
-      statusMsg.classList.remove('success');
-      statusMsg.classList.add('error');
-      console.error('删除学生失败:', err);
+    statusMsg.innerHTML = '<span class="success">✓ 已加载 ' + res.data.length + ' 个学生</span>';
+    
+  } catch (error) {
+    list.innerHTML = '<li class="empty-state">加载失败: ' + error.message + '</li>';
+    statusMsg.innerHTML = '<span class="error">✗ 加载失败: ' + error.message + '</span>';
+    
+    if (error.code === 'DATABASE_PERMISSION_DENIED') {
+      statusMsg.innerHTML += '<br><span class="warning">请设置数据库权限为"所有用户可读"</span>';
     }
+    
+    console.error('加载学生失败:', error);
   }
+}
 
-  loadStudents();
-});
+// 添加学生
+window.addStudent = async function() {
+  const nameInput = document.getElementById('studentName');
+  const name = nameInput.value.trim();
+  const statusMsg = document.getElementById('statusMsg');
+  
+  if (!name) {
+    alert('请输入学生姓名');
+    return;
+  }
+  
+  if (!db) {
+    alert('系统未初始化');
+    return;
+  }
+  
+  try {
+    // 确保已登录
+    const loginSuccess = await ensureLogin();
+    if (!loginSuccess) return;
+    
+    statusMsg.innerHTML = '<span class="info">正在添加...</span>';
+    
+    // 添加到数据库
+    await db.collection('students').add({
+      name: name,
+      createdAt: new Date().toISOString()
+    });
+    
+    // 清空输入框
+    nameInput.value = '';
+    
+    // 显示成功消息
+    statusMsg.innerHTML = '<span class="success">✓ 已添加学生: ' + name + '</span>';
+    
+    // 重新加载列表
+    await loadStudents();
+    
+  } catch (error) {
+    statusMsg.innerHTML = '<span class="error">✗ 添加失败: ' + error.message + '</span>';
+    console.error('添加学生失败:', error);
+  }
+}
+
+// 删除学生
+window.deleteStudent = async function(id) {
+  if (!confirm('确定要删除该学生吗？')) {
+    return;
+  }
+  
+  const statusMsg = document.getElementById('statusMsg');
+  
+  if (!db) {
+    alert('系统未初始化');
+    return;
+  }
+  
+  try {
+    // 确保已登录
+    const loginSuccess = await ensureLogin();
+    if (!loginSuccess) return;
+    
+    statusMsg.innerHTML = '<span class="info">正在删除...</span>';
+    
+    // 从数据库删除
+    await db.collection('students').doc(id).remove();
+    
+    statusMsg.innerHTML = '<span class="success">✓ 已删除学生</span>';
+    
+    // 重新加载列表
+    await loadStudents();
+    
+  } catch (error) {
+    statusMsg.innerHTML = '<span class="error">✗ 删除失败: ' + error.message + '</span>';
+    console.error('删除学生失败:', error);
+  }
+}
 </script>
+
 </body>
 </html>

@@ -5,7 +5,7 @@
 <title>英语提分系统</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<!-- 方案1: 腾讯云官方 CDN -->
+<!-- 腾讯云 CloudBase SDK -->
 <script src="https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.5.0/cloudbase.full.js"></script>
 
 <style>
@@ -18,300 +18,218 @@
   select,button{padding:10px 14px;margin:5px;border-radius:8px;border:1px solid #ccc;font-size:15px}
   button{background:#6653ff;color:#fff;border:none;cursor:pointer}
   button:hover{background:#4a3dd9}
-  .cloud-status{font-size:14px;margin-left:10px}
-  .cloud-status.offline{color:#e33}
-  .cloud-status.success{color:#0a0}
-  .hint{font-size:13px;color:#6d7691;margin-top:10px}
-  .box{padding:16px;border:1px solid #eee;border-radius:10px}
-  .error-msg{background:#ffebee;border-left:4px solid #f44336;padding:15px;margin:10px 0;border-radius:5px}
-  .success-msg{background:#e8f5e9;border-left:4px solid #4caf50;padding:15px;margin:10px 0;border-radius:5px}
-  .warning-msg{background:#fff3cd;border-left:4px solid #ffc107;padding:15px;margin:10px 0;border-radius:5px}
+  .status-box{background:#f8f9fa;padding:15px;border-radius:8px;margin:10px 0}
+  .success{color:#28a745;font-weight:bold}
+  .error{color:#dc3545;font-weight:bold}
+  .warning{color:#ffc107;font-weight:bold}
+  .info{color:#17a2b8}
+  ul{list-style:none;padding:0}
+  li{padding:10px;border:1px solid #e9ecef;margin:5px 0;border-radius:5px;display:flex;justify-content:space-between;align-items:center}
+  li:hover{background:#f8f9fa}
+  .delete-btn{background:#dc3545;color:#fff;border:none;padding:5px 15px;border-radius:4px;cursor:pointer}
+  .delete-btn:hover{background:#c82333}
 </style>
 </head>
 <body>
 <header>
-  <h1>英语提分系统 <span id="cloudStatus" class="cloud-status">正在初始化...</span></h1>
+  <h1>英语提分系统</h1>
   <nav>
     <a href="index.html">学生端</a> | 
     <a href="dashboard.html">教师端</a>
   </nav>
 </header>
-<main class="box">
-  <h2>选择学生</h2>
-  <div id="messageDisplay"></div>
-  <select id="studentSelect"></select>
-  <button id="reloadStudents">重新加载学生</button>
-  <button onclick="testSDK()">测试SDK</button>
-  <div id="studentLoadMsg" class="hint"></div>
+
+<main>
+  <div class="status-box">
+    <h3>系统状态</h3>
+    <div id="sdkStatus">检测中...</div>
+    <div id="authStatus" style="margin-top:10px"></div>
+    <div id="dbStatus" style="margin-top:10px"></div>
+  </div>
+  
+  <div class="status-box">
+    <h3>选择学生</h3>
+    <select id="studentSelect" style="width:100%">
+      <option value="" disabled selected>加载中...</option>
+    </select>
+    <div style="margin-top:15px">
+      <button onclick="loadStudents()">刷新列表</button>
+      <button onclick="window.location.href='dashboard.html'">教师管理</button>
+    </div>
+  </div>
+  
+  <div id="studentList" style="margin-top:20px"></div>
 </main>
 
 <script>
-// 等待页面加载完成
+// 全局变量
+let app = null;
+let auth = null;
+let db = null;
+
+// 页面加载完成后初始化
 window.addEventListener('DOMContentLoaded', function() {
-  console.log('页面加载完成，开始检测SDK...');
-  
-  // 延迟500ms确保SDK加载
-  setTimeout(function() {
-    initializeApp();
-  }, 500);
+  setTimeout(initApp, 500);
 });
 
-// 测试SDK函数
-function testSDK() {
-  const messageDisplay = document.getElementById('messageDisplay');
-  let testResults = '<div class="warning-msg"><strong>SDK 检测结果：</strong><br>';
-  
-  // 检测所有可能的SDK对象
-  const checks = {
-    'cloudbase': typeof cloudbase !== 'undefined' ? '✓ 存在' : '✗ 不存在',
-    'window.cloudbase': typeof window.cloudbase !== 'undefined' ? '✓ 存在' : '✗ 不存在',
-    'tcb': typeof tcb !== 'undefined' ? '✓ 存在' : '✗ 不存在',
-    'window.tcb': typeof window.tcb !== 'undefined' ? '✓ 存在' : '✗ 不存在'
-  };
-  
-  for (let key in checks) {
-    testResults += key + ': ' + checks[key] + '<br>';
-  }
-  
-  testResults += '</div>';
-  messageDisplay.innerHTML = testResults;
-  
-  // 如果找不到SDK，尝试动态加载
-  if (typeof cloudbase === 'undefined' && typeof tcb === 'undefined') {
-    loadBackupSDK();
-  }
-}
-
-// 动态加载备用SDK
-function loadBackupSDK() {
-  console.log('尝试加载备用SDK...');
-  const messageDisplay = document.getElementById('messageDisplay');
-  
-  // 尝试列表
-  const cdnList = [
-    'https://imgcache.qq.com/qcloud/tcbjs/1.10.10/tcb.js',
-    'https://web.sdk.qcloud.com/cloudbase/2.5.1/cloudbase.full.js',
-    'https://imgcache.qq.com/qcloud/cloudbase-js-sdk/1.5.1/cloudbase.full.js'
-  ];
-  
-  let currentIndex = 0;
-  
-  function tryNextCDN() {
-    if (currentIndex >= cdnList.length) {
-      messageDisplay.innerHTML += '<div class="error-msg">所有CDN都无法加载，请下载SDK到本地服务器</div>';
-      return;
-    }
-    
-    const script = document.createElement('script');
-    script.src = cdnList[currentIndex];
-    script.onload = function() {
-      console.log('备用CDN加载成功: ' + cdnList[currentIndex]);
-      messageDisplay.innerHTML += '<div class="success-msg">备用CDN加载成功！</div>';
-      setTimeout(initializeApp, 100);
-    };
-    script.onerror = function() {
-      console.log('CDN加载失败: ' + cdnList[currentIndex]);
-      currentIndex++;
-      tryNextCDN();
-    };
-    document.head.appendChild(script);
-  }
-  
-  tryNextCDN();
-}
-
 // 初始化应用
-function initializeApp() {
-  const cs = document.getElementById('cloudStatus');
-  const messageDisplay = document.getElementById('messageDisplay');
-  const studentSelect = document.getElementById('studentSelect');
-  const msg = document.getElementById('studentLoadMsg');
+function initApp() {
+  const sdkStatus = document.getElementById('sdkStatus');
+  const authStatus = document.getElementById('authStatus');
+  const dbStatus = document.getElementById('dbStatus');
   
-  // 查找SDK对象
-  let sdk = null;
-  if (typeof cloudbase !== 'undefined') {
-    sdk = cloudbase;
-    console.log('使用 cloudbase 对象');
-  } else if (typeof window.cloudbase !== 'undefined') {
-    sdk = window.cloudbase;
-    console.log('使用 window.cloudbase 对象');
-  } else if (typeof tcb !== 'undefined') {
-    sdk = tcb;
-    console.log('使用 tcb 对象');
-  } else if (typeof window.tcb !== 'undefined') {
-    sdk = window.tcb;
-    console.log('使用 window.tcb 对象');
-  }
-  
-  if (!sdk) {
-    cs.textContent = 'SDK未找到';
-    cs.classList.add('offline');
-    messageDisplay.innerHTML = `
-      <div class="error-msg">
-        <strong>SDK 未能加载</strong><br>
-        请尝试以下方法：<br>
-        1. 点击"测试SDK"按钮<br>
-        2. 刷新页面（Ctrl+F5）<br>
-        3. 下载SDK文件到本地服务器
-      </div>
-    `;
+  // 检查SDK
+  if (typeof cloudbase === 'undefined') {
+    sdkStatus.innerHTML = '<span class="error">✗ SDK未加载</span>';
     return;
   }
   
-  cs.textContent = 'SDK已加载';
-  cs.classList.add('success');
-  console.log('SDK加载成功，开始初始化...');
-  
-  const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2";
-  let app, db, auth;
+  sdkStatus.innerHTML = '<span class="success">✓ SDK已加载</span>';
   
   try {
-    // 初始化
-    app = sdk.init({
-      env: CLOUD_ENV_ID
+    // 初始化CloudBase
+    app = cloudbase.init({
+      env: 'cloud1-8gxc5t0wed3aa3e2'
     });
     
+    // 设置认证持久化
     auth = app.auth({
       persistence: 'local'
     });
     
+    // 获取数据库引用
     db = app.database();
     
-    cs.textContent = '云端已连接';
-    cs.classList.add('success');
-    console.log('CloudBase初始化成功');
+    sdkStatus.innerHTML += ' | <span class="success">✓ 已初始化</span>';
     
-    // 开始加载数据
-    startLoadingData(auth, db, messageDisplay, studentSelect, msg);
+    // 进行认证
+    performAuth();
     
-  } catch (e) {
-    cs.textContent = '初始化失败';
-    cs.classList.add('offline');
-    messageDisplay.innerHTML = `
-      <div class="error-msg">
-        <strong>云端初始化失败</strong><br>
-        错误: ${e.message}<br>
-        请检查环境ID是否正确
-      </div>
-    `;
-    console.error('初始化失败:', e);
+  } catch (error) {
+    sdkStatus.innerHTML += ' | <span class="error">✗ 初始化失败: ' + error.message + '</span>';
+    console.error('初始化失败:', error);
   }
 }
 
-// 加载数据
-async function startLoadingData(auth, db, messageDisplay, studentSelect, msg) {
-  // 确保登录
-  async function ensureAnonymousLogin() {
-    try {
-      const loginState = await auth.getLoginState();
-      if (!loginState) {
-        console.log('开始匿名登录...');
-        await auth.anonymousAuthProvider().signIn();
-        console.log('匿名登录成功');
-        return true;
-      } else {
-        console.log('已有登录态');
-        return true;
-      }
-    } catch (err) {
-      console.error('登录失败:', err);
-      messageDisplay.innerHTML = `
-        <div class="error-msg">
-          <strong>登录失败</strong><br>
-          ${err.message}<br>
-          请确认腾讯云控制台已开启"匿名登录"
-        </div>
-      `;
-      return false;
-    }
-  }
+// 执行认证
+async function performAuth() {
+  const authStatus = document.getElementById('authStatus');
   
-  // 加载学生数据
-  async function loadStudents() {
-    studentSelect.innerHTML = '<option value="" disabled selected>加载中...</option>';
-    msg.textContent = '';
+  try {
+    // 检查登录状态
+    const loginState = await auth.getLoginState();
     
-    try {
-      const loginSuccess = await ensureAnonymousLogin();
-      if (!loginSuccess) return;
+    if (!loginState) {
+      authStatus.innerHTML = '<span class="info">正在进行匿名登录...</span>';
       
-      console.log('开始读取students集合...');
-      const res = await db.collection('students').get();
-      console.log('数据读取结果:', res);
+      // 进行匿名登录
+      await auth.anonymousAuthProvider().signIn();
       
-      const list = res && res.data ? res.data : [];
-      
-      if (!list.length) {
-        studentSelect.innerHTML = '<option value="" disabled selected>暂无学生</option>';
-        msg.textContent = '请在教师端添加学生数据';
-        messageDisplay.innerHTML = `
-          <div class="warning-msg">
-            暂无学生数据<br>
-            请访问教师端添加学生
-          </div>
-        `;
-        return;
-      }
-      
-      studentSelect.innerHTML = '<option value="" disabled selected>请选择学生</option>';
-      
-      list.forEach(item => {
-        if (!item || !item.name) return;
-        const opt = document.createElement('option');
-        opt.value = item.name;
-        opt.textContent = item.name;
-        studentSelect.appendChild(opt);
-      });
-      
-      messageDisplay.innerHTML = `<div class="success-msg">成功加载 ${list.length} 个学生</div>`;
-      msg.textContent = `已加载 ${list.length} 个学生`;
-      msg.style.color = '#0a0';
-      
-    } catch (err) {
-      console.error('加载失败:', err);
-      studentSelect.innerHTML = '<option value="" disabled selected>加载失败</option>';
-      
-      let solution = '';
-      if (err.code === 'DATABASE_PERMISSION_DENIED' || err.message.includes('permission')) {
-        solution = '请检查数据库权限设置';
-      } else if (err.code && err.code.includes('AUTH')) {
-        solution = '请检查匿名登录设置';
-      }
-      
-      messageDisplay.innerHTML = `
-        <div class="error-msg">
-          <strong>数据加载失败</strong><br>
-          错误: ${err.message}<br>
-          ${solution}
-        </div>
-      `;
+      authStatus.innerHTML = '<span class="success">✓ 匿名登录成功</span>';
+    } else {
+      authStatus.innerHTML = '<span class="success">✓ 已登录</span>';
+    }
+    
+    // 测试数据库连接
+    testDatabase();
+    
+  } catch (error) {
+    authStatus.innerHTML = '<span class="error">✗ 认证失败: ' + error.message + '</span>';
+    console.error('认证失败:', error);
+    
+    // 如果是 ACCESS_TOKEN_DISABLED 错误，提供解决方案
+    if (error.message && error.message.includes('ACCESS_TOKEN_DISABLED')) {
+      authStatus.innerHTML += '<br><span class="warning">提示: 请在腾讯云控制台开启匿名登录功能</span>';
     }
   }
-  
-  // 绑定重新加载按钮
-  document.getElementById('reloadStudents').onclick = loadStudents;
-  
-  // 开始加载
-  await loadStudents();
 }
-</script>
 
-<!-- 备用方案：如果主CDN失败，自动尝试其他CDN -->
-<script>
-setTimeout(function() {
-  if (typeof cloudbase === 'undefined' && typeof tcb === 'undefined') {
-    console.log('主CDN加载失败，尝试备用CDN...');
-    var script = document.createElement('script');
-    script.src = 'https://imgcache.qq.com/qcloud/tcbjs/1.10.10/tcb.js';
-    script.onload = function() {
-      console.log('备用CDN加载成功');
-      if (typeof initializeApp === 'function') {
-        initializeApp();
-      }
-    };
-    document.head.appendChild(script);
+// 测试数据库
+async function testDatabase() {
+  const dbStatus = document.getElementById('dbStatus');
+  
+  try {
+    // 尝试读取students集合
+    const res = await db.collection('students').limit(1).get();
+    
+    dbStatus.innerHTML = '<span class="success">✓ 数据库连接正常</span>';
+    
+    // 加载学生列表
+    loadStudents();
+    
+  } catch (error) {
+    dbStatus.innerHTML = '<span class="error">✗ 数据库连接失败: ' + error.message + '</span>';
+    
+    if (error.code === 'DATABASE_PERMISSION_DENIED') {
+      dbStatus.innerHTML += '<br><span class="warning">提示: 请设置数据库权限为"所有用户可读"</span>';
+    }
+    
+    console.error('数据库测试失败:', error);
   }
-}, 2000);
+}
+
+// 加载学生列表
+async function loadStudents() {
+  const select = document.getElementById('studentSelect');
+  const list = document.getElementById('studentList');
+  
+  if (!db) {
+    select.innerHTML = '<option value="" disabled selected>系统未初始化</option>';
+    return;
+  }
+  
+  select.innerHTML = '<option value="" disabled selected>加载中...</option>';
+  list.innerHTML = '';
+  
+  try {
+    // 确保已登录
+    const loginState = await auth.getLoginState();
+    if (!loginState) {
+      await auth.anonymousAuthProvider().signIn();
+    }
+    
+    // 读取学生数据
+    const res = await db.collection('students').get();
+    
+    if (!res.data || res.data.length === 0) {
+      select.innerHTML = '<option value="" disabled selected>暂无学生数据</option>';
+      list.innerHTML = '<div class="status-box"><span class="warning">暂无学生，请在教师端添加</span></div>';
+      return;
+    }
+    
+    // 填充下拉列表
+    select.innerHTML = '<option value="" disabled selected>请选择学生</option>';
+    res.data.forEach(student => {
+      const option = document.createElement('option');
+      option.value = student._id;
+      option.textContent = student.name;
+      select.appendChild(option);
+    });
+    
+    // 显示学生列表
+    const ul = document.createElement('ul');
+    res.data.forEach(student => {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span>📚 ${student.name}</span>
+        <button class="delete-btn" style="display:none">选择</button>
+      `;
+      ul.appendChild(li);
+    });
+    list.appendChild(ul);
+    
+    // 显示成功消息
+    const successMsg = document.createElement('div');
+    successMsg.className = 'status-box';
+    successMsg.innerHTML = '<span class="success">✓ 成功加载 ' + res.data.length + ' 个学生</span>';
+    list.insertBefore(successMsg, list.firstChild);
+    
+  } catch (error) {
+    select.innerHTML = '<option value="" disabled selected>加载失败</option>';
+    list.innerHTML = '<div class="status-box"><span class="error">加载失败: ' + error.message + '</span></div>';
+    console.error('加载学生失败:', error);
+  }
+}
 </script>
 
 </body>
