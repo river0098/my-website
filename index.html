@@ -343,6 +343,181 @@
     font-size: 14px;
   }
   
+  /* 练习弹窗 */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 90;
+  }
+  .practice-modal {
+    position: fixed;
+    inset: 50% auto auto 50%;
+    transform: translate(-50%, -50%);
+    width: min(920px, 92vw);
+    max-height: 88vh;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+    z-index: 110;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .modal-backdrop.hidden,
+  .practice-modal.hidden {
+    display: none;
+  }
+  .practice-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 24px;
+    border-bottom: 1px solid #eef1f6;
+    background: #fbfbff;
+  }
+  .practice-modal-title {
+    font-size: 20px;
+    color: #2d2d2d;
+    margin: 0;
+  }
+  .practice-modal-subtitle {
+    font-size: 14px;
+    color: #6c757d;
+  }
+  .practice-close {
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    color: #555;
+    cursor: pointer;
+    line-height: 1;
+    padding: 4px 8px;
+  }
+  .practice-close:hover {
+    color: #000;
+  }
+  .practice-modal-body {
+    padding: 18px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: 100%;
+  }
+  .practice-stats {
+    font-size: 14px;
+    color: #495057;
+  }
+  .practice-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .practice-toolbar label {
+    font-size: 14px;
+    color: #495057;
+  }
+  .practice-toolbar select,
+  .practice-toolbar input {
+    padding: 10px 14px;
+    border: 1px solid #d9dee5;
+    border-radius: 10px;
+    font-size: 14px;
+    min-width: 200px;
+    flex: none;
+  }
+  .practice-toolbar input {
+    flex: 1;
+    min-width: 180px;
+  }
+  .practice-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+  .practice-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .practice-entry {
+    background: #f9fbff;
+    border: 1px solid #e3e7f2;
+    border-radius: 12px;
+    padding: 14px 18px;
+  }
+  .practice-entry-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  .practice-entry-subtitle {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #4a4f63;
+  }
+  .practice-entry-description {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #5f6b7d;
+  }
+  .practice-entry-meta {
+    margin-top: 8px;
+    font-size: 13px;
+    color: #6c757d;
+  }
+  .practice-entry-options {
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 8px;
+  }
+  .practice-entry-option {
+    background: #fff;
+    border: 1px solid #dfe3ee;
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 13px;
+    color: #3a4460;
+  }
+  .practice-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    background: #e7f1ff;
+    color: #3562d4;
+    margin-left: 6px;
+  }
+  .badge-answer {
+    background: #e6f4ea;
+    color: #1e7a34;
+  }
+  .practice-empty {
+    text-align: center;
+    padding: 45px 20px;
+    color: #8a94a6;
+    font-size: 15px;
+    background: #f7f9fc;
+    border: 1px dashed #d6deed;
+    border-radius: 12px;
+  }
+  @media (max-width: 768px) {
+    .practice-modal {
+      width: 96vw;
+      max-height: 92vh;
+    }
+    .practice-toolbar {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .practice-toolbar select,
+    .practice-toolbar input {
+      width: 100%;
+    }
+  }
+
   /* 加载动画 */
   .loading {
     display: inline-block;
@@ -390,10 +565,10 @@
       📚 英语提分系统
     </div>
     <div class="nav-tabs">
-      <button class="nav-tab active" onclick="switchTab('home')">首页</button>
-      <button class="nav-tab" onclick="switchTab('student')">学生端</button>
-      <button class="nav-tab" onclick="switchTab('teacher')">教师端</button>
-      <button class="nav-tab" onclick="switchTab('practice')">练习中心</button>
+      <button class="nav-tab active" data-tab="home" onclick="switchTab('home', this)">首页</button>
+      <button class="nav-tab" data-tab="student" onclick="switchTab('student', this)">学生端</button>
+      <button class="nav-tab" data-tab="teacher" onclick="switchTab('teacher', this)">教师端</button>
+      <button class="nav-tab" data-tab="practice" onclick="switchTab('practice', this)">练习中心</button>
     </div>
   </div>
 </header>
@@ -590,6 +765,25 @@
   </div>
 </div>
 
+<!-- 练习内容弹窗 -->
+<div id="modalBackdrop" class="modal-backdrop hidden"></div>
+<div id="practiceModal" class="practice-modal hidden" role="dialog" aria-modal="true">
+  <div class="practice-modal-header">
+    <div>
+      <h3 id="practiceTitle" class="practice-modal-title">练习内容</h3>
+      <div id="practiceSubtitle" class="practice-modal-subtitle"></div>
+    </div>
+    <button id="practiceClose" class="practice-close" aria-label="关闭练习窗口">&times;</button>
+  </div>
+  <div class="practice-modal-body">
+    <div id="practiceStats" class="practice-stats"></div>
+    <div id="practiceToolbar" class="practice-toolbar"></div>
+    <div id="practiceContent" class="practice-content"></div>
+  </div>
+</div>
+
+<script src="data-loader.js"></script>
+
 <script>
 // ========================================
 // LeanCloud 配置
@@ -604,6 +798,38 @@ const CONFIG = {
 let isReady = false;
 let currentStudent = null;
 let allStudents = [];
+let assetsStatus = 'pending';
+
+const PRACTICE_LABELS = {
+  word: '单词练习',
+  grammar: '语法练习',
+  sentence: '句子练习'
+};
+
+const practiceModal = document.getElementById('practiceModal');
+const modalBackdrop = document.getElementById('modalBackdrop');
+const practiceCloseBtn = document.getElementById('practiceClose');
+const practiceTitle = document.getElementById('practiceTitle');
+const practiceSubtitle = document.getElementById('practiceSubtitle');
+const practiceStats = document.getElementById('practiceStats');
+const practiceToolbar = document.getElementById('practiceToolbar');
+const practiceContent = document.getElementById('practiceContent');
+
+document.addEventListener('learning-assets-loaded', () => {
+  assetsStatus = 'success';
+});
+
+if (practiceCloseBtn) {
+  practiceCloseBtn.addEventListener('click', closePracticeModal);
+}
+if (modalBackdrop) {
+  modalBackdrop.addEventListener('click', closePracticeModal);
+}
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && practiceModal && !practiceModal.classList.contains('hidden')) {
+    closePracticeModal();
+  }
+});
 
 // 初始化系统
 async function init() {
@@ -624,13 +850,35 @@ async function init() {
     // 加载初始数据
     await loadStudents();
     updateStats();
-    
+
+    if (typeof window.preloadLearningAssets === 'function') {
+      assetsStatus = 'loading';
+      statusEl.className = 'status info';
+      statusEl.textContent = '正在加载学习资源...';
+      try {
+        await window.preloadLearningAssets();
+        assetsStatus = 'success';
+        statusEl.className = 'status success';
+        statusEl.textContent = '✓ 学习资源加载完成';
+      } catch (resourceError) {
+        assetsStatus = 'error';
+        console.error('学习资源加载失败:', resourceError);
+        statusEl.className = 'status warning';
+        statusEl.textContent = '部分资源加载失败，请刷新页面重试';
+      }
+    } else {
+      assetsStatus = 'success';
+    }
+
     // 3秒后隐藏状态栏
     setTimeout(() => {
-      statusEl.style.display = 'none';
+      if (statusEl.classList.contains('success')) {
+        statusEl.style.display = 'none';
+      }
     }, 3000);
-    
+
   } catch (error) {
+    assetsStatus = 'error';
     statusEl.className = 'status error';
     statusEl.textContent = '✗ 连接失败: ' + error.message;
     console.error('初始化失败:', error);
@@ -638,18 +886,23 @@ async function init() {
 }
 
 // 切换标签页
-function switchTab(tabName) {
-  // 更新标签按钮
-  document.querySelectorAll('.nav-tab').forEach(tab => {
-    tab.classList.remove('active');
+function switchTab(tabName, trigger) {
+  const navButtons = document.querySelectorAll('.nav-tab');
+  navButtons.forEach(button => {
+    button.classList.remove('active');
   });
-  event.target.classList.add('active');
+  const activeButton = trigger || document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
+  if (activeButton) {
+    activeButton.classList.add('active');
+  }
   
-  // 更新内容
   document.querySelectorAll('.tab-content').forEach(content => {
     content.classList.remove('active');
   });
-  document.getElementById(tabName + '-tab').classList.add('active');
+  const target = document.getElementById(`${tabName}-tab`);
+  if (target) {
+    target.classList.add('active');
+  }
 }
 
 // 加载学生列表
@@ -664,7 +917,6 @@ async function loadStudents() {
     
     allStudents = students;
     
-    // 更新学生选择框
     const selectEl = document.getElementById('studentSelect');
     selectEl.innerHTML = '<option value="">-- 请选择 --</option>';
     students.forEach(student => {
@@ -674,10 +926,7 @@ async function loadStudents() {
       selectEl.appendChild(option);
     });
     
-    // 更新教师端列表
     updateStudentList(students);
-    
-    // 更新统计
     document.getElementById('studentCount').textContent = students.length;
     document.getElementById('totalStudents').textContent = students.length;
     
@@ -690,7 +939,7 @@ async function loadStudents() {
 function updateStudentList(students) {
   const listEl = document.getElementById('studentList');
   
-  if (students.length === 0) {
+  if (!students.length) {
     listEl.innerHTML = `
       <div class="empty-state">
         <h3>暂无学生</h3>
@@ -742,9 +991,10 @@ async function addStudent() {
 // 批量导入
 async function batchImport() {
   const textarea = document.getElementById('batchNames');
-  const names = textarea.value.trim().split('\n').filter(name => name.trim());
+  const names = textarea.value.trim().split('
+').filter(name => name.trim());
   
-  if (names.length === 0) {
+  if (!names.length) {
     alert('请输入学生姓名');
     return;
   }
@@ -761,7 +1011,6 @@ async function batchImport() {
     if (!name) continue;
     
     try {
-      // 检查是否已存在
       const query = new AV.Query('Student');
       query.equalTo('name', name);
       const existing = await query.first();
@@ -785,7 +1034,7 @@ async function batchImport() {
   
   alert(`导入完成！成功: ${successCount}，跳过: ${skipCount}`);
   
-  if (successCount > 0) {
+  if (successCount) {
     textarea.value = '';
     loadStudents();
   }
@@ -813,7 +1062,7 @@ async function clearAll() {
     const query = new AV.Query('Student');
     const students = await query.find();
     
-    for (let student of students) {
+    for (const student of students) {
       await student.destroy();
     }
     
@@ -848,18 +1097,397 @@ function startPractice(type) {
     return;
   }
   
-  alert(`${currentStudent}同学，${type}练习功能正在开发中...`);
+  if (assetsStatus === 'pending' || assetsStatus === 'loading') {
+    alert('学习资源仍在加载，请稍候再试');
+    return;
+  }
+
+  if (assetsStatus === 'error') {
+    alert('部分资源加载失败，内容可能不完整。');
+  }
+
+  openPracticeModal(type);
+}
+
+function openPracticeModal(type) {
+  if (!practiceModal || !modalBackdrop) return;
+  practiceModal.classList.remove('hidden');
+  modalBackdrop.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+  practiceTitle.textContent = PRACTICE_LABELS[type] || '练习内容';
+  practiceSubtitle.textContent = currentStudent ? `当前学生：${currentStudent}` : '';
+  renderPracticeContent(type);
+}
+
+function closePracticeModal() {
+  if (!practiceModal || !modalBackdrop) return;
+  practiceModal.classList.add('hidden');
+  modalBackdrop.classList.add('hidden');
+  document.body.style.overflow = '';
+  practiceToolbar.innerHTML = '';
+  practiceContent.innerHTML = '';
+  practiceStats.textContent = '';
+}
+
+function renderPracticeContent(type) {
+  practiceToolbar.innerHTML = '';
+  practiceContent.innerHTML = '';
+  practiceStats.textContent = '';
+
+  switch (type) {
+    case 'word':
+      renderWordPractice();
+      break;
+    case 'grammar':
+      renderGrammarPractice();
+      break;
+    case 'sentence':
+      renderSentencePractice();
+      break;
+    default:
+      practiceContent.innerHTML = '<div class="practice-empty">暂不支持的练习类型。</div>';
+  }
+}
+
+function renderWordPractice() {
+  const vocab = Array.isArray(window.vocabulary688) ? window.vocabulary688 : [];
+
+  if (!vocab.length) {
+    practiceStats.textContent = '未找到词汇数据';
+    practiceContent.innerHTML = '<div class="practice-empty">未检测到词汇库数据，请确认相关脚本已正确加载。</div>';
+    return;
+  }
+
+  practiceToolbar.innerHTML = '<input id="practiceSearchInput" type="search" placeholder="输入英文或中文关键词筛选词汇">';
+  const searchInput = document.getElementById('practiceSearchInput');
+
+  const listEl = document.createElement('div');
+  listEl.className = 'practice-list';
+  practiceContent.appendChild(listEl);
+
+  const renderList = keyword => {
+    const key = keyword.trim().toLowerCase();
+    const filtered = key
+      ? vocab.filter(item => {
+          return includesKeyword(item.word, key) ||
+                 includesKeyword(item.cn, key) ||
+                 includesKeyword(item.pos, key) ||
+                 includesKeyword(item.example, key);
+        })
+      : vocab;
+
+    practiceStats.textContent = `共 ${vocab.length} 个词条，当前显示 ${filtered.length} 个`;
+
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="practice-empty">未找到匹配词汇</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(item => {
+      const pos = item.pos ? `<span class="practice-badge">${item.pos}</span>` : '';
+      const meta = [];
+      if (item.freq) meta.push(`频率指数：${item.freq}`);
+      if (item.id) meta.push(`编号：${item.id}`);
+      const metaBlock = meta.length ? `<div class="practice-entry-meta">${meta.join(' · ')}</div>` : '';
+      const exampleBlock = item.example ? `<div class="practice-entry-description">例句：${item.example}</div>` : '';
+      return `
+        <div class="practice-entry">
+          <div class="practice-entry-title">${item.word || ''}${pos}</div>
+          <div class="practice-entry-subtitle">${item.cn || ''}</div>
+          ${metaBlock}
+          ${exampleBlock}
+        </div>
+      `;
+    }).join('');
+  };
+
+  renderList('');
+  if (searchInput) {
+    searchInput.addEventListener('input', event => {
+      renderList(event.target.value);
+    });
+    searchInput.focus();
+  }
+}
+
+function renderGrammarPractice() {
+  const sources = [];
+
+  if (window.englishGrammarConcepts && Array.isArray(window.englishGrammarConcepts.sections)) {
+    const total = window.englishGrammarConcepts.sections.reduce((sum, section) => {
+      return sum + (Array.isArray(section.questions) ? section.questions.length : 0);
+    }, 0);
+    sources.push({ id: 'concepts', name: window.englishGrammarConcepts.title || '语法知识点200题', count: total });
+  }
+
+  if (Array.isArray(window.grammarQuestionOrder) && window.grammarQuestionBanks) {
+    window.grammarQuestionOrder.forEach(id => {
+      const bank = window.grammarQuestionBanks[id];
+      if (bank && Array.isArray(bank.questions) && bank.questions.length) {
+        sources.push({ id, name: bank.title || id, count: bank.questions.length });
+      }
+    });
+  }
+
+  if (!sources.length) {
+    practiceStats.textContent = '未找到语法题库数据';
+    practiceContent.innerHTML = '<div class="practice-empty">未检测到语法题库，请确认相关脚本已正确加载。</div>';
+    return;
+  }
+
+  const options = sources.map(source => `<option value="${source.id}">${source.name}（${source.count}题）</option>`).join('');
+  practiceToolbar.innerHTML = `
+    <label for="grammarSelect">选择题库</label>
+    <select id="grammarSelect">${options}</select>
+    <input id="grammarSearch" type="search" placeholder="输入题干或关键词筛选">
+  `;
+
+  const select = document.getElementById('grammarSelect');
+  const search = document.getElementById('grammarSearch');
+
+  const listEl = document.createElement('div');
+  listEl.className = 'practice-list';
+  practiceContent.appendChild(listEl);
+
+  const englishQuestions = flattenEnglishConcepts();
+
+  const getDataset = id => {
+    if (id === 'concepts') {
+      return {
+        title: window.englishGrammarConcepts?.title || '语法知识点200题',
+        total: englishQuestions.length,
+        questions: englishQuestions
+      };
+    }
+    const bank = window.grammarQuestionBanks ? window.grammarQuestionBanks[id] : null;
+    return {
+      title: bank?.title || id,
+      total: Array.isArray(bank?.questions) ? bank.questions.length : 0,
+      questions: Array.isArray(bank?.questions) ? bank.questions : []
+    };
+  };
+
+  const renderList = () => {
+    const dataset = getDataset(select.value);
+    const key = (search?.value || '').trim().toLowerCase();
+    const filtered = key
+      ? dataset.questions.filter(question => {
+          return includesKeyword(question.question, key) ||
+                 includesKeyword(question.knowledge, key) ||
+                 includesKeyword(question.explanation, key) ||
+                 includesKeyword(question.analysis, key) ||
+                 includesKeyword(question.section, key);
+        })
+      : dataset.questions;
+
+    practiceStats.textContent = `${dataset.title} · 共 ${dataset.total} 题，当前显示 ${filtered.length} 题`;
+
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="practice-empty">未找到匹配的题目</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map((question, idx) => {
+      const knowledge = question.knowledge ? `<div class="practice-entry-meta">知识点：${question.knowledge}</div>` : '';
+      const section = question.section ? `<div class="practice-entry-meta">所属模块：${question.section}</div>` : '';
+      const answer = question.answer || question.correctAnswer;
+      const answerBlock = answer ? `<div class="practice-entry-meta">答案：<span class="practice-badge badge-answer">${answer}</span></div>` : '';
+      const explanation = question.explanation ? `<div class="practice-entry-description">解析：${question.explanation}</div>` : '';
+      const analysis = !question.explanation && question.analysis
+        ? `<div class="practice-entry-description">解析：${question.analysis}</div>`
+        : question.analysis && question.explanation
+        ? `<div class="practice-entry-description">补充：${question.analysis}</div>`
+        : '';
+      return `
+        <div class="practice-entry">
+          <div class="practice-entry-title">${idx + 1}. ${question.question || ''}</div>
+          ${section}
+          ${knowledge}
+          ${formatOptions(question.options)}
+          ${answerBlock}
+          ${explanation}
+          ${analysis}
+        </div>
+      `;
+    }).join('');
+  };
+
+  if (select) {
+    select.addEventListener('change', renderList);
+  }
+  if (search) {
+    search.addEventListener('input', renderList);
+  }
+
+  renderList();
+}
+
+function renderSentencePractice() {
+  const baseSentences = Array.isArray(window.vocabularyData) ? window.vocabularyData : [];
+  const essaySources = [
+    { key: 'activityIntroduction', label: '作文模板 · 活动介绍' },
+    { key: 'activityReport', label: '作文模板 · 活动报告' },
+    { key: 'apologyLetter', label: '作文模板 · 道歉信' },
+    { key: 'applicationLetter', label: '作文模板 · 申请信' },
+    { key: 'invitationContent', label: '作文模板 · 邀请信' },
+    { key: 'noticeLetter', label: '作文模板 · 通知信' },
+    { key: 'personDescription', label: '作文模板 · 人物介绍' },
+    { key: 'suggestionLetter', label: '作文模板 · 建议信' }
+  ].filter(cfg => {
+    const source = window[cfg.key];
+    return source && Array.isArray(source.sentences);
+  });
+
+  if (!baseSentences.length && !essaySources.length) {
+    practiceStats.textContent = '未找到句子数据';
+    practiceContent.innerHTML = '<div class="practice-empty">未检测到句子或作文模板数据，请确认相关脚本已正确加载。</div>';
+    return;
+  }
+
+  const options = [];
+  if (baseSentences.length) {
+    options.push(`<option value="sentences">精选句子200（${baseSentences.length}句）</option>`);
+  }
+  essaySources.forEach(cfg => {
+    const entry = window[cfg.key];
+    const title = entry?.title?.chinese || entry?.title?.english || cfg.label;
+    const count = Array.isArray(entry?.sentences) ? entry.sentences.length : 0;
+    options.push(`<option value="${cfg.key}">${title}（${count}句）</option>`);
+  });
+
+  practiceToolbar.innerHTML = `
+    <label for="sentenceSelect">选择素材</label>
+    <select id="sentenceSelect">${options.join('')}</select>
+    <input id="sentenceSearch" type="search" placeholder="输入关键词筛选句子">
+  `;
+
+  const select = document.getElementById('sentenceSelect');
+  const search = document.getElementById('sentenceSearch');
+
+  const listEl = document.createElement('div');
+  listEl.className = 'practice-list';
+  practiceContent.appendChild(listEl);
+
+  const datasetFor = id => {
+    if (id === 'sentences') {
+      return {
+        title: '精选句子200',
+        total: baseSentences.length,
+        items: baseSentences.map((item, index) => ({
+          index: item.id || index + 1,
+          english: item.english,
+          chinese: item.chinese,
+          keywords: item.keywords
+        }))
+      };
+    }
+
+    const cfg = essaySources.find(entry => entry.key === id);
+    if (!cfg) {
+      return { title: '未知素材', total: 0, items: [] };
+    }
+
+    const source = window[cfg.key];
+    const sentences = Array.isArray(source?.sentences) ? source.sentences : [];
+    const title = source?.title?.chinese || source?.title?.english || cfg.label;
+    return {
+      title,
+      total: sentences.length,
+      items: sentences.map((sentence, index) => ({
+        index: index + 1,
+        english: sentence.english,
+        chinese: sentence.chinese
+      }))
+    };
+  };
+
+  const renderList = () => {
+    if (!select) return;
+    const dataset = datasetFor(select.value);
+    const key = (search?.value || '').trim().toLowerCase();
+    const filtered = key
+      ? dataset.items.filter(item => {
+          return includesKeyword(item.english, key) ||
+                 includesKeyword(item.chinese, key) ||
+                 (Array.isArray(item.keywords) && item.keywords.some(keyword => includesKeyword(keyword, key)));
+        })
+      : dataset.items;
+
+    practiceStats.textContent = `${dataset.title} · 共 ${dataset.total} 句，当前显示 ${filtered.length} 句`;
+
+    if (!filtered.length) {
+      listEl.innerHTML = '<div class="practice-empty">未找到匹配的句子</div>';
+      return;
+    }
+
+    listEl.innerHTML = filtered.map(item => {
+      const keywords = Array.isArray(item.keywords) && item.keywords.length
+        ? `<div class="practice-entry-meta">关键词：${item.keywords.join('、')}</div>`
+        : '';
+      return `
+        <div class="practice-entry">
+          <div class="practice-entry-title">${item.index}. ${item.english || ''}</div>
+          <div class="practice-entry-subtitle">${item.chinese || ''}</div>
+          ${keywords}
+        </div>
+      `;
+    }).join('');
+  };
+
+  if (select) {
+    select.addEventListener('change', renderList);
+  }
+  if (search) {
+    search.addEventListener('input', renderList);
+  }
+
+  renderList();
+}
+
+function formatOptions(options) {
+  if (!options) return '';
+  let entries = [];
+  if (Array.isArray(options)) {
+    entries = options.map((value, index) => `<div class="practice-entry-option">${String.fromCharCode(65 + index)}. ${value}</div>`);
+  } else if (typeof options === 'object') {
+    entries = Object.entries(options).map(([key, value]) => `<div class="practice-entry-option">${key}. ${value}</div>`);
+  }
+  if (!entries.length) return '';
+  return `<div class="practice-entry-options">${entries.join('')}</div>`;
+}
+
+function flattenEnglishConcepts() {
+  if (!window.englishGrammarConcepts || !Array.isArray(window.englishGrammarConcepts.sections)) {
+    return [];
+  }
+  const result = [];
+  window.englishGrammarConcepts.sections.forEach(section => {
+    const sectionName = section.name || '';
+    (section.questions || []).forEach(question => {
+      result.push({
+        question: question.question,
+        options: question.options,
+        answer: question.answer,
+        knowledge: question.knowledge,
+        section: sectionName
+      });
+    });
+  });
+  return result;
+}
+
+function includesKeyword(value, keyword) {
+  if (!value || !keyword) return false;
+  return String(value).toLowerCase().includes(keyword);
 }
 
 // 更新统计数据
 function updateStats() {
-  // 模拟数据，实际应从数据库获取
   document.getElementById('activeToday').textContent = Math.floor(Math.random() * 10);
   document.getElementById('practiceCount').textContent = Math.floor(Math.random() * 100);
   document.getElementById('avgScore').textContent = Math.floor(Math.random() * 30) + 70;
 }
 
-// 页面加载完成后初始化
 window.addEventListener('DOMContentLoaded', init);
 </script>
 
