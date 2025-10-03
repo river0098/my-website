@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <title>英语提分系统（本地SDK最终版）</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- 引用本地 vendor/cloudbase.full.min.js -->
 <script src="./vendor/cloudbase.full.min.js"></script>
-
 <style>
   body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;background:#f3f4ff;color:#1f2749}
   header{background:#6653ff;color:#fff;padding:20px;text-align:center}
+  nav{margin-top:10px}
+  nav a{color:#fff;text-decoration:none;margin:0 8px}
+  nav a:hover{text-decoration:underline}
   main{max-width:880px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
   select,button{padding:10px 14px;margin:5px;border-radius:8px;border:1px solid #ccc;font-size:15px}
   button{background:#6653ff;color:#fff;border:none;cursor:pointer}
@@ -23,15 +23,17 @@
 <body>
 <header>
   <h1>英语提分系统 <span id="cloudStatus" class="cloud-status">☁️ 正在初始化…</span></h1>
+  <nav>
+    <a href="index.html">学生端</a> | 
+    <a href="dashboard.html">教师端</a>
+  </nav>
 </header>
-
 <main class="box">
   <h2>选择学生</h2>
   <select id="studentSelect"></select>
   <button id="reloadStudents">重新加载学生</button>
   <div id="studentLoadMsg" class="hint"></div>
 </main>
-
 <script>
 window.addEventListener('DOMContentLoaded', async () => {
   const cs = document.getElementById('cloudStatus');
@@ -41,10 +43,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     return;
   }
   cs.textContent = '✅ SDK 已加载';
-
-  const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2"; // ⚠️ 替换为你的环境ID
+  const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2";
   let app, db, auth;
-
   try {
     app  = cloudbase.init({ env: CLOUD_ENV_ID });
     auth = app.auth({ persistence: "local" });
@@ -56,7 +56,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.error(e);
     return;
   }
-
   async function ensureAnonymousLogin() {
     try {
       const loginState = await auth.getLoginState();
@@ -72,7 +71,6 @@ window.addEventListener('DOMContentLoaded', async () => {
       throw err;
     }
   }
-
   async function loadStudents() {
     const select = document.getElementById('studentSelect');
     const msg    = document.getElementById('studentLoadMsg');
@@ -102,16 +100,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       console.error('❌ 加载学生失败:', err);
     }
   }
-
-  // 页面加载：先登录，再加载
   try { await ensureAnonymousLogin(); await loadStudents(); } catch(e){}
-
-  // 重新加载按钮
   document.getElementById('reloadStudents').addEventListener('click', async () => {
     try { await ensureAnonymousLogin(); await loadStudents(); } catch(e){}
   });
 });
 </script>
-
 </body>
 </html>
