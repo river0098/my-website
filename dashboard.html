@@ -15,7 +15,7 @@
   nav a{color:#fff;text-decoration:none;margin:0 8px}
   nav a:hover{text-decoration:underline}
   main{max-width:880px;margin:20px auto;background:#fff;padding:20px;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.1)}
-  .status-box{background:#f8f9fa;padding:15px;border-radius:8px;margin:10px 0}
+  .status-box{background:#f8f9fa;padding:15px;border-radius:8px;margin:15px 0}
   .success{color:#28a745;font-weight:bold}
   .error{color:#dc3545;font-weight:bold}
   .warning{color:#ffc107;font-weight:bold}
@@ -24,12 +24,14 @@
   button{background:#6653ff;color:#fff;border:none;cursor:pointer}
   button:hover{background:#4a3dd9}
   ul{list-style:none;padding:0;margin-top:20px}
-  li{padding:12px;border:1px solid #e9ecef;margin:8px 0;border-radius:6px;display:flex;justify-content:space-between;align-items:center;background:#fff}
+  li{padding:12px;border:1px solid #e9ecef;margin:8px 0;border-radius:6px;display:flex;justify-content:space-between;align-items:center;background:#fff;transition:all 0.3s ease}
   li:hover{background:#f8f9fa;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
   .delete-btn{background:#dc3545;color:#fff;border:none;padding:6px 12px;border-radius:4px;cursor:pointer;font-size:12px}
   .delete-btn:hover{background:#c82333}
   .student-name{font-size:16px;color:#495057}
   .empty-state{text-align:center;padding:40px;color:#6c757d}
+  .loading{text-align:center;padding:20px;color:#6c757d}
+  .student-count{background:#e7f3ff;color:#0066cc;padding:5px 10px;border-radius:4px;font-size:14px}
 </style>
 </head>
 <body>
@@ -48,18 +50,29 @@
   </div>
   
   <div class="status-box">
-    <h3>学生管理</h3>
+    <h3>添加学生</h3>
     <div style="display:flex;align-items:center">
       <input type="text" id="studentName" placeholder="输入学生姓名" style="flex:1">
       <button onclick="addStudent()">添加学生</button>
+      <button onclick="loadStudents()" style="background:#28a745">刷新列表</button>
     </div>
   </div>
   
   <div id="listContainer">
-    <h3>学生列表</h3>
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <h3>学生列表</h3>
+      <span id="studentCount" class="student-count">共 0 个学生</span>
+    </div>
     <ul id="studentList">
-      <li class="empty-state">加载中...</li>
+      <li class="loading">正在加载学生数据...</li>
     </ul>
+  </div>
+  
+  <div class="status-box" style="background:#fff3cd;border-left:4px solid #ffc107">
+    <h4>提示</h4>
+    <p>• 添加学生后，数据会自动保存到腾讯云数据库</p>
+    <p>• 学生端会自动读取这里添加的学生数据</p>
+    <p>• 数据会在页面加载时自动刷新</p>
   </div>
 </main>
 
@@ -71,6 +84,7 @@ let db = null;
 
 // 页面加载完成后初始化
 window.addEventListener('DOMContentLoaded', function() {
+  console.log('页面加载完成，开始初始化...');
   setTimeout(initApp, 500);
 });
 
@@ -85,6 +99,7 @@ async function initApp() {
   }
   
   statusMsg.innerHTML = '<span class="success">✓ SDK 已加载</span>';
+  console.log('SDK已加载');
   
   try {
     // 初始化CloudBase
@@ -101,12 +116,19 @@ async function initApp() {
     db = app.database();
     
     statusMsg.innerHTML = '<span class="success">✓ 云开发已初始化</span>';
+    console.log('CloudBase初始化成功');
     
     // 确保登录
-    await ensureLogin();
+    const loginSuccess = await ensureLogin();
     
-    // 加载学生列表
-    await loadStudents();
+    if (loginSuccess) {
+      // 自动加载学生列表
+      console.log('开始自动加载学生列表...');
+      await loadStudents();
+      
+      // 每30秒自动刷新一次
+      setInterval(loadStudents, 30000);
+    }
     
   } catch (error) {
     statusMsg.innerHTML = '<span class="error">✗ 初始化失败: ' + error.message + '</span>';
@@ -122,52 +144,72 @@ async function ensureLogin() {
     const loginState = await auth.getLoginState();
     
     if (!loginState) {
+      console.log('开始匿名登录...');
       statusMsg.innerHTML = '<span class="info">正在进行匿名登录...</span>';
       await auth.anonymousAuthProvider().signIn();
       statusMsg.innerHTML = '<span class="success">✓ 匿名登录成功</span>';
+      console.log('匿名登录成功');
     } else {
       statusMsg.innerHTML = '<span class="success">✓ 已登录</span>';
+      console.log('已有登录状态');
     }
     
     return true;
     
   } catch (error) {
     statusMsg.innerHTML = '<span class="error">✗ 登录失败: ' + error.message + '</span>';
-    
-    if (error.message && error.message.includes('ACCESS_TOKEN_DISABLED')) {
-      statusMsg.innerHTML += '<br><span class="warning">请在腾讯云控制台开启匿名登录</span>';
-    }
-    
     console.error('登录失败:', error);
     return false;
   }
 }
 
-// 加载学生列表
+// 加载学生列表（会自动调用）
 async function loadStudents() {
   const list = document.getElementById('studentList');
   const statusMsg = document.getElementById('statusMsg');
+  const countSpan = document.getElementById('studentCount');
+  
+  console.log('正在加载学生列表...');
   
   try {
     // 确保已登录
     const loginSuccess = await ensureLogin();
-    if (!loginSuccess) return;
+    if (!loginSuccess) {
+      console.log('未登录，无法加载数据');
+      return;
+    }
+    
+    // 显示加载中
+    if (list.children.length === 0 || list.querySelector('.empty-state')) {
+      list.innerHTML = '<li class="loading">正在加载数据...</li>';
+    }
     
     // 读取学生数据
+    console.log('开始读取students集合...');
     const res = await db.collection('students').get();
+    console.log('查询结果:', res);
     
     // 清空列表
     list.innerHTML = '';
     
     if (!res.data || res.data.length === 0) {
-      list.innerHTML = '<li class="empty-state">暂无学生数据，请添加学生</li>';
+      list.innerHTML = '<li class="empty-state">暂无学生数据，请点击上方"添加学生"按钮添加</li>';
       statusMsg.innerHTML = '<span class="warning">暂无学生数据</span>';
+      countSpan.textContent = '共 0 个学生';
+      console.log('数据库中暂无学生');
       return;
     }
     
+    // 按姓名排序
+    const sortedData = res.data.sort((a, b) => {
+      return (a.name || '').localeCompare(b.name || '', 'zh-CN');
+    });
+    
     // 显示学生列表
-    res.data.forEach(student => {
+    console.log(`找到 ${sortedData.length} 个学生`);
+    sortedData.forEach((student, index) => {
       const li = document.createElement('li');
+      li.style.animationDelay = (index * 0.1) + 's';
       li.innerHTML = `
         <span class="student-name">📚 ${student.name}</span>
         <button class="delete-btn" onclick="deleteStudent('${student._id}')">删除</button>
@@ -175,17 +217,19 @@ async function loadStudents() {
       list.appendChild(li);
     });
     
-    statusMsg.innerHTML = '<span class="success">✓ 已加载 ' + res.data.length + ' 个学生</span>';
+    statusMsg.innerHTML = '<span class="success">✓ 已加载 ' + sortedData.length + ' 个学生</span>';
+    countSpan.textContent = '共 ' + sortedData.length + ' 个学生';
+    console.log('学生列表加载完成');
     
   } catch (error) {
     list.innerHTML = '<li class="empty-state">加载失败: ' + error.message + '</li>';
     statusMsg.innerHTML = '<span class="error">✗ 加载失败: ' + error.message + '</span>';
+    countSpan.textContent = '加载失败';
+    console.error('加载学生失败:', error);
     
     if (error.code === 'DATABASE_PERMISSION_DENIED') {
-      statusMsg.innerHTML += '<br><span class="warning">请设置数据库权限为"所有用户可读"</span>';
+      statusMsg.innerHTML += '<br><span class="warning">请检查数据库权限设置</span>';
     }
-    
-    console.error('加载学生失败:', error);
   }
 }
 
@@ -197,75 +241,105 @@ window.addStudent = async function() {
   
   if (!name) {
     alert('请输入学生姓名');
+    nameInput.focus();
     return;
   }
   
   if (!db) {
-    alert('系统未初始化');
+    alert('系统未初始化，请刷新页面');
     return;
   }
   
   try {
     // 确保已登录
     const loginSuccess = await ensureLogin();
-    if (!loginSuccess) return;
+    if (!loginSuccess) {
+      alert('未登录，请刷新页面');
+      return;
+    }
     
-    statusMsg.innerHTML = '<span class="info">正在添加...</span>';
+    statusMsg.innerHTML = '<span class="info">正在添加学生...</span>';
+    console.log('正在添加学生:', name);
     
     // 添加到数据库
-    await db.collection('students').add({
+    const result = await db.collection('students').add({
       name: name,
       createdAt: new Date().toISOString()
     });
+    
+    console.log('添加成功，文档ID:', result.id);
     
     // 清空输入框
     nameInput.value = '';
     
     // 显示成功消息
-    statusMsg.innerHTML = '<span class="success">✓ 已添加学生: ' + name + '</span>';
+    statusMsg.innerHTML = '<span class="success">✓ 已成功添加学生: ' + name + '</span>';
     
-    // 重新加载列表
-    await loadStudents();
+    // 自动重新加载列表
+    setTimeout(() => {
+      loadStudents();
+    }, 500);
     
   } catch (error) {
     statusMsg.innerHTML = '<span class="error">✗ 添加失败: ' + error.message + '</span>';
     console.error('添加学生失败:', error);
+    alert('添加失败: ' + error.message);
   }
 }
 
 // 删除学生
 window.deleteStudent = async function(id) {
-  if (!confirm('确定要删除该学生吗？')) {
+  if (!confirm('确定要删除该学生吗？删除后无法恢复。')) {
     return;
   }
   
   const statusMsg = document.getElementById('statusMsg');
   
   if (!db) {
-    alert('系统未初始化');
+    alert('系统未初始化，请刷新页面');
     return;
   }
   
   try {
     // 确保已登录
     const loginSuccess = await ensureLogin();
-    if (!loginSuccess) return;
+    if (!loginSuccess) {
+      alert('未登录，请刷新页面');
+      return;
+    }
     
     statusMsg.innerHTML = '<span class="info">正在删除...</span>';
+    console.log('正在删除学生，ID:', id);
     
     // 从数据库删除
     await db.collection('students').doc(id).remove();
     
+    console.log('删除成功');
     statusMsg.innerHTML = '<span class="success">✓ 已删除学生</span>';
     
-    // 重新加载列表
-    await loadStudents();
+    // 自动重新加载列表
+    setTimeout(() => {
+      loadStudents();
+    }, 500);
     
   } catch (error) {
     statusMsg.innerHTML = '<span class="error">✗ 删除失败: ' + error.message + '</span>';
     console.error('删除学生失败:', error);
+    alert('删除失败: ' + error.message);
   }
 }
+
+// 监听输入框回车事件
+document.addEventListener('DOMContentLoaded', function() {
+  const input = document.getElementById('studentName');
+  if (input) {
+    input.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        addStudent();
+      }
+    });
+  }
+});
 </script>
 
 </body>
