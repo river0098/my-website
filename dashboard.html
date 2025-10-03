@@ -2,10 +2,10 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>教师端 Dashboard(最终修复版)</title>
+<title>教师端 Dashboard(SDK 2.0版)</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<!-- 使用腾讯云 CDN 引入 CloudBase SDK -->
-<script src="https://web.sdk.qcloud.com/cloudbase-js-sdk/latest/cloudbase.full.js"></script>
+<!-- 使用 CloudBase SDK 2.0 -->
+<script src="https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@2.0.1/dist/index.umd.js"></script>
 <style>
   body{font-family:"Segoe UI",Arial,"Microsoft YaHei";margin:0;background:#f9faff;color:#1f2749}
   header{background:#333;color:#fff;padding:20px;text-align:center}
@@ -20,9 +20,9 @@
   li{padding:6px 0;border-bottom:1px solid #eee;display:flex;justify-content:space-between;align-items:center}
   .delete-btn{background:#e33}
   .delete-btn:hover{background:#c11}
-  .status{font-size:14px;color:#666;margin-bottom:10px}
-  .status.success{color:#0a0}
-  .status.error{color:#e33}
+  .status{font-size:14px;padding:10px;margin:10px 0;border-radius:5px}
+  .status.success{background:#e8f5e9;color:#2e7d32}
+  .status.error{background:#ffebee;color:#c62828}
 </style>
 </head>
 <body>
@@ -47,24 +47,26 @@ window.addEventListener('DOMContentLoaded', async () => {
   const statusMsg = document.getElementById('statusMsg');
   
   if (typeof window.cloudbase === 'undefined') {
-    statusMsg.textContent = "❌ SDK 未加载,请检查网络连接";
+    statusMsg.textContent = "SDK 未加载,请检查网络连接";
     statusMsg.classList.add('error');
     return;
   }
   
-  statusMsg.textContent = "✅ SDK 已加载";
+  console.log('SDK版本:', window.cloudbase.version || '未知');
+  statusMsg.textContent = "SDK 已加载";
   statusMsg.classList.add('success');
   
   const CLOUD_ENV_ID = "cloud1-8gxc5t0wed3aa3e2";
   let app, auth, db;
   
   try {
-    app = cloudbase.init({ env: CLOUD_ENV_ID });
+    app = window.cloudbase.init({ env: CLOUD_ENV_ID });
     auth = app.auth({ persistence: "local" });
     db = app.database();
-    statusMsg.textContent = "✅ 云开发已初始化";
+    statusMsg.textContent = "云开发已初始化";
+    console.log('初始化成功');
   } catch (e) {
-    statusMsg.textContent = "❌ 云开发初始化失败: " + (e.message || e);
+    statusMsg.textContent = "云开发初始化失败: " + (e.message || e);
     statusMsg.classList.remove('success');
     statusMsg.classList.add('error');
     console.error(e);
@@ -75,7 +77,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const loginState = await auth.getLoginState();
     if (!loginState) {
       await auth.anonymousAuthProvider().signIn();
-      console.log('✅ 匿名登录成功');
+      console.log('匿名登录成功');
     }
   }
 
@@ -88,6 +90,8 @@ window.addEventListener('DOMContentLoaded', async () => {
       
       if (!res.data || res.data.length === 0) {
         list.innerHTML = '<li style="color:#999">暂无学生数据</li>';
+        statusMsg.textContent = '暂无学生数据';
+        statusMsg.classList.add('error');
         return;
       }
       
@@ -100,10 +104,11 @@ window.addEventListener('DOMContentLoaded', async () => {
         list.appendChild(li);
       });
       
-      statusMsg.textContent = `✅ 已加载 ${res.data.length} 个学生`;
+      statusMsg.textContent = `已加载 ${res.data.length} 个学生`;
+      statusMsg.classList.remove('error');
       statusMsg.classList.add('success');
     } catch (err) {
-      statusMsg.textContent = "❌ 加载失败: " + (err.message || err);
+      statusMsg.textContent = "加载失败: " + (err.message || err);
       statusMsg.classList.remove('success');
       statusMsg.classList.add('error');
       console.error('加载学生失败:', err);
@@ -121,11 +126,11 @@ window.addEventListener('DOMContentLoaded', async () => {
       await ensureLogin();
       await db.collection("students").add({ name });
       document.getElementById("studentName").value = "";
-      statusMsg.textContent = `✅ 已添加学生: ${name}`;
+      statusMsg.textContent = `已添加学生: ${name}`;
       statusMsg.classList.add('success');
       loadStudents();
     } catch (err) {
-      statusMsg.textContent = "❌ 添加失败: " + (err.message || err);
+      statusMsg.textContent = "添加失败: " + (err.message || err);
       statusMsg.classList.remove('success');
       statusMsg.classList.add('error');
       console.error('添加学生失败:', err);
@@ -138,11 +143,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     try {
       await ensureLogin();
       await db.collection("students").doc(id).remove();
-      statusMsg.textContent = "✅ 已删除学生";
+      statusMsg.textContent = "已删除学生";
       statusMsg.classList.add('success');
       loadStudents();
     } catch (err) {
-      statusMsg.textContent = "❌ 删除失败: " + (err.message || err);
+      statusMsg.textContent = "删除失败: " + (err.message || err);
       statusMsg.classList.remove('success');
       statusMsg.classList.add('error');
       console.error('删除学生失败:', err);
