@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>LeanCloud 数据表初始化工具</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://cdn.jsdelivr.net/npm/leancloud-storage@4.15.2/dist/av-min.js"></script>
+<style>
+  body {
+    font-family: -apple-system, "Microsoft YaHei", Arial, sans-serif;
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+  }
+  
+  .container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  }
+  
+  h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .status {
+    padding: 15px;
+    border-radius: 10px;
+    margin: 15px 0;
+    text-align: center;
+  }
+  
+  .status.success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+  }
+  
+  .status.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+  }
+  
+  .status.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+  }
+  
+  .status.warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeaa7;
+  }
+  
+  button {
+    display: block;
+    width: 100%;
+    padding: 15px 30px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 20px 0;
+    transition: all 0.3s;
+  }
+  
+  button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(102,126,234,0.3);
+  }
+  
+  button:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .progress-list {
+    list-style: none;
+    padding: 0;
+    margin: 20px 0;
+  }
+  
+  .progress-item {
+    padding: 10px;
+    margin: 10px 0;
+    background: #f8f9fa;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .progress-item.complete {
+    background: #d4edda;
+  }
+  
+  .progress-item.error {
+    background: #f8d7da;
+  }
+  
+  .spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+  
+  .check {
+    color: #28a745;
+    font-size: 20px;
+  }
+  
+  .cross {
+    color: #dc3545;
+    font-size: 20px;
+  }
+  
+  pre {
+    background: #f4f4f4;
+    padding: 15px;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 14px;
+    margin: 15px 0;
+  }
+  
+  .sample-data {
+    background: #f0f8ff;
+    border: 2px dashed #667eea;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+  }
+  
+  .sample-data h3 {
+    color: #667eea;
+    margin-bottom: 15px;
+  }
+  
+  .sample-data p {
+    color: #666;
+    line-height: 1.6;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🚀 LeanCloud 数据表初始化工具</h1>
+  
+  <div id="status" class="status info">
+    准备连接 LeanCloud...
+  </div>
+  
+  <button id="initBtn" onclick="startInitialization()">
+    开始初始化数据表
+  </button>
+  
+  <ul class="progress-list" id="progressList" style="display:none">
+    <li class="progress-item" id="progress-questions">
+      <span id="icon-questions" class="spinner"></span>
+      <span>Questions 表（题库）</span>
+    </li>
+    <li class="progress-item" id="progress-scores">
+      <span id="icon-scores" class="spinner"></span>
+      <span>Scores 表（成绩记录）</span>
+    </li>
+    <li class="progress-item" id="progress-progress">
+      <span id="icon-progress" class="spinner"></span>
+      <span>Progress 表（学习进度）</span>
+    </li>
+    <li class="progress-item" id="progress-sample">
+      <span id="icon-sample" class="spinner"></span>
+      <span>添加示例题目</span>
+    </li>
+  </ul>
+  
+  <div id="result" style="display:none">
+    <h2>✅ 初始化完成！</h2>
+    <div class="status success">
+      所有数据表已创建成功，系统已可以正常使用！
+    </div>
+    
+    <div class="sample-data">
+      <h3>📚 已添加的示例题目：</h3>
+      <ul id="sampleList"></ul>
+    </div>
+    
+    <h3>下一步：</h3>
+    <ol style="line-height: 2">
+      <li>返回您的英语提分系统</li>
+      <li>选择学生开始练习</li>
+      <li>系统会自动保存所有练习记录</li>
+      <li>在"成绩报告"查看学习进度</li>
+    </ol>
+  </div>
+  
+  <div id="error" style="display:none">
+    <div class="status error">
+      <strong>出现错误：</strong>
+      <p id="errorMsg"></p>
+    </div>
+  </div>
+</div>
+
+<script>
+// LeanCloud 配置
+const CONFIG = {
+  appId: 'WCOw44sgcriKsHGjR273OqON-gzGzoHsz',
+  appKey: 'tIJYmWK76EfPs2TEIi0Pd2in',
+  serverURL: 'https://wcow44sg.lc-cn-n1-shared.com'
+};
+
+// 示例题目数据
+const SAMPLE_QUESTIONS = [
+  {
+    question: 'What is the Chinese meaning of "apple"?',
+    type: 'choice',
+    options: ['苹果', '香蕉', '橙子', '梨子'],
+    answer: '苹果',
+    difficulty: 1,
+    category: 'word'
+  },
+  {
+    question: 'What does "happy" mean?',
+    type: 'choice',
+    options: ['悲伤的', '快乐的', '生气的', '累的'],
+    answer: '快乐的',
+    difficulty: 1,
+    category: 'word'
+  },
+  {
+    question: 'Choose the correct word: I ___ a student.',
+    type: 'choice',
+    options: ['am', 'is', 'are', 'be'],
+    answer: 'am',
+    difficulty: 1,
+    category: 'grammar'
+  },
+  {
+    question: 'She ___ to school every day.',
+    type: 'choice',
+    options: ['go', 'goes', 'going', 'went'],
+    answer: 'goes',
+    difficulty: 2,
+    category: 'grammar'
+  },
+  {
+    question: 'They ___ playing basketball now.',
+    type: 'choice',
+    options: ['is', 'am', 'are', 'be'],
+    answer: 'are',
+    difficulty: 2,
+    category: 'grammar'
+  },
+  {
+    question: 'The book is ___ the table. (在...上面)',
+    type: 'fill',
+    options: [],
+    answer: 'on',
+    difficulty: 1,
+    category: 'grammar'
+  },
+  {
+    question: 'My name ___ Tom. (是)',
+    type: 'fill',
+    options: [],
+    answer: 'is',
+    difficulty: 1,
+    category: 'grammar'
+  },
+  {
+    question: 'I like ___ (苹果).',
+    type: 'fill',
+    options: [],
+    answer: 'apples',
+    difficulty: 2,
+    category: 'word'
+  },
+  {
+    question: '请翻译：I am a student',
+    type: 'translation',
+    options: [],
+    answer: '我是一个学生',
+    difficulty: 1,
+    category: 'sentence'
+  },
+  {
+    question: '请翻译：She likes reading books',
+    type: 'translation',
+    options: [],
+    answer: '她喜欢读书',
+    difficulty: 2,
+    category: 'sentence'
+  },
+  {
+    question: '请翻译：Good morning',
+    type: 'translation',
+    options: [],
+    answer: '早上好',
+    difficulty: 1,
+    category: 'sentence'
+  },
+  {
+    question: '请翻译：Thank you very much',
+    type: 'translation',
+    options: [],
+    answer: '非常感谢',
+    difficulty: 1,
+    category: 'sentence'
+  },
+  {
+    question: 'What color is the sky?',
+    type: 'choice',
+    options: ['Red', 'Blue', 'Green', 'Yellow'],
+    answer: 'Blue',
+    difficulty: 1,
+    category: 'word'
+  },
+  {
+    question: 'How many days are there in a week?',
+    type: 'choice',
+    options: ['5', '6', '7', '8'],
+    answer: '7',
+    difficulty: 1,
+    category: 'word'
+  },
+  {
+    question: 'The opposite of "big" is ___.',
+    type: 'fill',
+    options: [],
+    answer: 'small',
+    difficulty: 2,
+    category: 'word'
+  }
+];
+
+// 初始化 LeanCloud
+async function init() {
+  const statusEl = document.getElementById('status');
+  
+  try {
+    AV.init({
+      appId: CONFIG.appId,
+      appKey: CONFIG.appKey,
+      serverURL: CONFIG.serverURL
+    });
+    
+    statusEl.className = 'status success';
+    statusEl.textContent = '✓ 已连接到 LeanCloud';
+    
+    return true;
+  } catch (error) {
+    statusEl.className = 'status error';
+    statusEl.textContent = '✗ 连接失败: ' + error.message;
+    document.getElementById('initBtn').disabled = true;
+    return false;
+  }
+}
+
+// 更新进度显示
+function updateProgress(tableName, status) {
+  const item = document.getElementById('progress-' + tableName);
+  const icon = document.getElementById('icon-' + tableName);
+  
+  if (status === 'complete') {
+    item.classList.add('complete');
+    icon.className = 'check';
+    icon.innerHTML = '✓';
+  } else if (status === 'error') {
+    item.classList.add('error');
+    icon.className = 'cross';
+    icon.innerHTML = '✗';
+  } else {
+    icon.className = 'spinner';
+    icon.innerHTML = '';
+  }
+}
+
+// 开始初始化
+async function startInitialization() {
+  const btn = document.getElementById('initBtn');
+  const progressList = document.getElementById('progressList');
+  const status = document.getElementById('status');
+  
+  btn.disabled = true;
+  btn.textContent = '正在初始化...';
+  progressList.style.display = 'block';
+  status.style.display = 'none';
+  
+  try {
+    // 初始化连接
+    const connected = await init();
+    if (!connected) {
+      throw new Error('无法连接到 LeanCloud');
+    }
+    
+    // 创建 Questions 表和添加示例题目
+    await createQuestionsTable();
+    updateProgress('questions', 'complete');
+    
+    // 创建 Scores 表
+    await createScoresTable();
+    updateProgress('scores', 'complete');
+    
+    // 创建 Progress 表
+    await createProgressTable();
+    updateProgress('progress', 'complete');
+    
+    // 添加示例题目
+    const addedQuestions = await addSampleQuestions();
+    updateProgress('sample', 'complete');
+    
+    // 显示结果
+    showSuccess(addedQuestions);
+    
+  } catch (error) {
+    showError(error.message);
+  }
+}
+
+// 创建 Questions 表
+async function createQuestionsTable() {
+  // LeanCloud 会在首次保存数据时自动创建表
+  // 我们通过添加一条测试数据来创建表结构
+  const Question = AV.Object.extend('Questions');
+  const test = new Question();
+  
+  // 设置所有字段以确保表结构完整
+  test.set('question', 'TEST');
+  test.set('type', 'test');
+  test.set('answer', 'test');
+  test.set('options', []);
+  test.set('difficulty', 1);
+  test.set('category', 'test');
+  
+  await test.save();
+  
+  // 删除测试数据
+  await test.destroy();
+  
+  console.log('Questions 表创建成功');
+}
+
+// 创建 Scores 表
+async function createScoresTable() {
+  const Score = AV.Object.extend('Scores');
+  const test = new Score();
+  
+  test.set('studentId', 'test');
+  test.set('studentName', 'test');
+  test.set('questionId', 'test');
+  test.set('userAnswer', 'test');
+  test.set('isCorrect', false);
+  test.set('score', 0);
+  test.set('practiceDate', new Date());
+  
+  await test.save();
+  await test.destroy();
+  
+  console.log('Scores 表创建成功');
+}
+
+// 创建 Progress 表
+async function createProgressTable() {
+  const Progress = AV.Object.extend('Progress');
+  const test = new Progress();
+  
+  test.set('studentId', 'test');
+  test.set('studentName', 'test');
+  test.set('totalQuestions', 0);
+  test.set('correctCount', 0);
+  test.set('accuracy', 0);
+  test.set('lastPractice', new Date());
+  
+  await test.save();
+  await test.destroy();
+  
+  console.log('Progress 表创建成功');
+}
+
+// 添加示例题目
+async function addSampleQuestions() {
+  const addedQuestions = [];
+  
+  // 检查是否已有题目
+  const checkQuery = new AV.Query('Questions');
+  checkQuery.limit(1);
+  const existing = await checkQuery.find();
+  
+  if (existing.length > 0) {
+    console.log('题目已存在，跳过添加');
+    return ['题目已存在，未重复添加'];
+  }
+  
+  // 批量添加题目
+  for (let q of SAMPLE_QUESTIONS) {
+    const Question = AV.Object.extend('Questions');
+    const question = new Question();
+    
+    question.set('question', q.question);
+    question.set('type', q.type);
+    question.set('answer', q.answer);
+    question.set('options', q.options);
+    question.set('difficulty', q.difficulty);
+    question.set('category', q.category);
+    
+    await question.save();
+    addedQuestions.push(q.question);
+  }
+  
+  return addedQuestions;
+}
+
+// 显示成功结果
+function showSuccess(questions) {
+  document.getElementById('progressList').style.display = 'none';
+  document.getElementById('initBtn').style.display = 'none';
+  document.getElementById('result').style.display = 'block';
+  
+  const list = document.getElementById('sampleList');
+  list.innerHTML = questions.map(q => `<li>${q}</li>`).join('');
+}
+
+// 显示错误
+function showError(message) {
+  document.getElementById('progressList').style.display = 'none';
+  document.getElementById('initBtn').disabled = false;
+  document.getElementById('initBtn').textContent = '重新尝试';
+  document.getElementById('error').style.display = 'block';
+  document.getElementById('errorMsg').textContent = message;
+}
+
+// 页面加载完成后初始化
+window.addEventListener('DOMContentLoaded', async () => {
+  await init();
+});
+</script>
+
+</body>
+</html>
