@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>英语提分系统 · 练习模式</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", Arial, sans-serif;
+      background: radial-gradient(circle at 15% 20%, rgba(132, 159, 255, 0.35), transparent 45%),
+                  radial-gradient(circle at 85% 15%, rgba(169, 132, 255, 0.35), transparent 40%),
+                  linear-gradient(140deg, #f8f9ff, #eef2ff 50%, #f7f9ff 100%);
+      color: #2d3561;
+    }
+    .practice-shell {
+      max-width: 1120px;
+      margin: 32px auto;
+      padding: 0 24px 48px;
+    }
+    .practice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(157, 174, 255, 0.35);
+      border-radius: 24px;
+      padding: 22px 30px;
+      box-shadow: 0 20px 45px rgba(70, 78, 156, 0.16);
+      backdrop-filter: blur(12px);
+      position: sticky;
+      top: 18px;
+      z-index: 10;
+    }
+    .practice-logo {
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #27305c;
+    }
+    .practice-logo span {
+      font-size: 26px;
+    }
+    .practice-header-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .type-switch {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(235, 240, 255, 0.9);
+      border-radius: 18px;
+      padding: 6px;
+    }
+    .type-btn {
+      border: none;
+      background: transparent;
+      padding: 8px 18px;
+      border-radius: 14px;
+      font-size: 14px;
+      color: #46508d;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .type-btn:hover {
+      background: rgba(118, 134, 233, 0.18);
+    }
+    .type-btn.active {
+      background: linear-gradient(135deg, #6f7dff, #9d5bff);
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(111, 125, 255, 0.4);
+    }
+    .btn-ghost {
+      border: 1px solid rgba(111, 125, 255, 0.35);
+      background: rgba(255, 255, 255, 0.85);
+      color: #505a92;
+      padding: 9px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-ghost:hover {
+      background: rgba(111, 125, 255, 0.12);
+    }
+    .student-badge {
+      margin: 26px 0 18px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-radius: 14px;
+      background: rgba(235, 240, 255, 0.65);
+      color: #394173;
+      border: 1px solid rgba(157, 174, 255, 0.35);
+    }
+    .student-badge span {
+      font-weight: 600;
+    }
+    .practice-stats {
+      font-size: 15px;
+      color: #3c4672;
+      background: linear-gradient(135deg, rgba(243,246,255,0.8) 0%, #ffffff 70%);
+      border: 1px solid #d7ddff;
+      border-radius: 18px;
+      padding: 14px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 10px 26px rgba(90, 108, 179, 0.12);
+      min-height: 54px;
+    }
+    .practice-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+      background: linear-gradient(135deg, #f9faff 0%, #eef1ff 100%);
+      border: 1px solid #e2e7ff;
+      border-radius: 16px;
+      padding: 16px 20px;
+      box-shadow: 0 8px 20px rgba(70, 92, 182, 0.08);
+      margin-top: 18px;
+    }
+    .toolbar-section {
+      display: flex;
+      flex: 1 1 auto;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+    }
+    .toolbar-section label {
+      font-size: 15px;
+      color: #3c4672;
+      font-weight: 600;
+    }
+    .toolbar-section select,
+    .toolbar-section input {
+      padding: 10px 14px;
+      border: 1px solid #cfd5ef;
+      background: #fff;
+      min-width: 220px;
+      border-radius: 12px;
+      font-size: 14px;
+      color: #3a4377;
+    }
+    .toolbar-section input[type="search"] {
+      flex: 1 1 240px;
+    }
+    .toolbar-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .btn-secondary,
+    .btn-accent {
+      border: none;
+      border-radius: 12px;
+      padding: 10px 18px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .btn-secondary {
+      background: #f1f3f9;
+      color: #4b5675;
+      border: 1px solid rgba(161, 174, 220, 0.35);
+    }
+    .btn-secondary:hover { background: #e4e8f5; }
+    .btn-accent {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
+      box-shadow: 0 10px 24px rgba(102, 126, 234, 0.32);
+    }
+    .btn-accent:hover { transform: translateY(-1px); }
+    .practice-content {
+      margin-top: 20px;
+      background: #ffffff;
+      border: 1px solid #dde2ff;
+      border-radius: 18px;
+      padding: 26px 30px;
+      box-shadow: 0 16px 32px rgba(50, 64, 145, 0.12);
+      min-height: 360px;
+    }
+    .practice-content::-webkit-scrollbar { width: 8px; }
+    .practice-content::-webkit-scrollbar-thumb {
+      background: rgba(120, 134, 218, 0.45);
+      border-radius: 4px;
+    }
+    .practice-content::-webkit-scrollbar-track { background: rgba(228, 233, 255, 0.6); }
+    .loading-state,
+    .practice-empty {
+      text-align: center;
+      color: #5b6697;
+      font-size: 16px;
+      padding: 80px 20px;
+    }
+    .loading-state span {
+      display: inline-block;
+      margin-top: 18px;
+      padding: 8px 18px;
+      background: rgba(118, 134, 233, 0.12);
+      border-radius: 18px;
+      color: #4c57a4;
+      font-size: 14px;
+    }
+    .quiz-card {
+      background: #ffffff;
+      border: 1px solid #dce1ff;
+      border-radius: 20px;
+      padding: 26px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      box-shadow: 0 18px 36px rgba(44, 58, 146, 0.12);
+    }
+    .quiz-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 15px;
+      color: #495486;
+      font-weight: 600;
+    }
+    .quiz-prompt {
+      font-size: 24px;
+      font-weight: 600;
+      color: #2c3e50;
+    }
+    .practice-entry-meta {
+      font-size: 14px;
+      color: #56608c;
+      background: rgba(234, 238, 255, 0.6);
+      padding: 10px 14px;
+      border-radius: 12px;
+    }
+    .quiz-options {
+      display: grid;
+      gap: 14px;
+      grid-template-columns: repeat(1, minmax(0, 1fr));
+    }
+    @media (min-width: 720px) {
+      .quiz-options {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+    .quiz-option {
+      padding: 12px 16px;
+      border: 1px solid #dfe3ee;
+      border-radius: 12px;
+      background: #fff;
+      cursor: pointer;
+      text-align: left;
+      font-size: 14px;
+      color: #3a4460;
+      transition: all 0.2s ease;
+      box-shadow: 0 8px 18px rgba(120, 134, 218, 0.09);
+    }
+    .quiz-option:hover {
+      border-color: #667eea;
+      box-shadow: 0 8px 20px rgba(102, 126, 234, 0.25);
+      transform: translateY(-1px);
+    }
+    .quiz-option.correct {
+      border-color: #34c38f;
+      background: #e6f5ef;
+      color: #217a55;
+      box-shadow: 0 10px 24px rgba(52, 195, 143, 0.25);
+    }
+    .quiz-option.incorrect {
+      border-color: #ff6c6c;
+      background: #fff1f1;
+      color: #c0392b;
+    }
+    .quiz-answer {
+      padding: 16px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid #e3e7f2;
+      font-size: 14px;
+      color: #4b5675;
+      line-height: 1.6;
+      box-shadow: inset 0 0 0 1px rgba(120, 134, 218, 0.1);
+    }
+    .quiz-answer.hidden { display: none; }
+    .quiz-actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .quiz-hint { font-size: 13px; color: #6c757d; }
+    .sentence-assembly,
+    .sentence-pool {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px dashed #cbd5ff;
+      background: linear-gradient(135deg, rgba(245,248,255,0.9), #ffffff);
+      min-height: 78px;
+      width: 100%;
+      box-sizing: border-box;
+      justify-content: flex-start;
+    }
+    .sentence-assembly { flex-wrap: wrap; }
+    .sentence-pool { flex-wrap: wrap; overflow: visible; max-height: none; padding-bottom: 0; }
+    .sentence-assembly { border-style: solid; background: #ffffff; }
+    .sentence-assembly.is-empty { border-style: dashed; color: #9aa3bb; }
+    .sentence-assembly.correct { border-color: #34c38f; background: #f1fff6; }
+    .sentence-assembly.incorrect { border-color: #ff6c6c; background: #fff5f5; }
+    .sentence-placeholder { color: #8a94a6; font-size: 14px; }
+    .sentence-token {
+      border: 1px solid #ccd4ff;
+      border-radius: 12px;
+      background: #eef2ff;
+      padding: 10px 16px;
+      font-size: 15px;
+      color: #33426f;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex: none;
+      box-shadow: 0 6px 12px rgba(92, 112, 187, 0.18);
+    }
+    .sentence-token:hover { background: #dbe4ff; }
+    .sentence-token.disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+    .sentence-token.assembled { background: #ffffff; }
+    .sentence-token.removeable:hover { background: #ffecec; border-color: #ffb3b3; }
+    .sentence-hint { margin-top: 6px; font-size: 14px; color: #4b5675; background: #f7f9ff; border: 1px solid #dce3f5; border-radius: 10px; padding: 12px; }
+    .quiz-summary {
+      padding: 24px;
+      border-radius: 16px;
+      background: linear-gradient(135deg, rgba(245, 248, 255, 0.95), #ffffff);
+      border: 1px solid #d6deed;
+      font-size: 15px;
+      color: #4b5675;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: flex-start;
+    }
+    .quiz-summary strong { color: #2c3e50; }
+    .practice-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      background: linear-gradient(135deg, #7a89ff, #9a5bff);
+    }
+    .practice-toolbar .toolbar-hint {
+      font-size: 13px;
+      color: #5d689c;
+    }
+    @media (max-width: 768px) {
+      .practice-shell { padding: 0 16px 40px; }
+      .practice-header { flex-direction: column; align-items: flex-start; gap: 18px; }
+      .practice-header-actions { width: 100%; justify-content: space-between; }
+      .practice-content { padding: 20px 18px; }
+      .toolbar-section { flex-direction: column; align-items: stretch; }
+      .toolbar-section input[type="search"],
+      .toolbar-section select { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="practice-shell">
+    <header class="practice-header">
+      <div class="practice-logo"><span>📚</span>英语提分系统 · 练习模式</div>
+      <div class="practice-header-actions">
+        <div class="type-switch">
+          <button class="type-btn" data-practice-type="word">词汇练习</button>
+          <button class="type-btn" data-practice-type="grammar">语法练习</button>
+          <button class="type-btn" data-practice-type="sentence">句子练习</button>
+        </div>
+        <button class="btn-ghost" id="btnBackHome">返回首页</button>
+      </div>
+    </header>
+    <div class="student-badge" id="studentBadge" style="display:none;"></div>
+    <section id="practiceStats" class="practice-stats">正在准备练习，请稍候...</section>
+    <section id="practiceToolbar" class="practice-toolbar" style="display:none;"></section>
+    <section id="practiceContent" class="practice-content">
+      <div class="loading-state"><span>正在加载题库资源...</span></div>
+    </section>
+  </div>
+
+  <script src="data-loader.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const practiceStats = document.getElementById('practiceStats');
+    const practiceToolbar = document.getElementById('practiceToolbar');
+    const practiceContent = document.getElementById('practiceContent');
+    const studentBadge = document.getElementById('studentBadge');
+
+    const practiceState = {
+      type: urlParams.get('type') || 'word',
+      datasetId: urlParams.get('dataset') || null,
+      queue: [],
+      index: 0,
+      answered: 0,
+      correct: 0,
+      reveal: false,
+      queueSourceId: null,
+      assetsReady: false
+    };
+
+    const studentName = urlParams.get('student');
+    if (studentName) {
+      studentBadge.style.display = 'inline-flex';
+      studentBadge.innerHTML = `<span>当前学生：</span>${studentName}`;
+    }
+
+    document.querySelectorAll('[data-practice-type]').forEach(btn => {
+      btn.addEventListener('click', () => setPracticeType(btn.dataset.practiceType));
+    });
+
+    document.getElementById('btnBackHome').addEventListener('click', () => {
+      window.location.href = 'index.html';
+    });
+
+    function updateTypeButtons() {
+      document.querySelectorAll('[data-practice-type]').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.practiceType === practiceState.type);
+      });
+    }
+
+    function setPracticeType(type) {
+      if (!type) return;
+      practiceState.type = type;
+      practiceState.datasetId = null;
+      resetProgress();
+      updateURL();
+      updateTypeButtons();
+      renderCurrentPractice();
+    }
+
+    function updateURL() {
+      const url = new URL(window.location.href);
+      url.searchParams.set('type', practiceState.type);
+      if (practiceState.datasetId) {
+        url.searchParams.set('dataset', practiceState.datasetId);
+      } else {
+        url.searchParams.delete('dataset');
+      }
+      if (studentName) {
+        url.searchParams.set('student', studentName);
+      }
+      history.replaceState({}, '', url);
+    }
+
+    function resetProgress() {
+      practiceState.queue = [];
+      practiceState.index = 0;
+      practiceState.answered = 0;
+      practiceState.correct = 0;
+      practiceState.reveal = false;
+      practiceState.queueSourceId = null;
+    }
+
+    function renderCurrentPractice() {
+      if (!practiceState.assetsReady) {
+        practiceStats.textContent = '资源加载中，请稍候...';
+        practiceToolbar.style.display = 'none';
+        practiceContent.innerHTML = '<div class="loading-state"><span>正在加载题库资源...</span></div>';
+        return;
+      }
+      practiceToolbar.style.display = 'flex';
+      switch (practiceState.type) {
+        case 'grammar':
+          renderGrammarPractice();
+          break;
+        case 'sentence':
+          renderSentencePractice();
+          break;
+        case 'word':
+        default:
+          renderWordPractice();
+          break;
+      }
+    }
+
+    function updateQuizProgress(total, label) {
+      const current = Math.min(practiceState.index + 1, total);
+      const accuracy = practiceState.answered ? Math.round((practiceState.correct / practiceState.answered) * 100) : 0;
+      const prefix = label ? `${label} · ` : '';
+      practiceStats.textContent = `${prefix}进度：第 ${current}/${total} 题 · 已答 ${practiceState.answered} 题 · 正确率 ${accuracy}%`;
+    }
+
+
+function renderWordPractice() {
+  const datasets = collectVocabularyDatasets();
+
+  if (!datasets.length) {
+    practiceToolbar.innerHTML = '';
+    practiceContent.innerHTML = '<div class="practice-empty">暂未检测到词汇数据，请确认词汇脚本已成功加载。</div>';
+    practiceStats.textContent = '词汇数据未加载';
+    return;
+  }
+
+  if (!practiceState.datasetId || !datasets.some(dataset => dataset.id === practiceState.datasetId)) {
+    practiceState.datasetId = datasets[0].id;
+    resetProgress();
+    updateURL();
+  }
+
+  const dataset = datasets.find(item => item.id === practiceState.datasetId) || datasets[0];
+  const optionsHtml = buildVocabularyOptions(datasets, dataset.id);
+  const hintText = dataset.description || '系统会随机抽取词汇进行四选一释义测试，请选择正确中文释义';
+
+  practiceToolbar.innerHTML = `
+    <div class="toolbar-section">
+      <label for="wordDataset">选择词库</label>
+      <select id="wordDataset">${optionsHtml}</select>
+      <span class="toolbar-hint">${hintText}</span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn-secondary" id="wordRestartBtn">重新开始</button>
+    </div>
+  `;
+
+  document.getElementById('wordDataset').addEventListener('change', event => {
+    practiceState.datasetId = event.target.value;
+    resetProgress();
+    updateURL();
+    renderWordPractice();
+  });
+
+  document.getElementById('wordRestartBtn').addEventListener('click', () => {
+    resetProgress();
+    renderWordPractice();
+  });
+
+  renderWordQuiz(dataset);
+}
+
+function renderWordQuiz(dataset) {
+  if (!dataset || !Array.isArray(dataset.entries) || !dataset.entries.length) {
+    practiceContent.innerHTML = '<div class="practice-empty">该词库暂无词条，请选择其他词库。</div>';
+    practiceStats.textContent = `${dataset ? dataset.title : '词汇练习'} 暂无词条`;
+    return;
+  }
+
+  if (practiceState.queueSourceId !== dataset.id) {
+    practiceState.queue = [];
+  }
+
+  if (!practiceState.queue.length) {
+    practiceState.queue = shuffle(dataset.entries.slice());
+    practiceState.queueSourceId = dataset.id;
+    practiceState.index = 0;
+    practiceState.answered = 0;
+    practiceState.correct = 0;
+    practiceState.reveal = false;
+  }
+
+  const total = practiceState.queue.length;
+  if (practiceState.index >= total) {
+    showWordSummary(dataset);
+    return;
+  }
+
+  const current = practiceState.queue[practiceState.index];
+  const availableEntries = dataset.entries.filter(item => item !== current && item.cn);
+  const distractorPool = shuffle(availableEntries);
+  const distractors = [];
+  const seenTranslations = new Set();
+  const correctTranslation = (current.cn || '').trim();
+
+  for (const candidate of distractorPool) {
+    const translation = (candidate.cn || '').trim();
+    if (!translation) continue;
+    const normalized = translation.toLowerCase();
+    if (normalized === correctTranslation.toLowerCase() || seenTranslations.has(normalized)) continue;
+    distractors.push(candidate);
+    seenTranslations.add(normalized);
+    if (distractors.length === 3) break;
+  }
+
+  while (distractors.length < 3) {
+    distractors.push({ word: '', cn: '（待补充）' });
+  }
+
+  const optionData = shuffle([
+    { isCorrect: true, text: current.cn || '暂无中文释义' },
+    ...distractors.slice(0, 3).map(item => ({ isCorrect: false, text: item.cn || '（待补充）' }))
+  ]).map((option, index) => ({ ...option, letter: String.fromCharCode(65 + index) }));
+
+  const answerDetails = [
+    `正确释义：<strong>${current.cn || '暂无中文释义'}</strong>`,
+    current.pos ? `词性：${current.pos}` : '',
+    current.example ? `例句：${current.example}` : '',
+    current.note ? `说明：${current.note}` : ''
+  ].filter(Boolean).join('<br>');
+
+  practiceContent.innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-header">
+        <span>${dataset.title}</span>
+        <span>正确 ${practiceState.correct}/${practiceState.answered}</span>
+      </div>
+      <div class="quiz-prompt">${current.word || ''}</div>
+      ${current.freq ? `<div class="practice-entry-meta">频率指数：${current.freq}</div>` : ''}
+      <div class="quiz-options">
+        ${optionData.map(option => `<button class="quiz-option" data-correct="${option.isCorrect ? '1' : '0'}"><strong>${option.letter}.</strong> ${option.text}</button>`).join('')}
+      </div>
+      <div id="wordAnswer" class="quiz-answer hidden">${answerDetails || '暂无解析，请联系教师补充词汇信息。'}</div>
+      <div class="quiz-actions">
+        <span class="quiz-hint">选择一个选项查看答案并进入下一题。</span>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-secondary" id="wordSkipBtn">跳过此题</button>
+          <button class="btn-accent" id="wordNextBtn" disabled>下一题</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  updateQuizProgress(total, dataset.title);
+
+  const answerBox = document.getElementById('wordAnswer');
+  const nextBtn = document.getElementById('wordNextBtn');
+  const skipBtn = document.getElementById('wordSkipBtn');
+  const optionButtons = Array.from(document.querySelectorAll('.quiz-option'));
+
+  optionButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      if (practiceState.reveal) return;
+      const isCorrect = button.dataset.correct === '1';
+      practiceState.reveal = true;
+      practiceState.answered++;
+      if (isCorrect) {
+        practiceState.correct++;
+        button.classList.add('correct');
+      } else {
+        button.classList.add('incorrect');
+        const correctButton = optionButtons.find(btn => btn.dataset.correct === '1');
+        if (correctButton) correctButton.classList.add('correct');
+      }
+      optionButtons.forEach(btn => btn.disabled = true);
+      answerBox.classList.remove('hidden');
+      nextBtn.disabled = false;
+      updateQuizProgress(total, dataset.title);
+    });
+  });
+
+  nextBtn.addEventListener('click', () => {
+    practiceState.index++;
+    practiceState.reveal = false;
+    renderWordQuiz(dataset);
+  });
+
+  skipBtn.addEventListener('click', () => {
+    practiceState.index++;
+    practiceState.reveal = false;
+    renderWordQuiz(dataset);
+  });
+}
+
+function showWordSummary(dataset) {
+  const answered = practiceState.answered;
+  const accuracy = answered ? Math.round((practiceState.correct / answered) * 100) : 0;
+  const poolSize = dataset.entries.length;
+
+  practiceStats.textContent = `${dataset.title} 练习完成 · 作答 ${answered} / ${poolSize} 词条 · 正确 ${practiceState.correct} · 正确率 ${accuracy}%`;
+
+  practiceContent.innerHTML = `
+    <div class="quiz-summary">
+      <strong>练习完成！</strong>
+      <p>本轮共作答 ${answered} 个词条，答对 ${practiceState.correct} 个，正确率 ${accuracy}%。</p>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn-accent" id="wordRetryAll">重新练习</button>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('wordRetryAll').addEventListener('click', () => {
+    resetProgress();
+    renderWordPractice();
+  });
+}
+
+
+function buildVocabularyOptions(datasets, selectedId) {
+  const groupMap = new Map();
+  datasets.forEach(dataset => {
+    const groupName = dataset.group || '词汇库';
+    if (!groupMap.has(groupName)) groupMap.set(groupName, []);
+    groupMap.get(groupName).push(dataset);
+  });
+  return Array.from(groupMap.entries()).map(([groupName, items]) => {
+    const options = items.map(item => `<option value="${item.id}" ${item.id === selectedId ? 'selected' : ''}>${item.title}（${item.total}词）</option>`).join('');
+    return `<optgroup label="${groupName}">${options}</optgroup>`;
+  }).join('');
+}
+
+function collectVocabularyDatasets() {
+  const datasets = [];
+
+  if (Array.isArray(window.vocabulary688) && window.vocabulary688.length) {
+    const entries = window.vocabulary688
+      .filter(item => item && item.word)
+      .map(item => ({
+        word: item.word,
+        cn: item.cn || item.translation || '',
+        pos: item.pos || item.type || '',
+        example: item.example || '',
+        freq: item.freq || ''
+      }));
+    if (entries.length) {
+      datasets.push({
+        id: 'core-688',
+        title: '核心688词汇',
+        entries,
+        total: entries.length,
+        group: '核心词汇',
+        description: '高考核心 688 词汇，覆盖常见考试高频词。'
+      });
+    }
+  }
+
+  if (window.textbookVocab && typeof window.textbookVocab === 'object') {
+    let unitIndex = 0;
+    Object.entries(window.textbookVocab).forEach(([bookId, book]) => {
+      const bookName = book && book.name ? book.name : bookId;
+      const units = book && book.units ? book.units : {};
+      Object.entries(units).forEach(([unitName, unitContent]) => {
+        const entries = extractTextbookUnitEntries(unitContent, unitName);
+        if (!entries.length) return;
+        const slug = `${slugify(bookId)}-${slugify(unitName)}-${unitIndex}`;
+        datasets.push({
+          id: `textbook-${slug}`,
+          title: `${bookName} · ${unitName}`,
+          entries,
+          total: entries.length,
+          group: '教材词汇',
+          description: `${bookName} ${unitName}`
+        });
+        unitIndex += 1;
+      });
+    });
+  }
+
+  if (window.vocab3500 && typeof window.vocab3500 === 'object') {
+    Object.keys(window.vocab3500).sort().forEach(letter => {
+      const list = window.vocab3500[letter];
+      if (!Array.isArray(list) || !list.length) return;
+      const entries = list
+        .filter(item => item && item.word)
+        .map(item => normalize3500Entry(item))
+        .filter(Boolean);
+      if (!entries.length) return;
+      datasets.push({
+        id: `vocab3500-${letter}`,
+        title: `高考3500词 · ${letter}`,
+        entries,
+        total: entries.length,
+        group: '高考3500词'
+      });
+    });
+  }
+
+  return datasets;
+}
+
+function normalize3500Entry(item) {
+  if (!item || !item.word) return null;
+  const meanings = [];
+  const types = [];
+  ['meaning', 'meaning2', 'meaning3', 'meaning4'].forEach(key => {
+    if (item[key]) meanings.push(String(item[key]));
+  });
+  ['type', 'type2', 'type3', 'type4'].forEach(key => {
+    if (item[key]) types.push(String(item[key]));
+  });
+  return {
+    word: item.word,
+    cn: meanings.join('；') || '',
+    pos: types.join('；') || ''
+  };
+}
+
+function extractTextbookUnitEntries(unitContent, sectionLabel) {
+  const entries = [];
+  if (!unitContent || typeof unitContent !== 'object') return entries;
+  Object.entries(unitContent).forEach(([categoryName, items]) => {
+    if (!Array.isArray(items)) return;
+    items.forEach(item => {
+      const word = item.word || item.phrase || item.expression || item.idiom;
+      const translation = item.translation || item.cn || item.meaning || '';
+      if (!word || !translation) return;
+      entries.push({
+        word,
+        cn: translation,
+        pos: categoryName,
+        note: sectionLabel
+      });
+    });
+  });
+  return entries;
+}
+
+function slugify(value) {
+  if (value === null || value === undefined) return Math.random().toString(36).slice(2, 8);
+  const raw = String(value).trim();
+  if (!raw) return Math.random().toString(36).slice(2, 8);
+  const ascii = raw.toLowerCase().replace(/[^0-9a-z]+/g, '-').replace(/^-+|-+$/g, '');
+  if (ascii) return ascii;
+  const encoded = encodeURIComponent(raw).replace(/%/g, '-').replace(/-+/g, '-').replace(/^-+|-+$/g, '');
+  return encoded || Math.random().toString(36).slice(2, 8);
+}
+    function renderGrammarPractice() {
+      const datasets = collectGrammarDatasets();
+      if (!datasets.length) {
+        practiceToolbar.innerHTML = '';
+        practiceContent.innerHTML = '<div class="practice-empty">尚未加载语法题库数据，请稍后重试。</div>';
+        practiceStats.textContent = '语法题库未加载';
+        return;
+      }
+
+      if (!practiceState.datasetId || !datasets.some(item => item.id === practiceState.datasetId)) {
+        practiceState.datasetId = datasets[0].id;
+        resetProgress();
+        updateURL();
+      }
+
+      const optionsHtml = buildGrammarOptions(datasets, practiceState.datasetId);
+
+      practiceToolbar.innerHTML = `
+        <div class="toolbar-section">
+          <label for="grammarDataset">选择题库</label>
+          <select id="grammarDataset">${optionsHtml}</select>
+          <span class="toolbar-hint">随机抽取选择题，选择正确答案并查看解析</span>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn-secondary" id="grammarRestartBtn">重新练习</button>
+        </div>
+      `;
+
+      document.getElementById('grammarDataset').addEventListener('change', event => {
+        practiceState.datasetId = event.target.value;
+        resetProgress();
+        updateURL();
+        renderGrammarPractice();
+      });
+
+      document.getElementById('grammarRestartBtn').addEventListener('click', () => {
+        resetProgress();
+        renderGrammarPractice();
+      });
+
+      const dataset = datasets.find(item => item.id === practiceState.datasetId) || datasets[0];
+      renderGrammarQuiz(dataset);
+    }
+
+    function buildGrammarOptions(datasets, currentId) {
+      const groups = datasets.reduce((acc, dataset) => {
+        const group = dataset.group || '语法题库';
+        if (!acc[group]) acc[group] = [];
+        acc[group].push(dataset);
+        return acc;
+      }, {});
+      return Object.entries(groups).map(([groupName, items]) => {
+        const options = items.map(item => `<option value="${item.id}" ${item.id === currentId ? 'selected' : ''}>${item.title}（${item.total}题）</option>`).join('');
+        return `<optgroup label="${groupName}">${options}</optgroup>`;
+      }).join('');
+    }
+
+    function renderGrammarQuiz(dataset) {
+      if (!Array.isArray(dataset.questions) || !dataset.questions.length) {
+        practiceContent.innerHTML = '<div class="practice-empty">该题库暂无题目，请选择其它题库。</div>';
+        practiceStats.textContent = `${dataset.title} 暂无题目`;
+        return;
+      }
+
+      if (!practiceState.queue.length) {
+        practiceState.queue = shuffle(dataset.questions.slice());
+        practiceState.index = 0;
+        practiceState.correct = 0;
+        practiceState.answered = 0;
+        practiceState.reveal = false;
+      }
+
+      const total = practiceState.queue.length;
+
+      if (practiceState.index >= total) {
+        showGrammarSummary(dataset);
+        return;
+      }
+
+      const current = practiceState.queue[practiceState.index];
+      const optionPairs = Array.isArray(current.options)
+        ? current.options.map((value, index) => ({ key: String.fromCharCode(65 + index), value: stripOptionPrefix(value) }))
+        : Object.entries(current.options || {}).map(([key, value]) => ({ key, value: stripOptionPrefix(value) }));
+
+      const normalizedAnswer = (current.answer || current.correctAnswer || '').toString().trim().toUpperCase();
+
+      practiceContent.innerHTML = `
+        <div class="quiz-card">
+          <div class="quiz-header">
+            <span>${dataset.title}</span>
+            <span>正确 ${practiceState.correct}/${practiceState.answered}</span>
+          </div>
+          <div class="quiz-prompt">${practiceState.index + 1}. ${current.question || '题目缺失'}</div>
+          ${current.section ? `<div class="practice-entry-meta">所属模块：${current.section}</div>` : ''}
+          ${current.knowledge ? `<div class="practice-entry-meta">知识点：${current.knowledge}</div>` : ''}
+          <div class="quiz-options">
+            ${optionPairs.map(option => `<button class="quiz-option" data-option="${option.key}"><strong>${option.key}.</strong> ${option.value}</button>`).join('')}
+          </div>
+          <div id="grammarAnswer" class="quiz-answer hidden">${buildGrammarAnswerBlock(current, normalizedAnswer)}</div>
+          <div class="quiz-actions">
+            <span class="quiz-hint">选择一个选项，查看解析并进入下一题。</span>
+            <div style="display:flex;gap:10px;">
+              <button class="btn-secondary" id="grammarSkipBtn">跳过此题</button>
+              <button class="btn-accent" id="grammarNextBtn" disabled>下一题</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      updateQuizProgress(total, dataset.title);
+
+      const answerBox = document.getElementById('grammarAnswer');
+      const nextBtn = document.getElementById('grammarNextBtn');
+      const skipBtn = document.getElementById('grammarSkipBtn');
+      const optionButtons = Array.from(document.querySelectorAll('.quiz-option'));
+
+      optionButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          if (practiceState.reveal) return;
+          const choice = (button.dataset.option || '').toUpperCase();
+          const isCorrect = normalizedAnswer ? choice === normalizedAnswer : false;
+
+          practiceState.reveal = true;
+          practiceState.answered++;
+          if (isCorrect) {
+            practiceState.correct++;
+            button.classList.add('correct');
+          } else {
+            button.classList.add('incorrect');
+            if (normalizedAnswer) {
+              const correctButton = optionButtons.find(btn => (btn.dataset.option || '').toUpperCase() === normalizedAnswer);
+              if (correctButton) correctButton.classList.add('correct');
+            }
+          }
+
+          optionButtons.forEach(btn => btn.disabled = true);
+          answerBox.classList.remove('hidden');
+          nextBtn.disabled = false;
+          updateQuizProgress(total, dataset.title);
+        });
+      });
+
+      nextBtn.addEventListener('click', () => {
+        practiceState.index++;
+        practiceState.reveal = false;
+        renderGrammarPractice();
+      });
+
+      skipBtn.addEventListener('click', () => {
+        practiceState.index++;
+        practiceState.reveal = false;
+        renderGrammarPractice();
+      });
+    }
+
+    function showGrammarSummary(dataset) {
+      const total = practiceState.queue.length;
+      const answered = practiceState.answered;
+      const accuracy = answered ? Math.round((practiceState.correct / answered) * 100) : 0;
+
+      practiceStats.textContent = `${dataset.title} 练习完成 · 作答 ${answered} 题 · 正确率 ${accuracy}%`;
+
+      practiceContent.innerHTML = `
+        <div class="quiz-summary">
+          <strong>练习完成！</strong>
+          <p>${dataset.title} 共 ${total} 题，本轮作答 ${answered} 题，答对 ${practiceState.correct} 题，正确率 ${accuracy}%。</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn-accent" id="grammarRetry">重新练习</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('grammarRetry').addEventListener('click', () => {
+        resetProgress();
+        renderGrammarPractice();
+      });
+    }
+
+    function renderSentencePractice() {
+      const datasets = collectSentenceDatasets();
+      if (!datasets.length) {
+        practiceToolbar.innerHTML = '';
+        practiceContent.innerHTML = '<div class="practice-empty">尚未加载句子或作文模板数据，请稍后重试。</div>';
+        practiceStats.textContent = '句子数据未加载';
+        return;
+      }
+
+      if (!practiceState.datasetId || !datasets.some(item => item.id === practiceState.datasetId)) {
+        practiceState.datasetId = datasets[0].id;
+        resetProgress();
+        updateURL();
+      }
+
+      const options = datasets.map(dataset => `<option value="${dataset.id}" ${dataset.id === practiceState.datasetId ? 'selected' : ''}>${dataset.title}（${dataset.total}句）</option>`).join('');
+
+      practiceToolbar.innerHTML = `
+        <div class="toolbar-section">
+          <label for="sentenceDataset">选择素材</label>
+          <select id="sentenceDataset">${options}</select>
+          <span class="toolbar-hint">点击下方词块，按正确顺序还原句子</span>
+        </div>
+        <div class="toolbar-actions">
+          <button class="btn-secondary" id="sentenceRestartBtn">重新练习</button>
+        </div>
+      `;
+
+      document.getElementById('sentenceDataset').addEventListener('change', event => {
+        practiceState.datasetId = event.target.value;
+        resetProgress();
+        updateURL();
+        renderSentencePractice();
+      });
+
+      document.getElementById('sentenceRestartBtn').addEventListener('click', () => {
+        resetProgress();
+        renderSentencePractice();
+      });
+
+      const dataset = datasets.find(entry => entry.id === practiceState.datasetId) || datasets[0];
+      renderSentenceQuiz(dataset);
+    }
+
+    function collectSentenceDatasets() {
+      const datasets = [];
+      const baseSentences = Array.isArray(window.vocabularyData) ? window.vocabularyData : [];
+      if (baseSentences.length) {
+        datasets.push({
+          id: 'sentences',
+          title: '精选句子200',
+          total: baseSentences.length,
+          items: baseSentences.map((item, index) => ({
+            index: item.id || index + 1,
+            english: item.english,
+            chinese: item.chinese,
+            keywords: Array.isArray(item.keywords) ? item.keywords : []
+          }))
+        });
+      }
+
+      const essayConfigs = [
+        { key: 'activityIntroduction', label: '作文模板 · 活动介绍' },
+        { key: 'activityReport', label: '作文模板 · 活动报告' },
+        { key: 'apologyLetter', label: '作文模板 · 道歉信' },
+        { key: 'applicationLetter', label: '作文模板 · 申请信' },
+        { key: 'invitationContent', label: '作文模板 · 邀请信' },
+        { key: 'noticeLetter', label: '作文模板 · 通知信' },
+        { key: 'personDescription', label: '作文模板 · 人物介绍' },
+        { key: 'suggestionLetter', label: '作文模板 · 建议信' }
+      ];
+
+      essayConfigs.forEach(cfg => {
+        const source = window[cfg.key];
+        if (!source || !Array.isArray(source.sentences) || !source.sentences.length) return;
+        const title = source.title?.chinese || source.title?.english || cfg.label;
+        datasets.push({
+          id: cfg.key,
+          title,
+          total: source.sentences.length,
+          items: source.sentences.map((sentence, index) => ({
+            index: index + 1,
+            english: sentence.english,
+            chinese: sentence.chinese,
+            keywords: Array.isArray(sentence.keywords) ? sentence.keywords : []
+          }))
+        });
+      });
+
+      return datasets;
+    }
+
+    function renderSentenceQuiz(dataset) {
+      if (!Array.isArray(dataset.items) || !dataset.items.length) {
+        practiceContent.innerHTML = '<div class="practice-empty">该素材暂无可用句子，请选择其它素材。</div>';
+        practiceStats.textContent = `${dataset.title} 暂无句子`;
+        return;
+      }
+
+      if (!practiceState.queue.length) {
+        practiceState.queue = shuffle(dataset.items.slice());
+        practiceState.index = 0;
+        practiceState.correct = 0;
+        practiceState.answered = 0;
+        practiceState.reveal = false;
+      }
+
+      const total = practiceState.queue.length;
+
+      if (practiceState.index >= total) {
+        showSentenceSummary(dataset);
+        return;
+      }
+
+      const current = practiceState.queue[practiceState.index];
+      const translation = current.chinese || '';
+      const keywords = Array.isArray(current.keywords) ? current.keywords : [];
+      const keywordText = keywords.length ? keywords.join('、') : '';
+      const originalTokens = splitSentenceIntoChunks(current.english);
+
+      const wordPositions = [];
+      originalTokens.forEach((token, index) => {
+        if (isWordToken(token)) wordPositions.push(index);
+      });
+
+      if (!wordPositions.length) {
+        practiceState.index++;
+        renderSentencePractice();
+        return;
+      }
+
+      const wordTokens = wordPositions.map((tokenIndex, wordIndex) => ({
+        value: originalTokens[tokenIndex],
+        key: `word-${wordIndex}`
+      }));
+      const originalWords = wordTokens.map(token => token.value);
+      const shuffledTokens = shuffle(wordTokens.map(token => ({ ...token })));
+      const referenceSentence = joinSentenceTokens(originalTokens);
+
+      practiceContent.innerHTML = `
+        <div class="quiz-card">
+          <div class="quiz-header">
+            <span>${dataset.title}</span>
+            <span>掌握 ${practiceState.correct}/${practiceState.answered}</span>
+          </div>
+          <div class="quiz-prompt">请点击下方词块，按正确顺序还原英文句子</div>
+          ${keywordText ? `<div class="practice-entry-meta">关键词：${keywordText}</div>` : ''}
+          <div id="sentenceHint" class="sentence-hint">中文提示：${translation || '暂无中文提示'}</div>
+          <div class="sentence-assembly is-empty" id="sentenceAssembly"></div>
+          <div class="sentence-pool" id="sentencePool"></div>
+          <div id="sentenceAnswer" class="quiz-answer hidden"></div>
+          <div class="quiz-actions">
+            <span class="quiz-hint">将词块按顺序排列后，点击“检查答案”查看结果。</span>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn-secondary" id="sentenceResetBtn">重置</button>
+              <button class="btn-secondary" id="sentenceHintBtn">隐藏中文提示</button>
+              <button class="btn-accent" id="sentenceCheckBtn" disabled>检查答案</button>
+              <button class="btn-accent" id="sentenceNextBtn" disabled>下一句</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      updateQuizProgress(total, dataset.title);
+
+      const assemblyContainer = document.getElementById('sentenceAssembly');
+      const poolContainer = document.getElementById('sentencePool');
+      const answerBox = document.getElementById('sentenceAnswer');
+      const resetBtn = document.getElementById('sentenceResetBtn');
+      const hintBtn = document.getElementById('sentenceHintBtn');
+      const hintBox = document.getElementById('sentenceHint');
+      const checkBtn = document.getElementById('sentenceCheckBtn');
+      const nextBtn = document.getElementById('sentenceNextBtn');
+
+      const assembled = [];
+      const tokenButtonMap = new Map();
+      let hintVisible = true;
+
+      shuffledTokens.forEach(token => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'sentence-token';
+        button.dataset.key = token.key;
+        button.textContent = token.value;
+        button.addEventListener('click', () => {
+          if (practiceState.reveal || button.disabled) return;
+          button.disabled = true;
+          button.classList.add('disabled');
+          assembled.push(token);
+          renderAssembly();
+          updateCheckButtonState();
+        });
+        tokenButtonMap.set(token.key, button);
+        poolContainer.appendChild(button);
+      });
+
+      function renderAssembly() {
+        assemblyContainer.classList.remove('correct', 'incorrect');
+        assemblyContainer.innerHTML = '';
+        if (!assembled.length) {
+          assemblyContainer.classList.add('is-empty');
+          assemblyContainer.innerHTML = '<span class="sentence-placeholder">点击下方词块还原句子</span>';
+          return;
+        }
+        assemblyContainer.classList.remove('is-empty');
+        assembled.forEach(token => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'sentence-token assembled';
+          button.dataset.key = token.key;
+          button.textContent = token.value;
+          if (!practiceState.reveal) {
+            button.classList.add('removeable');
+            button.addEventListener('click', () => {
+              const index = assembled.findIndex(item => item.key === token.key);
+              if (index !== -1) assembled.splice(index, 1);
+              const poolButton = tokenButtonMap.get(token.key);
+              if (poolButton) {
+                poolButton.disabled = false;
+                poolButton.classList.remove('disabled');
+              }
+              renderAssembly();
+              updateCheckButtonState();
+            });
+          } else {
+            button.disabled = true;
+          }
+          assemblyContainer.appendChild(button);
+        });
+      }
+
+      function updateCheckButtonState() {
+        checkBtn.disabled = practiceState.reveal || assembled.length !== originalWords.length;
+      }
+
+      resetBtn.addEventListener('click', () => {
+        if (practiceState.reveal) return;
+        assembled.length = 0;
+        tokenButtonMap.forEach(button => {
+          button.disabled = false;
+          button.classList.remove('disabled');
+        });
+        renderAssembly();
+        updateCheckButtonState();
+      });
+
+      hintBtn.addEventListener('click', () => {
+        hintVisible = !hintVisible;
+        hintBox.style.display = hintVisible ? 'block' : 'none';
+        hintBtn.textContent = hintVisible ? '隐藏中文提示' : '显示中文提示';
+      });
+
+      checkBtn.addEventListener('click', () => {
+        if (practiceState.reveal) return;
+        if (assembled.length !== originalWords.length) {
+          alert('请先选完所有词块。');
+          return;
+        }
+        const assembledWords = assembled.map(item => item.value);
+        const isCorrect = compareWordOrder(originalWords, assembledWords);
+        const assembledSentence = rebuildSentenceFromWords(originalTokens, assembledWords);
+
+        practiceState.answered++;
+        if (isCorrect) practiceState.correct++;
+        practiceState.reveal = true;
+
+        tokenButtonMap.forEach(button => {
+          button.disabled = true;
+          button.classList.add('disabled');
+        });
+
+        renderAssembly();
+        assemblyContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+        const resultLines = [
+          `<strong>正确句子：</strong>${referenceSentence}`,
+          translation ? `中文：${translation}` : '',
+          keywordText ? `关键词：${keywordText}` : '',
+          !isCorrect ? `<span style="color:#c0392b;">你的答案：${assembledSentence}</span>` : ''
+        ].filter(Boolean);
+
+        answerBox.innerHTML = resultLines.join('<br>');
+        answerBox.classList.remove('hidden');
+
+        checkBtn.disabled = true;
+        resetBtn.disabled = true;
+        nextBtn.disabled = false;
+
+        updateQuizProgress(total, dataset.title);
+      });
+
+      nextBtn.addEventListener('click', () => {
+        practiceState.index++;
+        practiceState.reveal = false;
+        renderSentencePractice();
+      });
+
+      renderAssembly();
+      updateCheckButtonState();
+    }
+
+    function showSentenceSummary(dataset) {
+      const total = practiceState.queue.length;
+      const answered = practiceState.answered;
+      const accuracy = answered ? Math.round((practiceState.correct / answered) * 100) : 0;
+
+      practiceStats.textContent = `${dataset.title} 练习完成 · 作答 ${answered} 句 · 正确率 ${accuracy}%`;
+
+      practiceContent.innerHTML = `
+        <div class="quiz-summary">
+          <strong>练习完成！</strong>
+          <p>${dataset.title} 共 ${total} 句，本轮作答 ${answered} 句，标记掌握 ${practiceState.correct} 句，正确率 ${accuracy}%。</p>
+          <div style="display:flex;gap:12px;flex-wrap:wrap;">
+            <button class="btn-accent" id="sentenceRetry">重新练习</button>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('sentenceRetry').addEventListener('click', () => {
+        resetProgress();
+        renderSentencePractice();
+      });
+    }
+
+    function collectGrammarDatasets() {
+      const seen = new Set();
+      const conceptDatasets = [];
+      const choiceDatasets = [];
+      const gapFillSource = collectGrammarGapFillDatasets();
+      const gapFillDatasets = [];
+
+      const addDataset = dataset => {
+        if (!dataset || !Array.isArray(dataset.questions) || !dataset.questions.length) return;
+        if (!dataset.id) dataset.id = `grammar-${seen.size + 1}`;
+        if (seen.has(dataset.id)) return;
+        dataset.total = dataset.questions.length;
+        seen.add(dataset.id);
+        if (dataset.group === '语法选择题库') {
+          choiceDatasets.push(dataset);
+        } else if (dataset.group === '语法填空题库') {
+          gapFillDatasets.push(dataset);
+        } else {
+          conceptDatasets.push(dataset);
+        }
+      };
+
+      if (window.englishGrammarConcepts && Array.isArray(window.englishGrammarConcepts.sections)) {
+        const concept = window.englishGrammarConcepts;
+        const allQuestions = flattenEnglishConcepts();
+        if (allQuestions.length) {
+          addDataset({
+            id: 'concepts-all',
+            title: concept.title || '语法知识点200题',
+            questions: allQuestions,
+            group: '语法概念精读'
+          });
+        }
+        concept.sections.forEach((section, index) => {
+          const sectionQuestions = flattenEnglishConcepts(index);
+          if (!sectionQuestions.length) return;
+          const prefix = (index + 1).toString().padStart(2, '0');
+          addDataset({
+            id: `concepts-section-${index + 1}`,
+            title: `${prefix} ${section.name || '语法章节'}`,
+            questions: sectionQuestions,
+            group: '语法概念精读'
+          });
+        });
+      }
+
+      const banks = window.grammarQuestionBanks || {};
+      const bankOrder = Array.isArray(window.grammarQuestionOrder) && window.grammarQuestionOrder.length
+        ? window.grammarQuestionOrder
+        : Object.keys(banks);
+      bankOrder.forEach(id => {
+        const bank = banks[id];
+        if (!bank || !Array.isArray(bank.questions) || !bank.questions.length) return;
+        addDataset({
+          id,
+          title: bank.title || id,
+          questions: bank.questions.map(question => ({ ...question })),
+          group: '语法选择题库'
+        });
+      });
+
+      gapFillSource.forEach(dataset => addDataset(dataset));
+
+      return [...conceptDatasets, ...choiceDatasets, ...gapFillDatasets];
+    }
+    function collectGrammarGapFillDatasets() {
+      const configs = [
+        { id: 'gap-articles', getter: () => (typeof articleExercises !== 'undefined' ? articleExercises : null), answerKey: 'answer', fallbackTitle: '冠词专题练习' },
+        { id: 'gap-conjunctions', getter: () => (typeof conjunctions !== 'undefined' ? conjunctions : null), answerKey: 'answer', fallbackTitle: '连词专题练习' },
+        { id: 'gap-prepositions', getter: () => (typeof prepositions !== 'undefined' ? prepositions : null), answerKey: 'answer', fallbackTitle: '介词专题练习' },
+        { id: 'gap-pronouns', getter: () => (typeof pronouns !== 'undefined' ? pronouns : null), answerKey: 'answer', fallbackTitle: '代词专题练习' },
+        { id: 'gap-adverbial-clauses', getter: () => (typeof adverbialClauseTest !== 'undefined' ? adverbialClauseTest : null), answerKey: 'correctAnswer', fallbackTitle: '状语从句专题练习' },
+        { id: 'gap-nonfinite-verbs', getter: () => (typeof nonFiniteVerbTest !== 'undefined' ? nonFiniteVerbTest : null), answerKey: 'correctAnswer', fallbackTitle: '非谓语动词专题练习' },
+        { id: 'gap-noun-clauses', getter: () => (typeof nounClauseTest !== 'undefined' ? nounClauseTest : null), answerKey: 'correctAnswer', fallbackTitle: '名词性从句专题练习' },
+        { id: 'gap-nouns', getter: () => (typeof nounTest !== 'undefined' ? nounTest : null), answerKey: 'correctAnswer', fallbackTitle: '名词数与可数性练习' },
+        { id: 'gap-relative-clauses', getter: () => (typeof attributiveClauseTest !== 'undefined' ? attributiveClauseTest : null), answerKey: 'correctAnswer', fallbackTitle: '定语从句专题练习' },
+        { id: 'gap-verb-tense', getter: () => (typeof verbTenseTest !== 'undefined' ? verbTenseTest : null), answerKey: 'correctAnswer', fallbackTitle: '动词时态专题练习' },
+        { id: 'gap-verb-voice', getter: () => (typeof verbVoiceTest !== 'undefined' ? verbVoiceTest : null), answerKey: 'correctAnswer', fallbackTitle: '动词语态专题练习' }
+      ];
+
+      const datasets = [];
+      configs.forEach(config => {
+        const data = config.getter();
+        if (!data) return;
+        let questions = [];
+        let title = '';
+        if (Array.isArray(data)) {
+          questions = normalizeGapFillQuestions(data, config.answerKey);
+          title = config.fallbackTitle;
+        } else if (typeof data === 'object') {
+          const questionList = Array.isArray(data.questions) ? data.questions : Array.isArray(data.items) ? data.items : [];
+          questions = normalizeGapFillQuestions(questionList, config.answerKey);
+          title = data.title || config.fallbackTitle;
+        }
+        if (!questions.length) return;
+        datasets.push({
+          id: config.id,
+          title: title || config.id,
+          total: questions.length,
+          questions,
+          group: '语法填空题库'
+        });
+      });
+      return datasets;
+    }
+
+    function normalizeGapFillQuestions(questions, answerKey) {
+      if (!Array.isArray(questions)) return [];
+      return questions.map(question => {
+        const cloned = { ...question };
+        if (Array.isArray(cloned.options)) {
+          cloned.options = cloned.options.map(option => stripOptionPrefix(option));
+        } else if (cloned.options && typeof cloned.options === 'object') {
+          const normalized = {};
+          Object.entries(cloned.options).forEach(([key, value]) => {
+            normalized[key] = stripOptionPrefix(value);
+          });
+          cloned.options = normalized;
+        }
+        if (answerKey && typeof cloned[answerKey] !== 'undefined' && typeof cloned.answer === 'undefined') {
+          cloned.answer = cloned[answerKey];
+        }
+        if (typeof cloned.answer === 'string') cloned.answer = cloned.answer.trim().toUpperCase();
+        if (typeof cloned.correctAnswer === 'string') cloned.correctAnswer = cloned.correctAnswer.trim().toUpperCase();
+        return cloned;
+      });
+    }
+
+    function stripOptionPrefix(value) {
+      if (typeof value !== 'string') return value;
+      return value.replace(/^[A-Z][\.)]\s*/i, '').trim();
+    }
+
+    function buildGrammarAnswerBlock(question, answer) {
+      const segments = [];
+      const normalizedAnswer = answer ? answer.toString().trim().toUpperCase() : '';
+      if (normalizedAnswer) segments.push(`正确答案：<strong>${normalizedAnswer}</strong>`);
+      if (question.translation) segments.push(`翻译：${question.translation}`);
+      if (question.explanation) segments.push(`解析：${question.explanation}`);
+      if (question.analysis && question.analysis !== question.explanation) segments.push(`补充：${question.analysis}`);
+      if (!segments.length) segments.push('暂无解析，请结合课堂笔记复习。');
+      return segments.join('<br>');
+    }
+
+    function flattenEnglishConcepts(sectionIndex) {
+      if (!window.englishGrammarConcepts || !Array.isArray(window.englishGrammarConcepts.sections)) return [];
+      const result = [];
+      window.englishGrammarConcepts.sections.forEach((section, index) => {
+        if (typeof sectionIndex === 'number' && index !== sectionIndex) return;
+        const sectionName = section.name || '';
+        (section.questions || []).forEach(question => {
+          result.push({
+            question: question.question,
+            options: question.options,
+            answer: question.answer,
+            knowledge: question.knowledge,
+            section: sectionName,
+            explanation: question.explanation,
+            analysis: question.analysis,
+            translation: question.translation
+          });
+        });
+      });
+      return result;
+    }
+
+    function splitSentenceIntoChunks(sentence) {
+      if (!sentence || typeof sentence !== 'string') return [];
+      return (sentence.match(/[\w'-]+|[^\s\w]/g) || []).filter(Boolean);
+    }
+
+    function joinSentenceTokens(tokens) {
+      return tokens.reduce((result, token) => {
+        if (!token) return result;
+        if (!result) return token;
+        if (/^[,.;!?"”')\]]/.test(token)) return result + token;
+        if (token === "'s" || token === "'re" || token === "'ll" || token === "'ve" || token === "'d") return result + token;
+        const trailing = result.slice(-1);
+        if (['“', '"', '(', '['].includes(trailing)) return result + token;
+        return `${result} ${token}`;
+      }, '');
+    }
+
+    function rebuildSentenceFromWords(templateTokens, words) {
+      const tokens = [];
+      let wordIndex = 0;
+      templateTokens.forEach(token => {
+        if (isWordToken(token)) {
+          const replacement = typeof words[wordIndex] !== 'undefined' ? words[wordIndex] : token;
+          tokens.push(replacement);
+          wordIndex++;
+        } else {
+          tokens.push(token);
+        }
+      });
+      return joinSentenceTokens(tokens);
+    }
+
+    function compareWordOrder(expected, actual) {
+      if (!Array.isArray(actual) || actual.length !== expected.length) return false;
+      return expected.every((value, index) => value.toLowerCase() === (actual[index] || '').toLowerCase());
+    }
+
+    function isWordToken(token) {
+      return typeof token === 'string' && /^[A-Za-z0-9][A-Za-z0-9'\-]*$/.test(token);
+    }
+
+    function shuffle(array) {
+      const result = array.slice();
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
+      }
+      return result;
+    }
+
+    function initPractice() {
+      updateTypeButtons();
+      practiceToolbar.style.display = 'none';
+      practiceContent.innerHTML = '<div class="loading-state"><span>正在加载题库资源...</span></div>';
+
+      if (typeof window.preloadLearningAssets === 'function') {
+        window.preloadLearningAssets().then(() => {
+          practiceState.assetsReady = true;
+          renderCurrentPractice();
+        }).catch(error => {
+          console.error('加载资源失败', error);
+          practiceStats.textContent = '资源加载失败，请刷新页面重试。';
+          practiceContent.innerHTML = '<div class="practice-empty">资源加载失败，请检查网络后刷新页面。</div>';
+        });
+      } else {
+        practiceState.assetsReady = true;
+        renderCurrentPractice();
+      }
+    }
+
+    initPractice();
+  </script>
+</body>
+</html>

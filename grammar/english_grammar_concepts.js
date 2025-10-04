@@ -1,5 +1,5 @@
 // 英语语法概念200道选择题集
-const englishGrammarConcepts = {
+window.englishGrammarConcepts = {
   title: "英语语法全知识点200道选择题集",
   sections: [
     {
@@ -8,7 +8,7 @@ const englishGrammarConcepts = {
         {
           id: 1,
           knowledge: "语法学习逻辑顺序",
-          question: "英语语法体系强调语法学习应遵循"先整体后局部"，正确顺序是？",
+          question: "英语语法体系强调语法学习应遵循\"先整体后局部\"，正确顺序是？",
           options: {
             A: "单词→短语→句子",
             B: "句子→单词→短语",
@@ -20,7 +20,7 @@ const englishGrammarConcepts = {
         {
           id: 2,
           knowledge: "句子核心成分的唯一性",
-          question: "一个完整句子中，"有且只有一个"的核心成分是？",
+          question: "一个完整句子中，'有且只有一个'的核心成分是？",
           options: {
             A: "主语（名词/代词）",
             B: "谓语（动词充当）",
@@ -34,10 +34,10 @@ const englishGrammarConcepts = {
           knowledge: "动词的唯一语法功能",
           question: "动词在句子中不可替代的核心功能是？",
           options: {
-            A: "充当主语（如"Running is good"中running是动名词，非动词原形）",
+            A: "充当主语（如'Running is good'中running是动名词，非动词原形）",
             B: "充当谓语",
-            C: "充当定语（如"a running man"中running是现在分词，非动词）",
-            D: "充当状语（如"Running fast, he won"中running是现在分词，非动词）"
+            C: "充当定语（如'a running man'中running是现在分词，非动词）",
+            D: "充当状语（如'Running fast, he won'中running是现在分词，非动词）"
           },
           answer: "B"
         },
@@ -46,10 +46,10 @@ const englishGrammarConcepts = {
           knowledge: "名词的语法功能范围",
           question: "名词（含代词、数词）不能充当的句子成分是？",
           options: {
-            A: "主语（如"He is a student"）",
+            A: "主语（如'He is a student'）",
             B: "谓语",
-            C: "表语（如"His job is a doctor"）",
-            D: "宾语（如"I love books"）"
+            C: "表语（如'His job is a doctor'）",
+            D: "宾语（如'I love books'）"
           },
           answer: "B"
         },
@@ -70,10 +70,10 @@ const englishGrammarConcepts = {
           knowledge: "副词的修饰对象限制",
           question: "副词无法修饰的成分是？",
           options: {
-            A: "动词（如"speak loudly"）",
-            B: "形容词（如"very happy"）",
-            C: "名词（如"a quick run"中quick是形容词）",
-            D: "其他副词（如"run very fast"）"
+            A: "动词（如'speak loudly'）",
+            B: "形容词（如'very happy'）",
+            C: "名词（如'a quick run'中quick是形容词）",
+            D: "其他副词（如'run very fast'）"
           },
           answer: "C"
         },
@@ -92,7 +92,7 @@ const englishGrammarConcepts = {
         {
           id: 8,
           knowledge: "句子层级划分（第一层级）",
-          question: "句子"第一层级（主干层级）"的构成是？",
+          question: "句子'第一层级（主干层级）'的构成是？",
           options: {
             A: "主语+谓语",
             B: "主语+谓语+宾语",
@@ -109,14 +109,14 @@ const englishGrammarConcepts = {
             A: "新的谓语动词（一个句子只有一个谓语）",
             B: "形容词（修饰名词）和副词（修饰动词）",
             C: "从句（如定语从句，属于第三层级扩展）",
-            D: "介词短语（如"in the park"，属于修饰成分的具体形式）"
+            D: "介词短语（如'in the park'，属于修饰成分的具体形式）"
           },
           answer: "B"
         },
         {
           id: 10,
           knowledge: "语法的推理性特征",
-          question: ""语法是可以推的"在英语体系中的含义是？",
+          question: "'语法是可以推的'在英语体系中的含义是？",
           options: {
             A: "无需记忆任何规则，临场推断即可",
             B: "核心规则可推导所有语法现象，无需死记特例",
@@ -140,24 +140,24 @@ const englishGrammarConcepts = {
         {
           id: 12,
           knowledge: "形容词作主语补足语",
-          question: ""The door was painted red"中，red的成分是？",
+          question: "'The door was painted red'中，red的成分是？",
           options: {
             A: "宾语（door是主语，无宾语）",
             B: "主语补足语（补充说明主语door的状态）",
-            C: "定语（修饰door需前置，如"a red door"）",
-            D: "状语（修饰动词painted需用副词，如"painted carefully"）"
+            C: "定语（修饰door需前置，如'a red door'）",
+            D: "状语（修饰动词painted需用副词，如'painted carefully'）"
           },
           answer: "B"
         },
         {
           id: 13,
           knowledge: "副词作状语的类型",
-          question: ""He runs quickly"中，quickly修饰动词，属于哪种状语？",
+          question: "'He runs quickly'中，quickly修饰动词，属于哪种状语？",
           options: {
-            A: "时间状语（如"yesterday"）",
+            A: "时间状语（如'yesterday'）",
             B: "方式状语（表动作执行方式）",
-            C: "原因状语（如"because he is happy"）",
-            D: "条件状语（如"if he is free"）"
+            C: "原因状语（如'because he is happy'）",
+            D: "条件状语（如'if he is free'）"
           },
           answer: "B"
         },
@@ -175,10 +175,10 @@ const englishGrammarConcepts = {
         },
         {
           id: 15,
-          knowledge: "语法规则的"无特殊规定"原则",
-          question: "英语语法提到"有规定，但没有特殊规定"，其含义是？",
+          knowledge: "语法规则的'无特殊规定'原则",
+          question: "英语语法提到'有规定，但没有特殊规定'，其含义是？",
           options: {
-            A: "所有语法现象都可通过核心逻辑解释，无真正"特例"",
+            A: "所有语法现象都可通过核心逻辑解释，无真正'特例'",
             B: "存在大量特例，需单独记忆",
             C: "规则仅适用于简单句，复合句无规则",
             D: "口语中可忽略规则，书面语需严格遵守"
@@ -225,5 +225,5 @@ const englishGrammarConcepts = {
 // 注意：由于内容过长，这里只展示了第一部分的题目结构
 // 完整的200道题目请参考原始文档
 console.log("英语语法概念题库已加载");
-console.log("总题目数：", englishGrammarConcepts.statistics.totalQuestions);
-console.log("章节分布：", englishGrammarConcepts.statistics.knowledgePoints);
+console.log("总题目数：", window.englishGrammarConcepts.statistics.totalQuestions);
+console.log("章节分布：", window.englishGrammarConcepts.statistics.knowledgePoints);

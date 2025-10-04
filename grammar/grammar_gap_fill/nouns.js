@@ -715,24 +715,30 @@ const nounTest = {
 };
 
 // 导出模块
+if (typeof window !== 'undefined') {
+  window.nounTest = nounTest;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = nounTest;
 }
 
-// 使用示例
-console.log(`名词测试加载完成！`);
-console.log(`总题数: ${nounTest.questions.length}`);
-console.log(`测试标题: ${nounTest.title}`);
+// 使用示例（仅用于调试）
+{
+  console.log(`名词测试加载完成！`);
+  console.log(`总题数: ${nounTest.questions.length}`);
+  console.log(`测试标题: ${nounTest.title}`);
 
-// 示例：获取第一题
-const firstQuestion = nounTest.getQuestionById(1);
-console.log('\n第一题:', firstQuestion.question);
-console.log('正确答案:', firstQuestion.correctAnswer);
+  // 示例：获取第一题
+  const nounFirstQuestion = nounTest.getQuestionById(1);
+  console.log('\n第一题:', nounFirstQuestion.question);
+  console.log('正确答案:', nounFirstQuestion.correctAnswer);
 
-// 示例：获取易错词汇
-const commonMistakes = nounTest.getCommonMistakes();
-console.log('\n常见不可数名词:', commonMistakes.alwaysUncountable.slice(0, 5));
+  // 示例：获取易错词汇
+  const commonMistakes = nounTest.getCommonMistakes();
+  console.log('\n常见不可数名词:', commonMistakes.alwaysUncountable.slice(0, 5));
 
-// 示例：获取复数变化规则
-const rules = nounTest.getPluralRules();
-console.log('\n不规则变化示例:', rules.不规则变化.type1.examples);
+  // 示例：获取复数变化规则
+  const rules = nounTest.getPluralRules();
+  console.log('\n不规则变化示例:', rules.不规则变化.type1.examples);
+}

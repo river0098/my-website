@@ -514,25 +514,31 @@ const attributiveClauseTest = {
   }
 };
 
+if (typeof window !== 'undefined') {
+  window.attributiveClauseTest = attributiveClauseTest;
+}
+
 // 导出模块
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = attributiveClauseTest;
 }
 
-// 使用示例
-console.log(`定语从句测试加载完成！`);
-console.log(`总题数: ${attributiveClauseTest.questions.length}`);
-console.log(`测试标题: ${attributiveClauseTest.title}`);
+// 使用示例（仅用于调试）
+{
+  console.log(`定语从句测试加载完成！`);
+  console.log(`总题数: ${attributiveClauseTest.questions.length}`);
+  console.log(`测试标题: ${attributiveClauseTest.title}`);
 
-// 示例：获取第一题
-const firstQuestion = attributiveClauseTest.getQuestionById(1);
-console.log('\n第一题:', firstQuestion.question);
-console.log('正确答案:', firstQuestion.correctAnswer);
+  // 示例：获取第一题
+  const relativeFirstQuestion = attributiveClauseTest.getQuestionById(1);
+  console.log('\n第一题:', relativeFirstQuestion.question);
+  console.log('正确答案:', relativeFirstQuestion.correctAnswer);
 
-// 示例：获取定语从句规则
-const rules = attributiveClauseTest.getAttributiveClauseRules();
-console.log('\n关系代词指人:', rules.关系代词.指人);
+  // 示例：获取定语从句规则
+  const rules = attributiveClauseTest.getAttributiveClauseRules();
+  console.log('\n关系代词指人:', rules.关系代词.指人);
 
-// 示例：获取that的特殊用法
-const section2 = attributiveClauseTest.sections.section2;
-console.log('\n必须用that的情况:', Object.keys(section2.mustUseThat));
+  // 示例：获取that的特殊用法
+  const section2 = attributiveClauseTest.sections.section2;
+  console.log('\n必须用that的情况:', Object.keys(section2.mustUseThat));
+}

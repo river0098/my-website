@@ -512,24 +512,30 @@ const nounClauseTest = {
 };
 
 // 导出模块
+if (typeof window !== 'undefined') {
+  window.nounClauseTest = nounClauseTest;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = nounClauseTest;
 }
 
-// 使用示例
-console.log(`名词性从句测试加载完成！`);
-console.log(`总题数: ${nounClauseTest.questions.length}`);
-console.log(`测试标题: ${nounClauseTest.title}`);
+// 使用示例（仅用于调试）
+{
+  console.log(`名词性从句测试加载完成！`);
+  console.log(`总题数: ${nounClauseTest.questions.length}`);
+  console.log(`测试标题: ${nounClauseTest.title}`);
 
-// 示例：获取第一题
-const firstQuestion = nounClauseTest.getQuestionById(1);
-console.log('\n第一题:', firstQuestion.question);
-console.log('正确答案:', firstQuestion.correctAnswer);
+  // 示例：获取第一题
+  const nounClauseFirstQuestion = nounClauseTest.getQuestionById(1);
+  console.log('\n第一题:', nounClauseFirstQuestion.question);
+  console.log('正确答案:', nounClauseFirstQuestion.correctAnswer);
 
-// 示例：获取名词性从句规则
-const rules = nounClauseTest.getNounClauseRules();
-console.log('\n主语从句引导词:', rules.主语从句.引导词);
+  // 示例：获取名词性从句规则
+  const rules = nounClauseTest.getNounClauseRules();
+  console.log('\n主语从句引导词:', rules.主语从句.引导词);
 
-// 示例：获取引导词选择技巧
-const selection = nounClauseTest.getConnectiveSelection();
-console.log('\n引导词选择原则:', selection.选择原则);
+  // 示例：获取引导词选择技巧
+  const selection = nounClauseTest.getConnectiveSelection();
+  console.log('\n引导词选择原则:', selection.选择原则);
+}

@@ -588,24 +588,30 @@ const verbTenseTest = {
 };
 
 // 导出模块
+if (typeof window !== 'undefined') {
+  window.verbTenseTest = verbTenseTest;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = verbTenseTest;
 }
 
-// 使用示例
-console.log(`动词时态测试加载完成！`);
-console.log(`总题数: ${verbTenseTest.questions.length}`);
-console.log(`测试标题: ${verbTenseTest.title}`);
+// 使用示例（仅用于调试）
+{
+  console.log(`动词时态测试加载完成！`);
+  console.log(`总题数: ${verbTenseTest.questions.length}`);
+  console.log(`测试标题: ${verbTenseTest.title}`);
 
-// 示例：获取第一题
-const firstQuestion = verbTenseTest.getQuestionById(1);
-console.log('\n第一题:', firstQuestion.question);
-console.log('正确答案:', firstQuestion.correctAnswer);
+  // 示例：获取第一题
+  const verbTenseFirstQuestion = verbTenseTest.getQuestionById(1);
+  console.log('\n第一题:', verbTenseFirstQuestion.question);
+  console.log('正确答案:', verbTenseFirstQuestion.correctAnswer);
 
-// 示例：获取时态规则
-const rules = verbTenseTest.getTenseRules();
-console.log('\n一般现在时规则:', rules.一般现在时);
+  // 示例：获取时态规则
+  const rules = verbTenseTest.getTenseRules();
+  console.log('\n一般现在时规则:', rules.一般现在时);
 
-// 示例：获取不规则动词
-const irregulars = verbTenseTest.getIrregularVerbs();
-console.log('\n不规则动词ABC型示例:', irregulars.常见不规则动词.ABC型.examples.slice(0, 3));
+  // 示例：获取不规则动词
+  const irregulars = verbTenseTest.getIrregularVerbs();
+  console.log('\n不规则动词ABC型示例:', irregulars.常见不规则动词.ABC型.examples.slice(0, 3));
+}

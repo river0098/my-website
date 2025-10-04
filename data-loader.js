@@ -44,66 +44,66 @@
     },
     {
       name: 'vocabulary-core',
-      files: ['word_bank/vocabulary688.js']
+      files: ['word/vocabulary688.js']
     },
     {
       name: 'vocabulary-textbook',
       files: [
-        'word_bank/gaokao_core_688/register.js',
-        'word_bank/gaokao_core_688/bixiu1.js',
-        'word_bank/gaokao_core_688/bixiu2.js',
-        'word_bank/gaokao_core_688/bixiu3.js',
-        'word_bank/gaokao_core_688/xuanxiu1.js',
-        'word_bank/gaokao_core_688/xuanxiu2.js',
-        'word_bank/gaokao_core_688/xuanxiu3.js',
-        'word_bank/gaokao_core_688/xuanxiu4.js'
+        'word/gaokao_core_688/register.js',
+        'word/gaokao_core_688/bixiu1.js',
+        'word/gaokao_core_688/bixiu2.js',
+        'word/gaokao_core_688/bixiu3.js',
+        'word/gaokao_core_688/xuanxiu1.js',
+        'word/gaokao_core_688/xuanxiu2.js',
+        'word/gaokao_core_688/xuanxiu3.js',
+        'word/gaokao_core_688/xuanxiu4.js'
       ]
     },
     {
       name: 'vocabulary-3500',
       files: [
-        'word_bank/3500/register.js',
-        'word_bank/3500/a-vocab.js',
-        'word_bank/3500/b-vocab-dictionary-b.js',
-        'word_bank/3500/c-vocab-dictionary-c.js',
-        'word_bank/3500/d-vocab-dictionary-d.js',
-        'word_bank/3500/e-vocab-dictionary-e.js',
-        'word_bank/3500/f-vocab-dictionary-f.js',
-        'word_bank/3500/g-vocab-dictionary-g.js',
-        'word_bank/3500/h-vocab-dictionary-h.js',
-        'word_bank/3500/i-vocab-dictionary-i.js',
-        'word_bank/3500/i-vocab-dictionary-l.js',
-        'word_bank/3500/j-vocab-dictionary-j.js',
-        'word_bank/3500/k-vocab-dictionary-k.js',
-        'word_bank/3500/m-vocab-dictionary-m.js',
-        'word_bank/3500/n-vocab-dictionary-n.js',
-        'word_bank/3500/p-vocab-dictionary-p.js',
-        'word_bank/3500/q-vocabulary-js.js',
-        'word_bank/3500/r-vocabulary-js.js',
-        'word_bank/3500/s-vocabulary1.js',
-        'word_bank/3500/s-vocabulary2.js',
-        'word_bank/3500/t-vocabulary-js.js',
-        'word_bank/3500/u-vocabulary-js.js',
-        'word_bank/3500/v-vocabulary-js.js',
-        'word_bank/3500/y-vocabulary-js.js',
-        'word_bank/3500/z-vocabulary-js.js'
+        'word/3500/register.js',
+        'word/3500/a-vocab.js',
+        'word/3500/b-vocab-dictionary-b.js',
+        'word/3500/c-vocab-dictionary-c.js',
+        'word/3500/d-vocab-dictionary-d.js',
+        'word/3500/e-vocab-dictionary-e.js',
+        'word/3500/f-vocab-dictionary-f.js',
+        'word/3500/g-vocab-dictionary-g.js',
+        'word/3500/h-vocab-dictionary-h.js',
+        'word/3500/i-vocab-dictionary-i.js',
+        'word/3500/i-vocab-dictionary-l.js',
+        'word/3500/j-vocab-dictionary-j.js',
+        'word/3500/k-vocab-dictionary-k.js',
+        'word/3500/m-vocab-dictionary-m.js',
+        'word/3500/n-vocab-dictionary-n.js',
+        'word/3500/p-vocab-dictionary-p.js',
+        'word/3500/q-vocabulary-js.js',
+        'word/3500/r-vocabulary-js.js',
+        'word/3500/s-vocabulary1.js',
+        'word/3500/s-vocabulary2.js',
+        'word/3500/t-vocabulary-js.js',
+        'word/3500/u-vocabulary-js.js',
+        'word/3500/v-vocabulary-js.js',
+        'word/3500/y-vocabulary-js.js',
+        'word/3500/z-vocabulary-js.js'
       ]
     },
     {
       name: 'sentence-bank',
-      files: ['sentence_bank/sentences_200.js']
+      files: ['sentence/sentences_200.js']
     },
     {
       name: 'model-essays',
       files: [
-        'sentence_bank/model_essays_8/activity_introduction.js',
-        'sentence_bank/model_essays_8/activity_report.js',
-        'sentence_bank/model_essays_8/apology_letter.js',
-        'sentence_bank/model_essays_8/application_letter.js',
-        'sentence_bank/model_essays_8/invitation_letter.js',
-        'sentence_bank/model_essays_8/notice_letter.js',
-        'sentence_bank/model_essays_8/person_introduction.js',
-        'sentence_bank/model_essays_8/suggestion_letter.js'
+        'sentence/model_essays_8/activity_introduction.js',
+        'sentence/model_essays_8/activity_report.js',
+        'sentence/model_essays_8/apology_letter.js',
+        'sentence/model_essays_8/application_letter.js',
+        'sentence/model_essays_8/invitation_letter.js',
+        'sentence/model_essays_8/notice_letter.js',
+        'sentence/model_essays_8/person_introduction.js',
+        'sentence/model_essays_8/suggestion_letter.js'
       ]
     }
   ];

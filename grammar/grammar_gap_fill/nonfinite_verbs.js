@@ -486,24 +486,30 @@ const nonFiniteVerbTest = {
 };
 
 // 导出模块
+if (typeof window !== 'undefined') {
+  window.nonFiniteVerbTest = nonFiniteVerbTest;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = nonFiniteVerbTest;
 }
 
-// 使用示例
-console.log(`非谓语动词测试加载完成！`);
-console.log(`总题数: ${nonFiniteVerbTest.questions.length}`);
-console.log(`测试标题: ${nonFiniteVerbTest.title}`);
+// 使用示例（仅用于调试）
+{
+  console.log(`非谓语动词测试加载完成！`);
+  console.log(`总题数: ${nonFiniteVerbTest.questions.length}`);
+  console.log(`测试标题: ${nonFiniteVerbTest.title}`);
 
-// 示例：获取第一题
-const firstQuestion = nonFiniteVerbTest.getQuestionById(1);
-console.log('\n第一题:', firstQuestion.question);
-console.log('正确答案:', firstQuestion.correctAnswer);
+  // 示例：获取第一题
+  const nonfiniteFirstQuestion = nonFiniteVerbTest.getQuestionById(1);
+  console.log('\n第一题:', nonfiniteFirstQuestion.question);
+  console.log('正确答案:', nonfiniteFirstQuestion.correctAnswer);
 
-// 示例：获取非谓语动词规则
-const rules = nonFiniteVerbTest.getNonFiniteVerbRules();
-console.log('\n不定式基本规则:', rules.不定式.基本形式);
+  // 示例：获取非谓语动词规则
+  const rules = nonFiniteVerbTest.getNonFiniteVerbRules();
+  console.log('\n不定式基本规则:', rules.不定式.基本形式);
 
-// 示例：获取固定搭配
-const collocations = nonFiniteVerbTest.getFixedCollocations();
-console.log('\n接动名词的动词:', collocations.接动名词的动词.slice(0, 5));
+  // 示例：获取固定搭配
+  const collocations = nonFiniteVerbTest.getFixedCollocations();
+  console.log('\n接动名词的动词:', collocations.接动名词的动词.slice(0, 5));
+}

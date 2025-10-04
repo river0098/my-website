@@ -354,11 +354,12 @@
     position: fixed;
     inset: 50% auto auto 50%;
     transform: translate(-50%, -50%);
-    width: min(920px, 92vw);
-    max-height: 88vh;
-    background: #fff;
-    border-radius: 20px;
-    box-shadow: 0 18px 45px rgba(0,0,0,0.18);
+    width: min(980px, 94vw);
+    max-height: 90vh;
+    background: #fdfdff;
+    border-radius: 26px;
+    box-shadow: 0 28px 65px rgba(38, 48, 115, 0.22);
+    border: 1px solid rgba(120, 134, 218, 0.15);
     z-index: 110;
     display: flex;
     flex-direction: column;
@@ -398,43 +399,89 @@
     color: #000;
   }
   .practice-modal-body {
-    padding: 18px 24px;
+    padding: 24px 32px 28px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 22px;
     height: 100%;
+    background: linear-gradient(180deg, rgba(244,247,255,0.95) 0%, #ffffff 32%);
   }
   .practice-stats {
     font-size: 14px;
-    color: #495057;
+    color: #3c4672;
+    background: linear-gradient(135deg, rgba(243,246,255,0.8) 0%, #ffffff 70%);
+    border: 1px solid #d7ddff;
+    border-radius: 18px;
+    padding: 14px 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 10px 26px rgba(90, 108, 179, 0.12);
   }
   .practice-toolbar {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
+    gap: 14px;
     align-items: center;
+    background: linear-gradient(135deg, #f9faff 0%, #eef1ff 100%);
+    border: 1px solid #e2e7ff;
+    border-radius: 16px;
+    padding: 16px 20px;
+    box-shadow: 0 8px 20px rgba(70, 92, 182, 0.08);
   }
-  .practice-toolbar label {
-    font-size: 14px;
-    color: #495057;
+  .practice-toolbar select,
+  .practice-toolbar input,
+  .practice-toolbar button {
+    border-radius: 12px;
   }
   .practice-toolbar select,
   .practice-toolbar input {
     padding: 10px 14px;
-    border: 1px solid #d9dee5;
-    border-radius: 10px;
-    font-size: 14px;
+    border: 1px solid #cfd5ef;
+    background: #fff;
     min-width: 200px;
-    flex: none;
   }
-  .practice-toolbar input {
-    flex: 1;
-    min-width: 180px;
+  .practice-toolbar input[type="search"] {
+    flex: 1 1 220px;
+  }
+  .toolbar-section {
+    display: flex;
+    flex: 1 1 auto;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .toolbar-actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+  .practice-toolbar label {
+    font-size: 15px;
+    color: #3c4672;
+    font-weight: 600;
   }
   .practice-content {
-    flex: 1;
+    flex: 1 1 auto;
     overflow-y: auto;
-    padding-right: 8px;
+    background: #ffffff;
+    border: 1px solid #dde2ff;
+    border-radius: 18px;
+    padding: 24px 28px;
+    box-shadow: 0 16px 32px rgba(50, 64, 145, 0.12);
+  }
+  .practice-content::-webkit-scrollbar {
+    width: 8px;
+  }
+  .practice-content::-webkit-scrollbar-thumb {
+    background: rgba(120, 134, 218, 0.45);
+    border-radius: 4px;
+  }
+  .practice-content::-webkit-scrollbar-track {
+    background: rgba(228, 233, 255, 0.6);
   }
   .practice-list {
     display: flex;
@@ -493,6 +540,285 @@
   .badge-answer {
     background: #e6f4ea;
     color: #1e7a34;
+  }
+  .toolbar-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  .toolbar-actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .btn-mode {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid #d0d7e6;
+    background: #fff;
+    cursor: pointer;
+    font-size: 13px;
+    color: #4b5675;
+    transition: all 0.2s ease;
+  }
+  .btn-mode:hover {
+    border-color: #667eea;
+    color: #667eea;
+  }
+  .btn-mode.active {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-color: transparent;
+    color: #fff;
+  }
+  .practice-content.quiz-mode {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+  .quiz-card {
+    background: #ffffff;
+    border: 1px solid #dce1ff;
+    border-radius: 20px;
+    padding: 26px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 18px 36px rgba(44, 58, 146, 0.12);
+  }
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    color: #495486;
+    font-weight: 600;
+  }
+  .quiz-prompt {
+    font-size: 24px;
+    font-weight: 600;
+    color: #2c3e50;
+  }
+  .quiz-subtitle {
+    font-size: 16px;
+    color: #4a4f63;
+  }
+  .quiz-options {
+    display: grid;
+    gap: 14px;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+  @media (min-width: 720px) {
+    .quiz-options {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .quiz-option {
+    padding: 12px 16px;
+    border: 1px solid #dfe3ee;
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+    text-align: left;
+    font-size: 14px;
+    color: #3a4460;
+    transition: all 0.2s ease;
+  }
+  .quiz-option:hover {
+    border-color: #667eea;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+  }
+  .quiz-option.correct {
+    border-color: #34c38f;
+    background: #e6f5ef;
+    color: #217a55;
+  }
+  .quiz-option.incorrect {
+    border-color: #ff6c6c;
+    background: #fff1f1;
+    color: #c0392b;
+  }
+  .quiz-answer {
+    padding: 16px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #e3e7f2;
+    font-size: 14px;
+    color: #4b5675;
+    line-height: 1.6;
+  }
+  .quiz-answer.hidden {
+    display: none;
+  }
+  .quiz-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .quiz-actions button {
+    padding: 10px 18px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .btn-secondary {
+    background: #f1f3f9;
+    color: #4b5675;
+  }
+  .btn-secondary:hover {
+    background: #e0e4f3;
+  }
+  .btn-accent {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff;
+  }
+  .btn-accent:hover {
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+  }
+  .quiz-hint {
+    font-size: 13px;
+    color: #6c757d;
+  }
+  .quiz-summary {
+    padding: 18px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px solid #d6deed;
+    font-size: 14px;
+    color: #4b5675;
+  }
+  .quiz-summary strong {
+    color: #2c3e50;
+  }
+  .quiz-flashcard {
+    text-align: center;
+    padding: 30px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f6f9ff, #fff);
+    border: 1px solid #e3e7f2;
+  }
+  .quiz-flashcard h4 {
+    font-size: 28px;
+    margin-bottom: 12px;
+    color: #2c3e50;
+  }
+  .quiz-flashcard .flashcard-sub {
+    font-size: 16px;
+    color: #4a4f63;
+    margin-bottom: 20px;
+  }
+  .sentence-assembly,
+  .sentence-pool {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px;
+    border-radius: 16px;
+    border: 1px dashed #cbd5ff;
+    background: linear-gradient(135deg, rgba(245,248,255,0.9), #ffffff);
+    min-height: 78px;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: flex-start;
+  }
+  .sentence-assembly {
+    flex-wrap: wrap;
+  }
+  .sentence-pool {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    grid-template-rows: repeat(4, 1fr);
+    gap: 12px;
+    max-height: 320px;
+    overflow-y: auto;
+    padding-bottom: 0;
+  }
+  .sentence-pool::-webkit-scrollbar {
+    width: 8px;
+  }
+  .sentence-pool::-webkit-scrollbar-thumb {
+    background: rgba(120, 134, 218, 0.45);
+    border-radius: 4px;
+  }
+  .sentence-pool::-webkit-scrollbar-track {
+    background: rgba(228, 233, 255, 0.6);
+  }
+  .sentence-assembly {
+    border-style: solid;
+    background: #ffffff;
+  }
+  .sentence-assembly.is-empty {
+    border-style: dashed;
+    color: #9aa3bb;
+  }
+  .sentence-assembly.correct {
+    border-color: #34c38f;
+    background: #f1fff6;
+  }
+  .sentence-assembly.incorrect {
+    border-color: #ff6c6c;
+    background: #fff5f5;
+  }
+  .sentence-placeholder {
+    color: #8a94a6;
+    font-size: 14px;
+  }
+  .sentence-token {
+    border: 1px solid #ccd4ff;
+    border-radius: 12px;
+    background: #eef2ff;
+    padding: 10px 16px;
+    font-size: 15px;
+    color: #33426f;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    box-shadow: 0 6px 12px rgba(92, 112, 187, 0.18);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: 48px;
+  }
+  .sentence-token:hover {
+    background: #dbe4ff;
+  }
+  .sentence-token.disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
+  .sentence-token.assembled {
+    background: #ffffff;
+  }
+  .sentence-token.removeable:hover {
+    background: #ffecec;
+    border-color: #ffb3b3;
+  }
+  .sentence-hint {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #4b5675;
+    background: #f7f9ff;
+    border: 1px solid #dce3f5;
+    border-radius: 10px;
+    padding: 12px;
+  }
+
+  .quiz-flashcard .flashcard-answer {
+    margin-top: 20px;
+    padding: 18px;
+    border-radius: 12px;
+    background: #fff;
+    border: 1px dashed #99a6d6;
+    font-size: 16px;
+    color: #3a4460;
+  }
+  .quiz-flashcard .flashcard-answer.hidden {
+    display: none;
   }
   .practice-empty {
     text-align: center;
@@ -740,17 +1066,17 @@
       </div>
       
       <div class="practice-grid">
-        <div class="practice-card">
+        <div class="practice-card" onclick="startPractice('word')">
           <div class="practice-icon">📚</div>
           <div class="practice-title">词汇库</div>
           <div class="practice-desc">包含 1000+ 核心词汇</div>
         </div>
-        <div class="practice-card">
+        <div class="practice-card" onclick="startPractice('grammar')">
           <div class="practice-icon">📋</div>
           <div class="practice-title">语法库</div>
           <div class="practice-desc">系统语法知识点</div>
         </div>
-        <div class="practice-card">
+        <div class="practice-card" onclick="startPractice('sentence')">
           <div class="practice-icon">🎯</div>
           <div class="practice-title">句型库</div>
           <div class="practice-desc">常用句型和翻译</div>
@@ -783,6 +1109,7 @@
 </div>
 
 <script src="data-loader.js"></script>
+<script src="grammar/english_grammar_concepts.js"></script>
 
 <script>
 // ========================================
@@ -814,6 +1141,74 @@ const practiceSubtitle = document.getElementById('practiceSubtitle');
 const practiceStats = document.getElementById('practiceStats');
 const practiceToolbar = document.getElementById('practiceToolbar');
 const practiceContent = document.getElementById('practiceContent');
+
+const practiceState = {
+  type: null,
+  mode: 'browse',
+  queue: [],
+  index: 0,
+  answered: 0,
+  correct: 0,
+  reveal: false,
+  datasetId: null
+};
+
+const practiceDatasets = {
+  word: [],
+  grammar: [],
+  sentence: []
+};
+
+function resetPracticeState(type) {
+  practiceState.type = type;
+  practiceState.mode = 'browse';
+  practiceState.queue = [];
+  practiceState.index = 0;
+  practiceState.answered = 0;
+  practiceState.correct = 0;
+  practiceState.reveal = false;
+  practiceState.datasetId = null;
+}
+
+function setPracticeMode(mode) {
+  if (mode === 'quiz') {
+    const target = new URL('practice.html', window.location.href);
+    const type = practiceState.type || 'word';
+    target.searchParams.set('type', type);
+    if (practiceState.datasetId) {
+      target.searchParams.set('dataset', practiceState.datasetId);
+    }
+    if (currentStudent) {
+      target.searchParams.set('student', currentStudent);
+    }
+    window.location.href = target.toString();
+    return;
+  }
+  if (practiceState.mode === mode) return;
+  practiceState.mode = mode;
+  practiceState.queue = [];
+  practiceState.index = 0;
+  practiceState.answered = 0;
+  practiceState.correct = 0;
+  practiceState.reveal = false;
+  renderPracticeContent(practiceState.type);
+}
+
+function shuffle(array) {
+  const result = array.slice();
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [result[i], result[j]] = [result[j], result[i]];
+  }
+  return result;
+}
+
+function updateQuizProgress(total, label) {
+  const current = Math.min(practiceState.index + 1, total);
+  const accuracy = practiceState.answered ? Math.round((practiceState.correct / practiceState.answered) * 100) : 0;
+  const prefix = label ? `${label} · ` : '';
+  practiceStats.textContent = `${prefix}进度：第 ${current}/${total} 题 · 已答 ${practiceState.answered} 题 · 正确率 ${accuracy}%`;
+}
 
 document.addEventListener('learning-assets-loaded', () => {
   assetsStatus = 'success';
@@ -991,8 +1386,7 @@ async function addStudent() {
 // 批量导入
 async function batchImport() {
   const textarea = document.getElementById('batchNames');
-  const names = textarea.value.trim().split('
-').filter(name => name.trim());
+  const names = textarea.value.trim().split('\n').filter(name => name.trim());
   
   if (!names.length) {
     alert('请输入学生姓名');
@@ -1096,17 +1490,12 @@ function startPractice(type) {
     switchTab('student');
     return;
   }
-  
-  if (assetsStatus === 'pending' || assetsStatus === 'loading') {
-    alert('学习资源仍在加载，请稍候再试');
-    return;
-  }
 
-  if (assetsStatus === 'error') {
-    alert('部分资源加载失败，内容可能不完整。');
-  }
-
-  openPracticeModal(type);
+  const target = new URL('practice.html', window.location.href);
+  const practiceType = type || 'word';
+  target.searchParams.set('type', practiceType);
+  target.searchParams.set('student', currentStudent);
+  window.location.href = target.toString();
 }
 
 function openPracticeModal(type) {
@@ -1116,6 +1505,7 @@ function openPracticeModal(type) {
   document.body.style.overflow = 'hidden';
   practiceTitle.textContent = PRACTICE_LABELS[type] || '练习内容';
   practiceSubtitle.textContent = currentStudent ? `当前学生：${currentStudent}` : '';
+  resetPracticeState(type);
   renderPracticeContent(type);
 }
 
@@ -1130,6 +1520,7 @@ function closePracticeModal() {
 }
 
 function renderPracticeContent(type) {
+  practiceState.type = type;
   practiceToolbar.innerHTML = '';
   practiceContent.innerHTML = '';
   practiceStats.textContent = '';
@@ -1150,181 +1541,851 @@ function renderPracticeContent(type) {
 }
 
 function renderWordPractice() {
-  const vocab = Array.isArray(window.vocabulary688) ? window.vocabulary688 : [];
+  const datasets = collectWordDatasets();
+  practiceDatasets.word = datasets;
 
-  if (!vocab.length) {
+  if (!datasets.length) {
     practiceStats.textContent = '未找到词汇数据';
     practiceContent.innerHTML = '<div class="practice-empty">未检测到词汇库数据，请确认相关脚本已正确加载。</div>';
     return;
   }
 
-  practiceToolbar.innerHTML = '<input id="practiceSearchInput" type="search" placeholder="输入英文或中文关键词筛选词汇">';
-  const searchInput = document.getElementById('practiceSearchInput');
+  const browseActive = practiceState.mode === 'browse';
+  const toolbarHint = browseActive
+    ? '<input id="practiceSearchInput" type="search" placeholder="输入英文或中文关键词筛选词汇">'
+    : '<div class="quiz-hint">练习模式：系统随机抽取单词，选择正确的中文释义（四选一）。</div>';
 
-  const listEl = document.createElement('div');
-  listEl.className = 'practice-list';
-  practiceContent.appendChild(listEl);
+  const datasetSelectHTML = datasets.length > 1 ? `
+    <select id="wordDatasetSelect">
+      ${datasets.map(dataset => `<option value="${dataset.id}">${dataset.title} (${dataset.total}词)</option>`).join('')}
+    </select>
+  ` : '';
 
-  const renderList = keyword => {
-    const key = keyword.trim().toLowerCase();
-    const filtered = key
-      ? vocab.filter(item => {
-          return includesKeyword(item.word, key) ||
-                 includesKeyword(item.cn, key) ||
-                 includesKeyword(item.pos, key) ||
-                 includesKeyword(item.example, key);
-        })
-      : vocab;
+  practiceToolbar.innerHTML = `
+    <div class="toolbar-section">
+      ${datasetSelectHTML}
+      ${toolbarHint}
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn-mode ${browseActive ? 'active' : ''}" data-mode="browse">浏览模式</button>
+      <button class="btn-mode ${browseActive ? '' : 'active'}" data-mode="quiz">练习模式</button>
+    </div>
+  `;
 
-    practiceStats.textContent = `共 ${vocab.length} 个词条，当前显示 ${filtered.length} 个`;
+  practiceToolbar.querySelectorAll('.btn-mode').forEach(btn => {
+    btn.addEventListener('click', () => setPracticeMode(btn.dataset.mode));
+  });
 
-    if (!filtered.length) {
-      listEl.innerHTML = '<div class="practice-empty">未找到匹配词汇</div>';
-      return;
-    }
-
-    listEl.innerHTML = filtered.map(item => {
-      const pos = item.pos ? `<span class="practice-badge">${item.pos}</span>` : '';
-      const meta = [];
-      if (item.freq) meta.push(`频率指数：${item.freq}`);
-      if (item.id) meta.push(`编号：${item.id}`);
-      const metaBlock = meta.length ? `<div class="practice-entry-meta">${meta.join(' · ')}</div>` : '';
-      const exampleBlock = item.example ? `<div class="practice-entry-description">例句：${item.example}</div>` : '';
-      return `
-        <div class="practice-entry">
-          <div class="practice-entry-title">${item.word || ''}${pos}</div>
-          <div class="practice-entry-subtitle">${item.cn || ''}</div>
-          ${metaBlock}
-          ${exampleBlock}
-        </div>
-      `;
-    }).join('');
-  };
-
-  renderList('');
-  if (searchInput) {
-    searchInput.addEventListener('input', event => {
-      renderList(event.target.value);
+  // 添加数据集选择事件监听
+  const datasetSelect = document.getElementById('wordDatasetSelect');
+  if (datasetSelect) {
+    datasetSelect.addEventListener('change', () => {
+      practiceState.datasetId = datasetSelect.value;
+      renderWordPractice();
     });
-    searchInput.focus();
+    // 设置默认选中的数据集
+    if (!practiceState.datasetId || !datasets.some(d => d.id === practiceState.datasetId)) {
+      practiceState.datasetId = datasets[0].id;
+      datasetSelect.value = practiceState.datasetId;
+    }
+  } else {
+    practiceState.datasetId = datasets[0].id;
+  }
+
+  const currentDataset = datasets.find(d => d.id === practiceState.datasetId) || datasets[0];
+  const vocab = currentDataset.items || [];
+
+  if (browseActive) {
+    practiceContent.classList.remove('quiz-mode');
+    practiceContent.innerHTML = '';
+    const listEl = document.createElement('div');
+    listEl.className = 'practice-list';
+    practiceContent.appendChild(listEl);
+
+    const renderList = keyword => {
+      const key = keyword.trim().toLowerCase();
+      const filtered = key
+        ? vocab.filter(item => {
+            return includesKeyword(item.word, key) ||
+                   includesKeyword(item.cn, key) ||
+                   includesKeyword(item.pos, key) ||
+                   includesKeyword(item.example, key);
+          })
+        : vocab;
+
+      practiceStats.textContent = `${currentDataset.title} · 共 ${vocab.length} 个词条，当前显示 ${filtered.length} 个`;
+
+      if (!filtered.length) {
+        listEl.innerHTML = '<div class="practice-empty">未找到匹配词汇</div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(item => {
+        const pos = item.pos ? `<span class="practice-badge">${item.pos}</span>` : '';
+        const meta = [];
+        if (item.freq) meta.push(`频率指数：${item.freq}`);
+        if (item.id) meta.push(`编号：${item.id}`);
+        const metaBlock = meta.length ? `<div class="practice-entry-meta">${meta.join(' · ')}</div>` : '';
+        const exampleBlock = item.example ? `<div class="practice-entry-description">例句：${item.example}</div>` : '';
+        return `
+          <div class="practice-entry">
+            <div class="practice-entry-title">${item.word || ''}${pos}</div>
+            <div class="practice-entry-subtitle">${item.cn || ''}</div>
+            ${metaBlock}
+            ${exampleBlock}
+          </div>
+        `;
+      }).join('');
+    };
+
+    renderList('');
+    const searchInput = document.getElementById('practiceSearchInput');
+    if (searchInput) {
+      searchInput.addEventListener('input', event => renderList(event.target.value));
+      searchInput.focus();
+    }
+  } else {
+    practiceContent.classList.add('quiz-mode');
+    renderWordQuiz(vocab, currentDataset);
+  }
+}
+
+function renderWordQuiz(vocab, dataset) {
+  if (!practiceState.queue.length) {
+    practiceState.queue = shuffle(vocab.slice());
+    practiceState.index = 0;
+    practiceState.answered = 0;
+    practiceState.correct = 0;
+    practiceState.reveal = false;
+  }
+
+  const total = practiceState.queue.length;
+
+  if (!total) {
+    practiceStats.textContent = '未找到词汇数据';
+    practiceContent.innerHTML = '<div class="practice-empty">未检测到词汇库数据，请确认相关脚本已正确加载。</div>';
+    return;
+  }
+
+  if (practiceState.index >= total) {
+    showWordSummary(vocab.length);
+    return;
+  }
+
+  const current = practiceState.queue[practiceState.index];
+  const distractorPool = shuffle(vocab.filter(item => item !== current && item && item.cn));
+  const distractors = [];
+  const seenTranslations = new Set();
+  const correctTranslation = (current.cn || '').trim();
+
+  for (const candidate of distractorPool) {
+    const translation = (candidate.cn || '').trim();
+    if (!translation || translation === correctTranslation || seenTranslations.has(translation)) continue;
+    distractors.push(candidate);
+    seenTranslations.add(translation);
+    if (distractors.length === 3) break;
+  }
+
+  while (distractors.length < 3) {
+    distractors.push({ word: '', cn: '（待补充）' });
+  }
+
+  const optionData = shuffle([
+    { isCorrect: true, text: current.cn || '暂无中文释义', detail: current },
+    ...distractors.slice(0, 3).map(item => ({ isCorrect: false, text: item.cn || '（待补充）', detail: item }))
+  ]).slice(0, 4).map((option, index) => ({
+    ...option,
+    letter: String.fromCharCode(65 + index)
+  }));
+
+  const answerDetails = [
+    `正确释义：<strong>${current.cn || '暂无中文释义'}</strong>`,
+    current.pos ? `词性：${current.pos}` : '',
+    current.example ? `例句：${current.example}` : ''
+  ].filter(Boolean).join('<br>');
+
+  practiceContent.innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-header">
+        <span>${dataset ? dataset.title : '词汇练习'}</span>
+        <span>正确 ${practiceState.correct}/${practiceState.answered}</span>
+      </div>
+      <div class="quiz-prompt">${current.word || ''}</div>
+      ${current.freq ? `<div class="practice-entry-meta">频率指数：${current.freq}</div>` : ''}
+      <div class="quiz-options">
+        ${optionData.map(option => `<button class="quiz-option" data-letter="${option.letter}" data-correct="${option.isCorrect ? '1' : '0'}"><strong>${option.letter}.</strong> ${option.text}</button>`).join('')}
+      </div>
+      <div id="wordAnswer" class="quiz-answer hidden">
+        ${answerDetails || '暂无解析，请联系教师补充词汇信息。'}
+      </div>
+      <div class="quiz-actions">
+        <span class="quiz-hint">选择一个选项查看答案并进入下一题。</span>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-secondary" id="wordSkipBtn">跳过此题</button>
+          <button class="btn-accent" id="wordNextBtn" disabled>下一题</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  updateQuizProgress(total, '词汇练习');
+
+  const answerBox = document.getElementById('wordAnswer');
+  const nextBtn = document.getElementById('wordNextBtn');
+  const skipBtn = document.getElementById('wordSkipBtn');
+  const optionButtons = Array.from(document.querySelectorAll('.quiz-option'));
+
+  optionButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      if (practiceState.reveal) return;
+      const isCorrect = button.dataset.correct === '1';
+
+      practiceState.reveal = true;
+      practiceState.answered++;
+      if (isCorrect) {
+        practiceState.correct++;
+        button.classList.add('correct');
+      } else {
+        button.classList.add('incorrect');
+        const correctButton = document.querySelector('.quiz-option[data-correct="1"]');
+        if (correctButton) {
+          correctButton.classList.add('correct');
+        }
+      }
+
+      optionButtons.forEach(btn => {
+        btn.disabled = true;
+      });
+
+      answerBox?.classList.remove('hidden');
+      if (nextBtn) {
+        nextBtn.disabled = false;
+      }
+      updateQuizProgress(total, '词汇练习');
+    });
+  });
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      practiceState.index++;
+      practiceState.reveal = false;
+      renderWordPractice();
+    });
+  }
+
+  if (skipBtn) {
+    skipBtn.addEventListener('click', () => {
+      practiceState.index++;
+      practiceState.reveal = false;
+      renderWordPractice();
+    });
+  }
+}
+
+function showWordSummary(totalUnique) {
+  const totalAnswered = practiceState.answered;
+  const accuracy = totalAnswered ? Math.round((practiceState.correct / totalAnswered) * 100) : 0;
+  const poolSize = totalUnique || practiceDatasets.word.length || 0;
+
+  practiceStats.textContent = `练习完成：答题 ${totalAnswered} / 词汇总数 ${poolSize} · 正确 ${practiceState.correct} · 正确率 ${accuracy}%`;
+
+  practiceContent.innerHTML = `
+    <div class="quiz-summary">
+      <strong>练习完成！</strong>
+      <p>本轮共作答 ${totalAnswered} 题，答对 ${practiceState.correct} 题，正确率 ${accuracy}%。</p>
+      <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn-accent" id="wordRetryAll">重新练习</button>
+        <button class="btn-secondary" id="wordBackToBrowse">返回浏览模式</button>
+      </div>
+    </div>
+  `;
+
+  const retryBtn = document.getElementById('wordRetryAll');
+  const backBtn = document.getElementById('wordBackToBrowse');
+
+  if (retryBtn) {
+    retryBtn.addEventListener('click', () => {
+      practiceState.queue = [];
+      practiceState.index = 0;
+      practiceState.correct = 0;
+      practiceState.answered = 0;
+      practiceState.reveal = false;
+      renderWordPractice();
+    });
+  }
+
+  if (backBtn) {
+    backBtn.addEventListener('click', () => setPracticeMode('browse'));
   }
 }
 
 function renderGrammarPractice() {
-  const sources = [];
+  const datasets = collectGrammarDatasets();
 
-  if (window.englishGrammarConcepts && Array.isArray(window.englishGrammarConcepts.sections)) {
-    const total = window.englishGrammarConcepts.sections.reduce((sum, section) => {
-      return sum + (Array.isArray(section.questions) ? section.questions.length : 0);
-    }, 0);
-    sources.push({ id: 'concepts', name: window.englishGrammarConcepts.title || '语法知识点200题', count: total });
+  if (!datasets.length) {
+    practiceToolbar.innerHTML = '';
+    practiceContent.classList.remove('quiz-mode');
+    practiceContent.innerHTML = '<div class="practice-empty">尚未加载语法题库数据，请稍后重试。</div>';
+    practiceStats.textContent = '语法题库未加载';
+    return;
   }
 
-  if (Array.isArray(window.grammarQuestionOrder) && window.grammarQuestionBanks) {
-    window.grammarQuestionOrder.forEach(id => {
-      const bank = window.grammarQuestionBanks[id];
-      if (bank && Array.isArray(bank.questions) && bank.questions.length) {
-        sources.push({ id, name: bank.title || id, count: bank.questions.length });
+  if (!practiceState.datasetId || !datasets.some(dataset => dataset.id === practiceState.datasetId)) {
+    practiceState.datasetId = datasets[0].id;
+  }
+
+  const browseActive = practiceState.mode === 'browse';
+  const grouped = datasets.reduce((acc, dataset) => {
+    const group = dataset.group || '语法题库';
+    if (!acc[group]) acc[group] = [];
+    acc[group].push(dataset);
+    return acc;
+  }, {});
+  const groupNames = Object.keys(grouped);
+
+  const optionsHtml = groupNames.length > 1
+    ? groupNames.map(groupName => {
+        const optionItems = grouped[groupName].map(dataset => `<option value="${dataset.id}" ${dataset.id === practiceState.datasetId ? 'selected' : ''}>${dataset.title}（${dataset.total}题）</option>`).join('');
+        return `<optgroup label="${groupName}">${optionItems}</optgroup>`;
+      }).join('')
+    : grouped[groupNames[0]].map(dataset => `<option value="${dataset.id}" ${dataset.id === practiceState.datasetId ? 'selected' : ''}>${dataset.title}（${dataset.total}题）</option>`).join('');
+
+  const toolbarContent = browseActive
+    ? `<label for="grammarSelect">选择题库</label>
+       <select id="grammarSelect">${optionsHtml}</select>
+       <input id="grammarSearch" type="search" placeholder="输入题干或关键词筛选">`
+    : `<label for="grammarSelect">选择题库</label>
+       <select id="grammarSelect">${optionsHtml}</select>
+       <div class="quiz-hint">练习模式：随机抽题，选择答案后即可查看解析。</div>`;
+
+  practiceToolbar.innerHTML = `
+    <div class="toolbar-section">
+      ${toolbarContent}
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn-mode ${browseActive ? 'active' : ''}" data-mode="browse">浏览模式</button>
+      <button class="btn-mode ${browseActive ? '' : 'active'}" data-mode="quiz">练习模式</button>
+    </div>
+  `;
+
+  practiceToolbar.querySelectorAll('.btn-mode').forEach(btn => {
+    btn.addEventListener('click', () => setPracticeMode(btn.dataset.mode));
+  });
+
+  const select = document.getElementById('grammarSelect');
+  if (select) {
+    select.addEventListener('change', event => {
+      practiceState.datasetId = event.target.value;
+      practiceState.queue = [];
+      practiceState.index = 0;
+      practiceState.correct = 0;
+      practiceState.answered = 0;
+      practiceState.reveal = false;
+      renderGrammarPractice();
+    });
+  }
+
+  const dataset = datasets.find(entry => entry.id === practiceState.datasetId) || datasets[0];
+
+  if (browseActive) {
+    practiceContent.classList.remove('quiz-mode');
+    practiceContent.innerHTML = '';
+    const listEl = document.createElement('div');
+    listEl.className = 'practice-list';
+    practiceContent.appendChild(listEl);
+
+    const renderList = keyword => {
+      const key = (keyword || '').trim().toLowerCase();
+      const filtered = key
+        ? dataset.questions.filter(question => {
+            return includesKeyword(question.question, key) ||
+                   includesKeyword(question.knowledge, key) ||
+                   includesKeyword(question.explanation, key) ||
+                   includesKeyword(question.analysis, key) ||
+                   includesKeyword(question.translation, key) ||
+                   includesKeyword(question.section, key);
+          })
+        : dataset.questions;
+
+      practiceStats.textContent = `${dataset.title}（${dataset.group || '语法题库'}） · 共 ${dataset.total} 题，当前显示 ${filtered.length} 题`;
+
+      if (!filtered.length) {
+        listEl.innerHTML = '<div class="practice-empty">未找到匹配的题目</div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map((question, idx) => {
+        const knowledge = question.knowledge ? `<div class="practice-entry-meta">知识点：${question.knowledge}</div>` : '';
+        const section = question.section ? `<div class="practice-entry-meta">所属模块：${question.section}</div>` : '';
+        const translation = question.translation ? `<div class="practice-entry-subtitle">翻译：${question.translation}</div>` : '';
+        const answer = question.answer || question.correctAnswer;
+        const answerBlock = answer ? `<div class="practice-entry-meta">答案：<span class="practice-badge badge-answer">${answer}</span></div>` : '';
+        const explanation = question.explanation ? `<div class="practice-entry-description">解析：${question.explanation}</div>` : '';
+        const analysis = question.analysis && question.analysis !== question.explanation
+          ? `<div class="practice-entry-description">补充：${question.analysis}</div>`
+          : '';
+        return `
+          <div class="practice-entry">
+            <div class="practice-entry-title">${idx + 1}. ${question.question || ''}</div>
+            ${section}
+            ${knowledge}
+            ${translation}
+            ${formatOptions(question.options)}
+            ${answerBlock}
+            ${explanation}
+            ${analysis}
+          </div>
+        `;
+      }).join('');
+    };
+
+    renderList('');
+    const search = document.getElementById('grammarSearch');
+    if (search) {
+      search.addEventListener('input', event => renderList(event.target.value));
+    }
+  } else {
+    practiceContent.classList.add('quiz-mode');
+    renderGrammarQuiz(dataset);
+  }
+}
+
+function renderGrammarQuiz(dataset) {
+  if (!Array.isArray(dataset.questions) || !dataset.questions.length) {
+    practiceStats.textContent = `${dataset.title} 暂无题目`;
+    practiceContent.innerHTML = '<div class="practice-empty">该题库暂无题目，请稍后再试。</div>';
+    return;
+  }
+
+  if (!practiceState.queue.length) {
+    practiceState.queue = shuffle(dataset.questions);
+    practiceState.index = 0;
+    practiceState.correct = 0;
+    practiceState.answered = 0;
+    practiceState.reveal = false;
+  }
+
+  const total = practiceState.queue.length;
+
+  if (practiceState.index >= total) {
+    showGrammarSummary(dataset);
+    return;
+  }
+
+  const current = practiceState.queue[practiceState.index];
+  const optionPairs = Array.isArray(current.options)
+    ? current.options.map((value, index) => ({ key: String.fromCharCode(65 + index), value: stripOptionPrefix(value) }))
+    : Object.entries(current.options || {}).map(([key, value]) => ({ key, value: stripOptionPrefix(value) }));
+
+  practiceContent.innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-header">
+        <span>${dataset.title}</span>
+        <span>正确 ${practiceState.correct}/${practiceState.answered}</span>
+      </div>
+      <div class="quiz-prompt">${practiceState.index + 1}. ${current.question || '题目缺失'}</div>
+      ${current.section ? `<div class="practice-entry-meta">所属模块：${current.section}</div>` : ''}
+      ${current.knowledge ? `<div class="practice-entry-meta">知识点：${current.knowledge}</div>` : ''}
+      <div class="quiz-options">
+        ${optionPairs.map(option => `<button class="quiz-option" data-option="${option.key}"><strong>${option.key}.</strong> ${option.value}</button>`).join('')}
+      </div>
+      <div id="grammarAnswer" class="quiz-answer hidden">
+        ${buildGrammarAnswerBlock(current, current.answer || current.correctAnswer)}
+      </div>
+      <div class="quiz-actions">
+        <span class="quiz-hint">选择一个选项，查看解析并进入下一题。</span>
+        <div style="display:flex;gap:10px;">
+          <button class="btn-secondary" id="grammarSkipBtn">跳过此题</button>
+          <button class="btn-accent" id="grammarNextBtn" disabled>下一题</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const normalizedAnswer = (current.answer || current.correctAnswer || '').toString().trim().toUpperCase();
+  const answerBox = document.getElementById('grammarAnswer');
+  const nextBtn = document.getElementById('grammarNextBtn');
+  const skipBtn = document.getElementById('grammarSkipBtn');
+  const optionButtons = Array.from(document.querySelectorAll('.quiz-option'));
+
+  optionButtons.forEach(button => {
+    button.addEventListener('click', () => {
+      if (practiceState.reveal) return;
+      const choice = (button.dataset.option || '').toUpperCase();
+      const isCorrect = normalizedAnswer ? choice === normalizedAnswer : false;
+
+      practiceState.reveal = true;
+      practiceState.answered++;
+      if (isCorrect) {
+        practiceState.correct++;
+        button.classList.add('correct');
+      } else {
+        button.classList.add('incorrect');
+        if (normalizedAnswer) {
+          const correctButton = optionButtons.find(btn => (btn.dataset.option || '').toUpperCase() === normalizedAnswer);
+          if (correctButton) {
+            correctButton.classList.add('correct');
+          }
+        }
+      }
+
+      optionButtons.forEach(btn => {
+        btn.disabled = true;
+      });
+
+      answerBox?.classList.remove('hidden');
+      if (nextBtn) {
+        nextBtn.disabled = false;
+      }
+      updateQuizProgress(total, dataset.title);
+    });
+  });
+
+  if (nextBtn) {
+    nextBtn.addEventListener('click', () => {
+      practiceState.index++;
+      practiceState.reveal = false;
+      renderGrammarPractice();
+    });
+  }
+
+  if (skipBtn) {
+    skipBtn.addEventListener('click', () => {
+      practiceState.index++;
+      practiceState.reveal = false;
+      renderGrammarPractice();
+    });
+  }
+
+  updateQuizProgress(total, dataset.title);
+}
+
+function collectWordDatasets() {
+  const datasets = [];
+
+  // 688核心词汇
+  if (Array.isArray(window.vocabulary688) && window.vocabulary688.length) {
+    const vocab688 = window.vocabulary688.filter(item => item && item.word && item.cn);
+    if (vocab688.length) {
+      datasets.push({
+        id: 'vocab-688',
+        title: '核心词汇688',
+        total: vocab688.length,
+        items: vocab688
+      });
+    }
+  }
+
+  // 3500词汇
+  if (window.vocab3500) {
+    const all3500 = [];
+    Object.keys(window.vocab3500).forEach(letter => {
+      const letterWords = window.vocab3500[letter];
+      if (Array.isArray(letterWords)) {
+        all3500.push(...letterWords.filter(item => item && item.word && item.cn));
+      }
+    });
+    if (all3500.length) {
+      datasets.push({
+        id: 'vocab-3500',
+        title: '高考词汇3500',
+        total: all3500.length,
+        items: all3500
+      });
+    }
+  }
+
+  // 教材词汇
+  if (window.textbookVocab) {
+    Object.keys(window.textbookVocab).forEach(bookId => {
+      const book = window.textbookVocab[bookId];
+      if (book && book.units) {
+        const allBookWords = [];
+        Object.keys(book.units).forEach(unitName => {
+          const unit = book.units[unitName];
+          if (Array.isArray(unit)) {
+            allBookWords.push(...unit.filter(item => item && item.word && item.cn));
+          }
+        });
+        if (allBookWords.length) {
+          datasets.push({
+            id: `textbook-${bookId}`,
+            title: `教材词汇 · ${book.name || bookId}`,
+            total: allBookWords.length,
+            items: allBookWords
+          });
+        }
       }
     });
   }
 
-  if (!sources.length) {
-    practiceStats.textContent = '未找到语法题库数据';
-    practiceContent.innerHTML = '<div class="practice-empty">未检测到语法题库，请确认相关脚本已正确加载。</div>';
-    return;
+  return datasets;
+}
+
+function collectGrammarDatasets() {
+  const seen = new Set();
+  const conceptDatasets = [];
+  const choiceDatasets = [];
+  const gapFillSource = collectGrammarGapFillDatasets();
+  const gapFillDatasets = [];
+
+  const addDataset = dataset => {
+    if (!dataset || !Array.isArray(dataset.questions) || !dataset.questions.length) return;
+    if (!dataset.id) dataset.id = `grammar-${seen.size + 1}`;
+    if (seen.has(dataset.id)) return;
+    dataset.total = dataset.questions.length;
+    seen.add(dataset.id);
+    if (dataset.group === '语法选择题库') {
+      choiceDatasets.push(dataset);
+    } else if (dataset.group === '语法填空题库') {
+      gapFillDatasets.push(dataset);
+    } else {
+      conceptDatasets.push(dataset);
+    }
+  };
+
+  if (window.englishGrammarConcepts && Array.isArray(window.englishGrammarConcepts.sections)) {
+    const concept = window.englishGrammarConcepts;
+    const allQuestions = flattenEnglishConcepts();
+    if (allQuestions.length) {
+      addDataset({
+        id: 'concepts-all',
+        title: concept.title || '语法知识点200题',
+        questions: allQuestions,
+        group: '语法概念精读'
+      });
+    }
+    concept.sections.forEach((section, index) => {
+      const sectionQuestions = flattenEnglishConcepts(index);
+      if (!sectionQuestions.length) return;
+      const prefix = (index + 1).toString().padStart(2, '0');
+      addDataset({
+        id: `concepts-section-${index + 1}`,
+        title: `${prefix} ${section.name || '语法章节'}`,
+        questions: sectionQuestions,
+        group: '语法概念精读'
+      });
+    });
   }
 
-  const options = sources.map(source => `<option value="${source.id}">${source.name}（${source.count}题）</option>`).join('');
-  practiceToolbar.innerHTML = `
-    <label for="grammarSelect">选择题库</label>
-    <select id="grammarSelect">${options}</select>
-    <input id="grammarSearch" type="search" placeholder="输入题干或关键词筛选">
+  const banks = window.grammarQuestionBanks || {};
+  const bankOrder = Array.isArray(window.grammarQuestionOrder) && window.grammarQuestionOrder.length
+    ? window.grammarQuestionOrder
+    : Object.keys(banks);
+  bankOrder.forEach(id => {
+    const bank = banks[id];
+    if (!bank || !Array.isArray(bank.questions) || !bank.questions.length) return;
+    addDataset({
+      id,
+      title: bank.title || id,
+      questions: bank.questions.map(question => ({ ...question })),
+      group: '语法选择题库'
+    });
+  });
+
+  gapFillSource.forEach(dataset => addDataset(dataset));
+
+  return [...conceptDatasets, ...choiceDatasets, ...gapFillDatasets];
+}
+
+function collectGrammarGapFillDatasets() {
+  const configs = [
+    {
+      id: 'gap-articles',
+      getter: () => (typeof articleExercises !== 'undefined' ? articleExercises : null),
+      answerKey: 'answer',
+      fallbackTitle: '冠词专题练习'
+    },
+    {
+      id: 'gap-conjunctions',
+      getter: () => (typeof conjunctions !== 'undefined' ? conjunctions : null),
+      answerKey: 'answer',
+      fallbackTitle: '连词专项练习'
+    },
+    {
+      id: 'gap-prepositions',
+      getter: () => (typeof prepositions !== 'undefined' ? prepositions : null),
+      answerKey: 'answer',
+      fallbackTitle: '介词专项练习'
+    },
+    {
+      id: 'gap-pronouns',
+      getter: () => (typeof pronouns !== 'undefined' ? pronouns : null),
+      answerKey: 'answer',
+      fallbackTitle: '代词专项练习'
+    },
+    {
+      id: 'gap-adverbial-clauses',
+      getter: () => (typeof adverbialClauseTest !== 'undefined' ? adverbialClauseTest : null),
+      answerKey: 'correctAnswer',
+      fallbackTitle: '状语从句专项练习'
+    },
+    {
+      id: 'gap-nonfinite-verbs',
+      getter: () => (typeof nonFiniteVerbTest !== 'undefined' ? nonFiniteVerbTest : null),
+      answerKey: 'correctAnswer',
+      fallbackTitle: '非谓语动词专项练习'
+    },
+    {
+      id: 'gap-noun-clauses',
+      getter: () => (typeof nounClauseTest !== 'undefined' ? nounClauseTest : null),
+      answerKey: 'correctAnswer',
+      fallbackTitle: '名词性从句专项练习'
+    },
+    {
+      id: 'gap-nouns',
+      getter: () => (typeof nounTest !== 'undefined' ? nounTest : null),
+      answerKey: 'correctAnswer',
+      fallbackTitle: '名词数与可数性练习'
+    },
+    {
+      id: 'gap-relative-clauses',
+      getter: () => (typeof attributiveClauseTest !== 'undefined' ? attributiveClauseTest : null),
+      answerKey: 'correctAnswer',
+      fallbackTitle: '定语从句专项练习'
+    },
+    {
+      id: 'gap-verb-tense',
+      getter: () => (typeof verbTenseTest !== 'undefined' ? verbTenseTest : null),
+      answerKey: 'correctAnswer',
+      fallbackTitle: '动词时态专项练习'
+    },
+    {
+      id: 'gap-verb-voice',
+      getter: () => (typeof verbVoiceTest !== 'undefined' ? verbVoiceTest : null),
+      answerKey: 'correctAnswer',
+      fallbackTitle: '动词语态专项练习'
+    }
+  ];
+
+  const datasets = [];
+
+  configs.forEach(config => {
+    const data = config.getter();
+    if (!data) return;
+
+    let questions = [];
+    let title = '';
+
+    if (Array.isArray(data)) {
+      questions = normalizeGapFillQuestions(data, config.answerKey);
+      title = config.fallbackTitle;
+    } else if (typeof data === 'object') {
+      const questionList = Array.isArray(data.questions) ? data.questions : Array.isArray(data.items) ? data.items : [];
+      questions = normalizeGapFillQuestions(questionList, config.answerKey);
+      title = data.title || config.fallbackTitle;
+    }
+
+    if (!questions.length) return;
+
+    datasets.push({
+      id: config.id,
+      title: title || config.id,
+      total: questions.length,
+      questions,
+      group: '语法填空题库'
+    });
+  });
+
+  return datasets;
+}
+
+function normalizeGapFillQuestions(questions, answerKey) {
+  if (!Array.isArray(questions)) return [];
+  return questions.map(question => {
+    const cloned = { ...question };
+    if (Array.isArray(cloned.options)) {
+      cloned.options = cloned.options.map(option => stripOptionPrefix(option));
+    } else if (cloned.options && typeof cloned.options === 'object') {
+      const normalized = {};
+      Object.entries(cloned.options).forEach(([key, value]) => {
+        normalized[key] = stripOptionPrefix(value);
+      });
+      cloned.options = normalized;
+    }
+
+    if (answerKey && typeof cloned[answerKey] !== 'undefined' && typeof cloned.answer === 'undefined') {
+      cloned.answer = cloned[answerKey];
+    }
+
+    if (typeof cloned.answer === 'string') {
+      cloned.answer = cloned.answer.trim().toUpperCase();
+    }
+
+    if (typeof cloned.correctAnswer === 'string') {
+      cloned.correctAnswer = cloned.correctAnswer.trim().toUpperCase();
+    }
+
+    return cloned;
+  });
+}
+
+function stripOptionPrefix(value) {
+  if (typeof value !== 'string') return value;
+  return value.replace(/^[A-Z][\.)]\s*/i, '').trim();
+}
+
+function buildGrammarAnswerBlock(question, answer) {
+  const segments = [];
+  const normalizedAnswer = answer ? answer.toString().trim().toUpperCase() : '';
+  if (normalizedAnswer) {
+    segments.push(`正确答案：<strong>${normalizedAnswer}</strong>`);
+  }
+  if (question.translation) {
+    segments.push(`翻译：${question.translation}`);
+  }
+  if (question.explanation) {
+    segments.push(`解析：${question.explanation}`);
+  }
+  if (question.analysis && question.analysis !== question.explanation) {
+    segments.push(`补充：${question.analysis}`);
+  }
+  if (!segments.length) {
+    segments.push('暂无解析，请结合课堂笔记复习。');
+  }
+  return segments.join('<br>');
+}
+
+function showGrammarSummary(dataset) {
+  const total = practiceState.queue.length;
+  const answered = practiceState.answered;
+  const accuracy = answered ? Math.round((practiceState.correct / answered) * 100) : 0;
+
+  practiceStats.textContent = `${dataset.title} 练习完成 · 作答 ${answered} 题 · 正确率 ${accuracy}%`;
+
+  practiceContent.innerHTML = `
+    <div class="quiz-summary">
+      <strong>练习完成！</strong>
+      <p>${dataset.title} 共 ${total} 题，本轮作答 ${answered} 题，答对 ${practiceState.correct} 题，正确率 ${accuracy}%。</p>
+      <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn-accent" id="grammarRetry">重新练习</button>
+        <button class="btn-secondary" id="grammarBrowse">返回浏览模式</button>
+      </div>
+    </div>
   `;
 
-  const select = document.getElementById('grammarSelect');
-  const search = document.getElementById('grammarSearch');
+  const retryBtn = document.getElementById('grammarRetry');
+  const browseBtn = document.getElementById('grammarBrowse');
 
-  const listEl = document.createElement('div');
-  listEl.className = 'practice-list';
-  practiceContent.appendChild(listEl);
-
-  const englishQuestions = flattenEnglishConcepts();
-
-  const getDataset = id => {
-    if (id === 'concepts') {
-      return {
-        title: window.englishGrammarConcepts?.title || '语法知识点200题',
-        total: englishQuestions.length,
-        questions: englishQuestions
-      };
-    }
-    const bank = window.grammarQuestionBanks ? window.grammarQuestionBanks[id] : null;
-    return {
-      title: bank?.title || id,
-      total: Array.isArray(bank?.questions) ? bank.questions.length : 0,
-      questions: Array.isArray(bank?.questions) ? bank.questions : []
-    };
-  };
-
-  const renderList = () => {
-    const dataset = getDataset(select.value);
-    const key = (search?.value || '').trim().toLowerCase();
-    const filtered = key
-      ? dataset.questions.filter(question => {
-          return includesKeyword(question.question, key) ||
-                 includesKeyword(question.knowledge, key) ||
-                 includesKeyword(question.explanation, key) ||
-                 includesKeyword(question.analysis, key) ||
-                 includesKeyword(question.section, key);
-        })
-      : dataset.questions;
-
-    practiceStats.textContent = `${dataset.title} · 共 ${dataset.total} 题，当前显示 ${filtered.length} 题`;
-
-    if (!filtered.length) {
-      listEl.innerHTML = '<div class="practice-empty">未找到匹配的题目</div>';
-      return;
-    }
-
-    listEl.innerHTML = filtered.map((question, idx) => {
-      const knowledge = question.knowledge ? `<div class="practice-entry-meta">知识点：${question.knowledge}</div>` : '';
-      const section = question.section ? `<div class="practice-entry-meta">所属模块：${question.section}</div>` : '';
-      const answer = question.answer || question.correctAnswer;
-      const answerBlock = answer ? `<div class="practice-entry-meta">答案：<span class="practice-badge badge-answer">${answer}</span></div>` : '';
-      const explanation = question.explanation ? `<div class="practice-entry-description">解析：${question.explanation}</div>` : '';
-      const analysis = !question.explanation && question.analysis
-        ? `<div class="practice-entry-description">解析：${question.analysis}</div>`
-        : question.analysis && question.explanation
-        ? `<div class="practice-entry-description">补充：${question.analysis}</div>`
-        : '';
-      return `
-        <div class="practice-entry">
-          <div class="practice-entry-title">${idx + 1}. ${question.question || ''}</div>
-          ${section}
-          ${knowledge}
-          ${formatOptions(question.options)}
-          ${answerBlock}
-          ${explanation}
-          ${analysis}
-        </div>
-      `;
-    }).join('');
-  };
-
-  if (select) {
-    select.addEventListener('change', renderList);
-  }
-  if (search) {
-    search.addEventListener('input', renderList);
+  if (retryBtn) {
+    retryBtn.addEventListener('click', () => {
+      practiceState.queue = [];
+      practiceState.index = 0;
+      practiceState.correct = 0;
+      practiceState.answered = 0;
+      practiceState.reveal = false;
+      renderGrammarPractice();
+    });
   }
 
-  renderList();
+  if (browseBtn) {
+    browseBtn.addEventListener('click', () => setPracticeMode('browse'));
+  }
 }
 
 function renderSentencePractice() {
   const baseSentences = Array.isArray(window.vocabularyData) ? window.vocabularyData : [];
-  const essaySources = [
+  const essayConfigs = [
     { key: 'activityIntroduction', label: '作文模板 · 活动介绍' },
     { key: 'activityReport', label: '作文模板 · 活动报告' },
     { key: 'apologyLetter', label: '作文模板 · 道歉信' },
@@ -1333,116 +2394,458 @@ function renderSentencePractice() {
     { key: 'noticeLetter', label: '作文模板 · 通知信' },
     { key: 'personDescription', label: '作文模板 · 人物介绍' },
     { key: 'suggestionLetter', label: '作文模板 · 建议信' }
-  ].filter(cfg => {
-    const source = window[cfg.key];
-    return source && Array.isArray(source.sentences);
+  ];
+
+  const datasets = [];
+
+  if (baseSentences.length) {
+    datasets.push({
+      id: 'sentences',
+      title: '精选句子200',
+      total: baseSentences.length,
+      items: baseSentences.map((item, index) => ({
+        index: item.id || index + 1,
+        english: item.english,
+        chinese: item.chinese,
+        keywords: Array.isArray(item.keywords) ? item.keywords : []
+      }))
+    });
+  }
+
+  essayConfigs.forEach(cfg => {
+    const entry = window[cfg.key];
+    if (entry && Array.isArray(entry.sentences) && entry.sentences.length) {
+      const title = entry.title?.chinese || entry.title?.english || cfg.label;
+      datasets.push({
+        id: cfg.key,
+        title,
+        total: entry.sentences.length,
+        items: entry.sentences.map((sentence, index) => ({
+          index: index + 1,
+          english: sentence.english,
+          chinese: sentence.chinese,
+          keywords: Array.isArray(sentence.keywords) ? sentence.keywords : []
+        }))
+      });
+    }
   });
 
-  if (!baseSentences.length && !essaySources.length) {
+  if (!datasets.length) {
     practiceStats.textContent = '未找到句子数据';
     practiceContent.innerHTML = '<div class="practice-empty">未检测到句子或作文模板数据，请确认相关脚本已正确加载。</div>';
     return;
   }
 
-  const options = [];
-  if (baseSentences.length) {
-    options.push(`<option value="sentences">精选句子200（${baseSentences.length}句）</option>`);
+  if (!practiceState.datasetId || !datasets.some(dataset => dataset.id === practiceState.datasetId)) {
+    practiceState.datasetId = datasets[0].id;
   }
-  essaySources.forEach(cfg => {
-    const entry = window[cfg.key];
-    const title = entry?.title?.chinese || entry?.title?.english || cfg.label;
-    const count = Array.isArray(entry?.sentences) ? entry.sentences.length : 0;
-    options.push(`<option value="${cfg.key}">${title}（${count}句）</option>`);
-  });
+
+  const browseActive = practiceState.mode === 'browse';
+
+  const options = datasets.map(dataset => {
+    const selected = dataset.id === practiceState.datasetId ? 'selected' : '';
+    return `<option value="${dataset.id}" ${selected}>${dataset.title}（${dataset.total}句）</option>`;
+  }).join('');
+
+  const toolbarContent = browseActive
+    ? `<label for="sentenceSelect">选择素材</label>
+       <select id="sentenceSelect">${options}</select>
+       <input id="sentenceSearch" type="search" placeholder="输入关键词筛选句子">`
+    : `<label for="sentenceSelect">选择素材</label>
+       <select id="sentenceSelect">${options}</select>
+       <div class="quiz-hint">练习模式：请点击下方词块，按正确顺序还原英文句子。</div>`;
 
   practiceToolbar.innerHTML = `
-    <label for="sentenceSelect">选择素材</label>
-    <select id="sentenceSelect">${options.join('')}</select>
-    <input id="sentenceSearch" type="search" placeholder="输入关键词筛选句子">
+    <div class="toolbar-section">
+      ${toolbarContent}
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn-mode ${browseActive ? 'active' : ''}" data-mode="browse">浏览模式</button>
+      <button class="btn-mode ${browseActive ? '' : 'active'}" data-mode="quiz">练习模式</button>
+    </div>
   `;
 
+  practiceToolbar.querySelectorAll('.btn-mode').forEach(btn => {
+    btn.addEventListener('click', () => setPracticeMode(btn.dataset.mode));
+  });
+
   const select = document.getElementById('sentenceSelect');
-  const search = document.getElementById('sentenceSearch');
+  if (select) {
+    select.addEventListener('change', event => {
+      practiceState.datasetId = event.target.value;
+      practiceState.queue = [];
+      practiceState.index = 0;
+      practiceState.correct = 0;
+      practiceState.answered = 0;
+      practiceState.reveal = false;
+      renderSentencePractice();
+    });
+  }
 
-  const listEl = document.createElement('div');
-  listEl.className = 'practice-list';
-  practiceContent.appendChild(listEl);
+  const dataset = datasets.find(item => item.id === practiceState.datasetId) || datasets[0];
+  practiceDatasets.sentence = dataset.items;
 
-  const datasetFor = id => {
-    if (id === 'sentences') {
-      return {
-        title: '精选句子200',
-        total: baseSentences.length,
-        items: baseSentences.map((item, index) => ({
-          index: item.id || index + 1,
-          english: item.english,
-          chinese: item.chinese,
-          keywords: item.keywords
-        }))
-      };
-    }
+  if (browseActive) {
+    practiceContent.classList.remove('quiz-mode');
+    const listEl = document.createElement('div');
+    listEl.className = 'practice-list';
+    practiceContent.innerHTML = '';
+    practiceContent.appendChild(listEl);
 
-    const cfg = essaySources.find(entry => entry.key === id);
-    if (!cfg) {
-      return { title: '未知素材', total: 0, items: [] };
-    }
+    const renderList = keyword => {
+      const key = keyword.trim().toLowerCase();
+      const filtered = key
+        ? dataset.items.filter(item => {
+            return includesKeyword(item.english, key) ||
+                   includesKeyword(item.chinese, key) ||
+                   (Array.isArray(item.keywords) && item.keywords.some(word => includesKeyword(word, key)));
+          })
+        : dataset.items;
 
-    const source = window[cfg.key];
-    const sentences = Array.isArray(source?.sentences) ? source.sentences : [];
-    const title = source?.title?.chinese || source?.title?.english || cfg.label;
-    return {
-      title,
-      total: sentences.length,
-      items: sentences.map((sentence, index) => ({
-        index: index + 1,
-        english: sentence.english,
-        chinese: sentence.chinese
-      }))
+      practiceStats.textContent = `${dataset.title} · 共 ${dataset.total} 句，当前显示 ${filtered.length} 句`;
+
+      if (!filtered.length) {
+        listEl.innerHTML = '<div class="practice-empty">未找到匹配的句子</div>';
+        return;
+      }
+
+      listEl.innerHTML = filtered.map(item => {
+        const keywords = Array.isArray(item.keywords) && item.keywords.length
+          ? `<div class="practice-entry-meta">关键词：${item.keywords.join('、')}</div>`
+          : '';
+        return `
+          <div class="practice-entry">
+            <div class="practice-entry-title">${item.index}. ${item.english || ''}</div>
+            <div class="practice-entry-subtitle">${item.chinese || ''}</div>
+            ${keywords}
+          </div>
+        `;
+      }).join('');
     };
-  };
 
-  const renderList = () => {
-    if (!select) return;
-    const dataset = datasetFor(select.value);
-    const key = (search?.value || '').trim().toLowerCase();
-    const filtered = key
-      ? dataset.items.filter(item => {
-          return includesKeyword(item.english, key) ||
-                 includesKeyword(item.chinese, key) ||
-                 (Array.isArray(item.keywords) && item.keywords.some(keyword => includesKeyword(keyword, key)));
-        })
-      : dataset.items;
+    renderList('');
+    const search = document.getElementById('sentenceSearch');
+    if (search) {
+      search.addEventListener('input', event => renderList(event.target.value));
+    }
+  } else {
+    practiceContent.classList.add('quiz-mode');
+    renderSentenceQuiz(dataset);
+  }
+}
 
-    practiceStats.textContent = `${dataset.title} · 共 ${dataset.total} 句，当前显示 ${filtered.length} 句`;
+function renderSentenceQuiz(dataset) {
+  if (!Array.isArray(dataset.items) || !dataset.items.length) {
+    practiceStats.textContent = `${dataset.title} 暂无内容`;
+    practiceContent.innerHTML = '<div class="practice-empty">该素材暂无句子，请稍后再试。</div>';
+    return;
+  }
 
-    if (!filtered.length) {
-      listEl.innerHTML = '<div class="practice-empty">未找到匹配的句子</div>';
+  if (!practiceState.queue.length) {
+    practiceState.queue = shuffle(dataset.items.slice());
+    practiceState.index = 0;
+    practiceState.correct = 0;
+    practiceState.answered = 0;
+    practiceState.reveal = false;
+  }
+
+  const total = practiceState.queue.length;
+
+  if (practiceState.index >= total) {
+    showSentenceSummary(dataset);
+    return;
+  }
+
+  const current = practiceState.queue[practiceState.index];
+  const translation = current.chinese || '';
+  const keywords = Array.isArray(current.keywords) ? current.keywords : [];
+  const keywordText = keywords.length ? keywords.join('、') : '';
+  const originalTokens = splitSentenceIntoChunks(current.english);
+
+  const wordPositions = [];
+  originalTokens.forEach((token, index) => {
+    if (isWordToken(token)) {
+      wordPositions.push(index);
+    }
+  });
+
+  if (!wordPositions.length) {
+    practiceState.index++;
+    renderSentencePractice();
+    return;
+  }
+
+  const wordTokens = wordPositions.map((tokenIndex, wordIndex) => ({
+    value: originalTokens[tokenIndex],
+    key: `word-${wordIndex}`
+  }));
+  const originalWords = wordTokens.map(token => token.value);
+  const shuffledTokens = shuffle(wordTokens.map(token => ({ ...token })));
+  const referenceSentence = joinSentenceTokens(originalTokens);
+
+  practiceContent.innerHTML = `
+    <div class="quiz-card">
+      <div class="quiz-header">
+        <span>${dataset.title}</span>
+        <span>掌握 ${practiceState.correct}/${practiceState.answered}</span>
+      </div>
+      <div class="quiz-prompt">请点击下方词块，按正确顺序还原英文句子</div>
+      ${keywordText ? `<div class="practice-entry-meta">关键词：${keywordText}</div>` : ''}
+      <div id="sentenceHint" class="sentence-hint">中文提示：${translation || '暂无中文提示'}</div>
+      <div class="sentence-assembly is-empty" id="sentenceAssembly"></div>
+      <div class="sentence-pool" id="sentencePool"></div>
+      <div id="sentenceAnswer" class="quiz-answer hidden"></div>
+      <div class="quiz-actions">
+        <span class="quiz-hint">完成排序后点击“检查答案”，需要帮助时可先隐藏或显示中文提示。</span>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn-secondary" id="sentenceResetBtn">重置</button>
+          <button class="btn-secondary" id="sentenceHintBtn">隐藏中文提示</button>
+          <button class="btn-accent" id="sentenceCheckBtn" disabled>检查答案</button>
+          <button class="btn-accent" id="sentenceNextBtn" disabled>下一句</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const assemblyContainer = document.getElementById('sentenceAssembly');
+  const poolContainer = document.getElementById('sentencePool');
+  const answerBox = document.getElementById('sentenceAnswer');
+  const resetBtn = document.getElementById('sentenceResetBtn');
+  const hintBtn = document.getElementById('sentenceHintBtn');
+  const hintBox = document.getElementById('sentenceHint');
+  const checkBtn = document.getElementById('sentenceCheckBtn');
+  const nextBtn = document.getElementById('sentenceNextBtn');
+  const assembled = [];
+  const tokenButtonMap = new Map();
+  const totalWords = wordTokens.length;
+  let hintVisible = true;
+
+  if (!translation) {
+    hintBtn.disabled = true;
+    hintBtn.textContent = '中文提示不可用';
+  }
+
+  const renderAssembly = () => {
+    assemblyContainer.classList.remove('correct', 'incorrect');
+    assemblyContainer.innerHTML = '';
+
+    if (!assembled.length) {
+      assemblyContainer.classList.add('is-empty');
+      assemblyContainer.innerHTML = '<span class="sentence-placeholder">点击下方词块还原句子</span>';
       return;
     }
 
-    listEl.innerHTML = filtered.map(item => {
-      const keywords = Array.isArray(item.keywords) && item.keywords.length
-        ? `<div class="practice-entry-meta">关键词：${item.keywords.join('、')}</div>`
-        : '';
-      return `
-        <div class="practice-entry">
-          <div class="practice-entry-title">${item.index}. ${item.english || ''}</div>
-          <div class="practice-entry-subtitle">${item.chinese || ''}</div>
-          ${keywords}
-        </div>
-      `;
-    }).join('');
+    assemblyContainer.classList.remove('is-empty');
+    assembled.forEach(token => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'sentence-token assembled';
+      button.dataset.key = token.key;
+      button.textContent = token.value;
+      if (!practiceState.reveal) {
+        button.classList.add('removeable');
+        button.addEventListener('click', () => {
+          const index = assembled.findIndex(item => item.key === token.key);
+          if (index !== -1) {
+            assembled.splice(index, 1);
+          }
+          const poolButton = tokenButtonMap.get(token.key);
+          if (poolButton) {
+            poolButton.disabled = false;
+            poolButton.classList.remove('disabled');
+          }
+          renderAssembly();
+          updateCheckButtonState();
+        });
+      } else {
+        button.disabled = true;
+      }
+      assemblyContainer.appendChild(button);
+    });
   };
 
-  if (select) {
-    select.addEventListener('change', renderList);
-  }
-  if (search) {
-    search.addEventListener('input', renderList);
+  const updateCheckButtonState = () => {
+    checkBtn.disabled = practiceState.reveal || assembled.length !== totalWords;
+  };
+
+  shuffledTokens.forEach(token => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'sentence-token';
+    button.dataset.key = token.key;
+    button.textContent = token.value;
+    button.addEventListener('click', () => {
+      if (practiceState.reveal || button.disabled) return;
+      button.disabled = true;
+      button.classList.add('disabled');
+      assembled.push(token);
+      renderAssembly();
+      updateCheckButtonState();
+    });
+    tokenButtonMap.set(token.key, button);
+    poolContainer.appendChild(button);
+  });
+
+  const resetAssembly = () => {
+    if (practiceState.reveal) return;
+    assembled.length = 0;
+    tokenButtonMap.forEach(button => {
+      button.disabled = false;
+      button.classList.remove('disabled');
+    });
+    renderAssembly();
+    updateCheckButtonState();
+  };
+
+  resetBtn.addEventListener('click', resetAssembly);
+
+  hintBtn.addEventListener('click', () => {
+    if (!translation) return;
+    hintVisible = !hintVisible;
+    hintBox.style.display = hintVisible ? 'block' : 'none';
+    hintBtn.textContent = hintVisible ? '隐藏中文提示' : '显示中文提示';
+  });
+
+  checkBtn.addEventListener('click', () => {
+    if (practiceState.reveal) return;
+    if (assembled.length !== totalWords) {
+      alert('请先选完所有词块。');
+      return;
+    }
+
+    const assembledWords = assembled.map(item => item.value);
+    const isCorrect = compareWordOrder(originalWords, assembledWords);
+    const assembledSentence = rebuildSentenceFromWords(originalTokens, assembledWords);
+
+    practiceState.answered++;
+    if (isCorrect) {
+      practiceState.correct++;
+    }
+    practiceState.reveal = true;
+
+    tokenButtonMap.forEach(button => {
+      button.disabled = true;
+      button.classList.add('disabled');
+    });
+
+    renderAssembly();
+    assemblyContainer.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+    const resultLines = [
+      `<strong>正确句子：</strong>${referenceSentence}`,
+      translation ? `中文：${translation}` : '',
+      keywordText ? `关键词：${keywordText}` : '',
+      !isCorrect ? `<span style="color:#c0392b;">你的答案：${assembledSentence}</span>` : ''
+    ].filter(Boolean);
+
+    answerBox.innerHTML = resultLines.join('<br>');
+    answerBox.classList.remove('hidden');
+
+    checkBtn.disabled = true;
+    resetBtn.disabled = true;
+    nextBtn.disabled = false;
+
+    updateQuizProgress(total, dataset.title);
+  });
+
+  nextBtn.addEventListener('click', () => {
+    practiceState.index++;
+    practiceState.reveal = false;
+    renderSentencePractice();
+  });
+
+  renderAssembly();
+  updateCheckButtonState();
+  updateQuizProgress(total, dataset.title);
+}
+function showSentenceSummary(dataset) {
+  const total = practiceState.queue.length;
+  const answered = practiceState.answered;
+  const accuracy = answered ? Math.round((practiceState.correct / answered) * 100) : 0;
+
+  practiceStats.textContent = `${dataset.title} 练习完成 · 作答 ${answered} 句 · 正确率 ${accuracy}%`;
+
+  practiceContent.innerHTML = `
+    <div class="quiz-summary">
+      <strong>练习完成！</strong>
+      <p>${dataset.title} 共 ${total} 句，本轮作答 ${answered} 句，答对 ${practiceState.correct} 句，正确率 ${accuracy}%。</p>
+      <div style="margin-top:16px;display:flex;gap:12px;flex-wrap:wrap;">
+        <button class="btn-accent" id="sentenceRetry">重新练习</button>
+        <button class="btn-secondary" id="sentenceBrowse">返回浏览模式</button>
+      </div>
+    </div>
+  `;
+
+  const retryBtn = document.getElementById('sentenceRetry');
+  const browseBtn = document.getElementById('sentenceBrowse');
+
+  if (retryBtn) {
+    retryBtn.addEventListener('click', () => {
+      practiceState.queue = [];
+      practiceState.index = 0;
+      practiceState.correct = 0;
+      practiceState.answered = 0;
+      practiceState.reveal = false;
+      renderSentencePractice();
+    });
   }
 
-  renderList();
+  if (browseBtn) {
+    browseBtn.addEventListener('click', () => setPracticeMode('browse'));
+  }
 }
+
+function splitSentenceIntoChunks(sentence) {
+  if (!sentence || typeof sentence !== 'string') return [];
+  return (sentence.match(/[\w'-]+|[^\s\w]/g) || []).filter(Boolean);
+}
+
+function joinSentenceTokens(tokens) {
+  return tokens.reduce((result, token) => {
+    if (!token) return result;
+    if (!result) return token;
+    if (/^[,.;!?"”')\]]/.test(token)) {
+      return result + token;
+    }
+    if (token === "'s" || token === "'re" || token === "'ll" || token === "'ve" || token === "'d") {
+      return result + token;
+    }
+    const trailing = result.slice(-1);
+    if (trailing === '“' || trailing === '"' || trailing === '(' || trailing === '[') {
+      return result + token;
+    }
+    return `${result} ${token}`;
+  }, '');
+}
+
+function rebuildSentenceFromWords(templateTokens, words) {
+  const tokens = [];
+  let wordIndex = 0;
+  templateTokens.forEach(token => {
+    if (isWordToken(token)) {
+      const replacement = typeof words[wordIndex] !== 'undefined' ? words[wordIndex] : token;
+      tokens.push(replacement);
+      wordIndex++;
+    } else {
+      tokens.push(token);
+    }
+  });
+  return joinSentenceTokens(tokens);
+}
+
+function compareWordOrder(expected, actual) {
+  if (!Array.isArray(actual) || actual.length !== expected.length) {
+    return false;
+  }
+  return expected.every((value, index) => {
+    return value.toLowerCase() === (actual[index] || '').toLowerCase();
+  });
+}
+
+function isWordToken(token) {
+  return typeof token === 'string' && /^[A-Za-z0-9][A-Za-z0-9'\-]*$/.test(token);
+}
+
 
 function formatOptions(options) {
   if (!options) return '';
@@ -1456,12 +2859,15 @@ function formatOptions(options) {
   return `<div class="practice-entry-options">${entries.join('')}</div>`;
 }
 
-function flattenEnglishConcepts() {
+function flattenEnglishConcepts(sectionIndex) {
   if (!window.englishGrammarConcepts || !Array.isArray(window.englishGrammarConcepts.sections)) {
     return [];
   }
   const result = [];
-  window.englishGrammarConcepts.sections.forEach(section => {
+  window.englishGrammarConcepts.sections.forEach((section, index) => {
+    if (typeof sectionIndex === 'number' && index !== sectionIndex) {
+      return;
+    }
     const sectionName = section.name || '';
     (section.questions || []).forEach(question => {
       result.push({
@@ -1469,7 +2875,10 @@ function flattenEnglishConcepts() {
         options: question.options,
         answer: question.answer,
         knowledge: question.knowledge,
-        section: sectionName
+        section: sectionName,
+        explanation: question.explanation,
+        analysis: question.analysis,
+        translation: question.translation
       });
     });
   });

@@ -14,7 +14,7 @@ const pronouns = [
     options: ["A. your; my", "B. yours; mine", "C. your; mine", "D. yours; my"],
     translation: "这支铅笔是你的吗？不，它不是我的。它是莉莉的。",
     answer: "B",
-    explanation: "形容词性物主代词（your/my）后需接名词，名词性物主代词（yours/mine）可单独使用（相当于 "形容词性物主代词 + 名词"）。两空后均无名词，需用名词性物主代词，排除 A、C、D。"
+    explanation: "形容词性物主代词（your/my）后需接名词，名词性物主代词（yours/mine）可单独使用（相当于 \"形容词性物主代词 + 名词\"）。两空后均无名词，需用名词性物主代词，排除 A、C、D。"
   },
   {
     id: 3,
@@ -801,6 +801,10 @@ const pronouns = [
     explanation: "rice 是不可数名词，few/a few 修饰可数名词，排除 A、B；a little 表 \"有一点\"（肯定，可做饭），little 表 \"几乎没有\"（否定，无法做饭），排除 C。"
   }
 ];
+
+if (typeof window !== 'undefined') {
+  window.pronouns = pronouns;
+}
 
 // 导出数据
 if (typeof module !== 'undefined' && module.exports) {

@@ -802,6 +802,10 @@ const conjunctions = [
   }
 ];
 
+if (typeof window !== 'undefined') {
+  window.conjunctions = conjunctions;
+}
+
 // 导出数据
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = conjunctions;

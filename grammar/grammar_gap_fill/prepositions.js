@@ -6,7 +6,7 @@ const prepositions = [
     options: ["A. in", "B. on", "C. at", "D. for"],
     translation: "我们通常在周日下午去野餐。",
     answer: "B",
-    explanation: "介词 on 用于 "具体某天的上午/下午/晚上"；in 用于泛指的上午/下午（如 in the afternoon）、年/月/季节；at 用于具体时间点（如 at 3 p.m.）；for 表持续时间。"
+    explanation: "介词 on 用于 \"具体某天的上午/下午/晚上\"；in 用于泛指的上午/下午（如 in the afternoon）、年/月/季节；at 用于具体时间点（如 at 3 p.m.）；for 表持续时间。"
   },
   {
     id: 2,
@@ -801,6 +801,10 @@ const prepositions = [
     explanation: "固定搭配 "agree to sth." 表 "同意（计划、建议等）"；agree with 表 "同意某人的观点"；in/on 无此搭配。"
   }
 ];
+
+if (typeof window !== 'undefined') {
+  window.prepositions = prepositions;
+}
 
 // 导出数据
 if (typeof module !== 'undefined' && module.exports) {

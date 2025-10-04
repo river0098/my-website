@@ -618,24 +618,30 @@ const adverbialClauseTest = {
 };
 
 // 导出模块
+if (typeof window !== 'undefined') {
+  window.adverbialClauseTest = adverbialClauseTest;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = adverbialClauseTest;
 }
 
-// 使用示例
-console.log(`状语从句测试加载完成！`);
-console.log(`总题数: ${adverbialClauseTest.questions.length}`);
-console.log(`测试标题: ${adverbialClauseTest.title}`);
+// 使用示例（仅用于调试）
+{
+  console.log(`状语从句测试加载完成！`);
+  console.log(`总题数: ${adverbialClauseTest.questions.length}`);
+  console.log(`测试标题: ${adverbialClauseTest.title}`);
 
-// 示例：获取第一题
-const firstQuestion = adverbialClauseTest.getQuestionById(1);
-console.log('\n第一题:', firstQuestion.question);
-console.log('正确答案:', firstQuestion.correctAnswer);
+  // 示例：获取第一题
+  const firstQuestion = adverbialClauseTest.getQuestionById(1);
+  console.log('\n第一题:', firstQuestion.question);
+  console.log('正确答案:', firstQuestion.correctAnswer);
 
-// 示例：获取状语从句规则
-const rules = adverbialClauseTest.getAdverbialClauseRules();
-console.log('\n时间状语从句引导词:', rules.时间状语从句.引导词);
+  // 示例：获取状语从句规则
+  const rules = adverbialClauseTest.getAdverbialClauseRules();
+  console.log('\n时间状语从句引导词:', rules.时间状语从句.引导词);
 
-// 示例：获取易混淆连词
-const confusing = adverbialClauseTest.getConfusingConnectives();
-console.log('\nwhen vs while vs as区别:', confusing["when vs while vs as"]);
+  // 示例：获取易混淆连词
+  const confusing = adverbialClauseTest.getConfusingConnectives();
+  console.log('\nwhen vs while vs as区别:', confusing["when vs while vs as"]);
+}

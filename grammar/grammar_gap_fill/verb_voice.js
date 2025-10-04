@@ -671,24 +671,30 @@ const verbVoiceTest = {
 };
 
 // 导出模块
+if (typeof window !== 'undefined') {
+  window.verbVoiceTest = verbVoiceTest;
+}
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = verbVoiceTest;
 }
 
-// 使用示例
-console.log(`动词语态测试加载完成！`);
-console.log(`总题数: ${verbVoiceTest.questions.length}`);
-console.log(`测试标题: ${verbVoiceTest.title}`);
+// 使用示例（仅用于调试）
+{
+  console.log(`动词语态测试加载完成！`);
+  console.log(`总题数: ${verbVoiceTest.questions.length}`);
+  console.log(`测试标题: ${verbVoiceTest.title}`);
 
-// 示例：获取第一题
-const firstQuestion = verbVoiceTest.getQuestionById(1);
-console.log('\n第一题:', firstQuestion.question);
-console.log('正确答案:', firstQuestion.correctAnswer);
+  // 示例：获取第一题
+  const verbVoiceFirstQuestion = verbVoiceTest.getQuestionById(1);
+  console.log('\n第一题:', verbVoiceFirstQuestion.question);
+  console.log('正确答案:', verbVoiceFirstQuestion.correctAnswer);
 
-// 示例：获取被动语态规则
-const rules = verbVoiceTest.getPassiveVoiceRules();
-console.log('\n一般现在时被动语态:', rules.时态变化规则.一般现在时);
+  // 示例：获取被动语态规则
+  const rules = verbVoiceTest.getPassiveVoiceRules();
+  console.log('\n一般现在时被动语态:', rules.时态变化规则.一般现在时);
 
-// 示例：获取常见不规则过去分词
-const irregulars = verbVoiceTest.metadata.commonIrregularPastParticiples;
-console.log('\n常见不规则过去分词:', Object.entries(irregulars).slice(0, 5));
+  // 示例：获取常见不规则过去分词
+  const irregulars = verbVoiceTest.metadata.commonIrregularPastParticiples;
+  console.log('\n常见不规则过去分词:', Object.entries(irregulars).slice(0, 5));
+}
