@@ -14,7 +14,7 @@ const prepositions = [
     options: ["A. in", "B. at", "C. to", "D. for"],
     translation: "他们昨晚 10 点到达了北京。",
     answer: "A",
-    explanation: ""arrive in + 大地点"（如城市、国家）；"arrive at + 小地点"（如车站、公园）；arrive 不与 to/for 搭配（reach 直接接地点，get to 接地点）。北京是城市，用 in。"
+    explanation: "\"arrive in + 大地点\"（如城市、国家）；\"arrive at + 小地点\"（如车站、公园）；arrive 不与 to/for 搭配（reach 直接接地点，get to 接地点）。北京是城市，用 in。"
   },
   {
     id: 3,

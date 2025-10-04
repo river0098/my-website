@@ -248,6 +248,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
   }
   
   .student-item:hover {
@@ -260,6 +261,150 @@
     font-size: 16px;
     color: #333;
     font-weight: 500;
+  }
+
+  .student-class-badge {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    background: #e7f3ff;
+    border-radius: 999px;
+    color: #3366cc;
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .student-list-hint {
+    font-size: 12px;
+    color: #6c757d;
+    margin-top: 6px;
+  }
+
+  .analytic-chart {
+    margin-top: 12px;
+  }
+
+  .bar-row {
+    display: flex;
+    align-items: center;
+    margin: 6px 0;
+  }
+
+  .bar-label {
+    width: 120px;
+    font-size: 13px;
+    color: #495057;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .bar-track {
+    flex: 1;
+    height: 12px;
+    background: #e9ecef;
+    border-radius: 999px;
+    margin: 0 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #4a3dd9);
+    border-radius: 999px;
+  }
+
+  .bar-value {
+    font-size: 12px;
+    color: #333;
+    font-weight: bold;
+  }
+
+  .detail-box {
+    margin-top: 20px;
+    padding: 15px;
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    background: #fff;
+  }
+
+  .detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .detail-title {
+    font-size: 18px;
+    margin: 0;
+    color: #333;
+  }
+
+  .detail-close {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #999;
+  }
+
+  .detail-close:hover {
+    color: #333;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 10px;
+    margin: 15px 0;
+  }
+
+  .summary-card {
+    padding: 12px;
+    border-radius: 10px;
+    background: #f8f9ff;
+    border: 1px solid #e3e7ff;
+    text-align: center;
+  }
+
+  .summary-label {
+    font-size: 12px;
+    color: #6c757d;
+  }
+
+  .summary-number {
+    font-size: 20px;
+    font-weight: bold;
+    color: #4a3dd9;
+    margin-top: 4px;
+  }
+
+  .log-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+  }
+
+  .log-table th,
+  .log-table td {
+    border: 1px solid #e9ecef;
+    padding: 8px;
+    font-size: 12px;
+    text-align: center;
+  }
+
+  .log-table th {
+    background: #f1f3f5;
+    color: #495057;
+  }
+
+  .log-empty {
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+    font-size: 13px;
   }
   
   .student-number {
@@ -954,11 +1099,14 @@
   <div id="student-tab" class="tab-content">
     <div class="card">
       <h2>👨‍🎓 学生登录</h2>
-      <div class="form-group">
-        <label>选择你的姓名：</label>
+      <div class="form-group" id="studentSelectSection">
+        <label>选择班级与姓名：</label>
         <div class="input-group">
-          <select id="studentSelect">
-            <option value="">-- 请选择 --</option>
+          <select id="classSelect">
+            <option value="">-- 请选择班级 --</option>
+          </select>
+          <select id="studentSelect" disabled>
+            <option value="">-- 请选择学生 --</option>
           </select>
           <button class="btn-primary" onclick="studentLogin()">开始学习</button>
         </div>
@@ -995,7 +1143,7 @@
       <h2>👨‍🏫 学生管理</h2>
       
       <!-- 添加单个学生 -->
-      <div class="form-group">
+      <div class="form-group" id="teacherAddSection">
         <label>添加新学生：</label>
         <div class="input-group">
           <input type="text" id="newStudentName" placeholder="输入学生姓名">
@@ -1005,7 +1153,7 @@
       </div>
       
       <!-- 批量导入 -->
-      <div class="batch-import">
+      <div class="batch-import" id="teacherBatchSection">
         <h3>📤 批量导入学生</h3>
         <textarea id="batchNames" placeholder="每行输入一个姓名，例如：
 张三
@@ -1045,14 +1193,33 @@
           <span style="margin-left:10px;color:#666">已预填29个学生名单</span>
         </div>
       </div>
-      
+
+      <div class="status success" id="teacherLocalNotice" style="display:none">
+        当前使用内置学生名单（31班、39班）。如需调整请编辑 <code>student_data.js</code>。
+      </div>
+
+      <div class="status-box" style="background:#f8f9ff;border:1px solid #dee2ff;margin-top:20px">
+        <h3 style="margin-top:0">📊 学生练习概览</h3>
+        <div id="teacherPracticeChart" class="analytic-chart">等待加载学生数据...</div>
+        <div class="student-list-hint">提示：图表展示练习题量排名靠前的学生，点击下方学生可查看详细记录。</div>
+      </div>
+
       <!-- 学生列表 -->
       <h3>学生列表 (<span id="studentCount">0</span>)</h3>
+      <div id="teacherRosterNotice" class="status info" style="display:none"></div>
       <div id="studentList" class="student-grid">
         <div class="empty-state">
           <h3>暂无学生</h3>
           <p>点击上方"批量导入"添加学生</p>
         </div>
+      </div>
+
+      <div id="teacherStudentDetail" class="detail-box" style="display:none">
+        <div class="detail-header">
+          <h3 id="teacherDetailTitle" class="detail-title">学生练习详情</h3>
+          <button class="detail-close" onclick="hideTeacherStudentDetail()">×</button>
+        </div>
+        <div id="teacherDetailContent">请选择一位学生查看练习数据</div>
       </div>
     </div>
   </div>
@@ -1108,6 +1275,7 @@
   </div>
 </div>
 
+<script src="student_data.js"></script>
 <script src="data-loader.js"></script>
 <script src="grammar/english_grammar_concepts.js"></script>
 
@@ -1126,6 +1294,7 @@ let isReady = false;
 let currentStudent = null;
 let allStudents = [];
 let assetsStatus = 'pending';
+let currentClass = null;
 
 const PRACTICE_LABELS = {
   word: '单词练习',
@@ -1141,6 +1310,8 @@ const practiceSubtitle = document.getElementById('practiceSubtitle');
 const practiceStats = document.getElementById('practiceStats');
 const practiceToolbar = document.getElementById('practiceToolbar');
 const practiceContent = document.getElementById('practiceContent');
+const classSelectEl = document.getElementById('classSelect');
+const studentSelectEl = document.getElementById('studentSelect');
 
 const practiceState = {
   type: null,
@@ -1158,6 +1329,268 @@ const practiceDatasets = {
   grammar: [],
   sentence: []
 };
+
+const teacherPracticeDataStore = {};
+const teacherPracticeChartEl = document.getElementById('teacherPracticeChart');
+const teacherDetailBox = document.getElementById('teacherStudentDetail');
+const teacherDetailTitle = document.getElementById('teacherDetailTitle');
+const teacherDetailContent = document.getElementById('teacherDetailContent');
+
+function seededRandom(seed) {
+  let value = seed % 2147483647;
+  if (value <= 0) value += 2147483646;
+  return function() {
+    value = value * 16807 % 2147483647;
+    return (value - 1) / 2147483646;
+  };
+}
+
+function hashString(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = (hash << 5) - hash + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash) + 1;
+}
+
+function generateTeacherPracticeData(name, className) {
+  return {
+    name,
+    className,
+    sessions: 0,
+    totalQuestions: 0,
+    totalCorrect: 0,
+    totalMinutes: 0,
+    averageAccuracy: 0,
+    logs: []
+  };
+}
+
+function ensureTeacherPracticeData(student) {
+  const name = student.name || '未知';
+  const className = student.class || student.className || '未分班';
+  const key = `${name}__${className}`;
+  if (!teacherPracticeDataStore[key]) {
+    teacherPracticeDataStore[key] = generateTeacherPracticeData(name, className);
+  }
+  return teacherPracticeDataStore[key];
+}
+
+function updateTeacherPracticeChart(students) {
+  if (!teacherPracticeChartEl) return;
+  if (!students || !students.length) {
+    teacherPracticeChartEl.innerHTML = '<div class="log-empty">暂无学生练习数据</div>';
+    return;
+  }
+
+  const datasets = students.map(student => {
+    const data = ensureTeacherPracticeData(student);
+    return {
+      name: student.name || '未知',
+      totalQuestions: data.totalQuestions
+    };
+  });
+
+  datasets.sort((a, b) => b.totalQuestions - a.totalQuestions);
+  const top = datasets.slice(0, 8);
+  const maxValue = Math.max(...top.map(item => item.totalQuestions), 1);
+
+  teacherPracticeChartEl.innerHTML = top.map(item => {
+    const percentage = Math.round((item.totalQuestions / maxValue) * 100);
+    return `
+      <div class="bar-row">
+        <span class="bar-label" title="${item.name}">${item.name}</span>
+        <div class="bar-track">
+          <div class="bar-fill" style="width:${percentage}%"></div>
+        </div>
+        <span class="bar-value">${item.totalQuestions} 题</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function showTeacherStudentDetail(student) {
+  const data = ensureTeacherPracticeData(student);
+  if (!teacherDetailBox || !teacherDetailTitle || !teacherDetailContent) return;
+
+  teacherDetailTitle.textContent = `${data.name} · ${data.className}`;
+
+  const summaryHtml = `
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-label">练习次数</div>
+        <div class="summary-number">${data.sessions}</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">总题量</div>
+        <div class="summary-number">${data.totalQuestions}</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">正确率</div>
+        <div class="summary-number">${data.averageAccuracy}%</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-label">累计用时</div>
+        <div class="summary-number">${data.totalMinutes} 分钟</div>
+      </div>
+    </div>
+  `;
+
+  const logsHtml = data.logs.length ? `
+    <table class="log-table">
+      <thead>
+        <tr>
+          <th>练习时间</th>
+          <th>题库</th>
+          <th>题量</th>
+          <th>正确数</th>
+          <th>正确率</th>
+          <th>用时</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.logs.map(log => `
+          <tr>
+            <td>${log.timestamp.toLocaleString()}</td>
+            <td>${log.dataset}</td>
+            <td>${log.questions}</td>
+            <td>${log.correct}</td>
+            <td>${log.accuracy}%</td>
+            <td>${log.duration} 分钟</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  ` : '<div class="log-empty">暂无练习记录</div>';
+
+  teacherDetailContent.innerHTML = summaryHtml + logsHtml;
+  teacherDetailBox.style.display = 'block';
+}
+
+function hideTeacherStudentDetail() {
+  if (teacherDetailBox) {
+    teacherDetailBox.style.display = 'none';
+    if (teacherDetailTitle) {
+      teacherDetailTitle.textContent = '学生练习详情';
+    }
+    if (teacherDetailContent) {
+      teacherDetailContent.innerHTML = '请选择一位学生查看练习数据';
+    }
+  }
+}
+
+// 调试：检查学生数据加载情况
+console.log('window.ALL_STUDENTS:', window.ALL_STUDENTS);
+console.log('window.STUDENT_ROSTERS:', window.STUDENT_ROSTERS);
+console.log('window.STUDENT_ROSTERS_BY_KEY:', window.STUDENT_ROSTERS_BY_KEY);
+
+const BUILT_IN_STUDENTS = Array.isArray(window.ALL_STUDENTS)
+  ? window.ALL_STUDENTS.map(student => ({ ...student }))
+  : [];
+
+console.log('BUILT_IN_STUDENTS:', BUILT_IN_STUDENTS);
+
+const BUILT_IN_STUDENTS_BY_CLASS = BUILT_IN_STUDENTS.reduce((acc, student) => {
+  if (!acc[student.className]) {
+    acc[student.className] = [];
+  }
+  acc[student.className].push(student);
+  return acc;
+}, {});
+
+console.log('BUILT_IN_STUDENTS_BY_CLASS:', BUILT_IN_STUDENTS_BY_CLASS);
+
+const USE_LOCAL_ROSTER = BUILT_IN_STUDENTS.length > 0;
+console.log('USE_LOCAL_ROSTER:', USE_LOCAL_ROSTER);
+
+function getStudentName(student) {
+  if (!student) return '';
+  return typeof student.get === 'function' ? student.get('name') : student.name || '';
+}
+
+function getStudentId(student) {
+  if (!student) return '';
+  if (typeof student.id === 'string') return student.id;
+  if (typeof student.get === 'function') {
+    return student.id || student.get('objectId') || '';
+  }
+  return student.objectId || student.id || '';
+}
+
+function getStudentClass(student) {
+  if (!student) return '';
+  if (student.className) return student.className;
+  if (typeof student.get === 'function') {
+    return student.get('class') || '';
+  }
+  return '';
+}
+
+function normalizeStudent(student) {
+  if (!student) return null;
+  const name = getStudentName(student);
+  const className = getStudentClass(student) || '未分班';
+  return {
+    id: getStudentId(student),
+    name,
+    className,
+    class: className
+  };
+}
+
+function populateClassOptions() {
+  if (!classSelectEl) return;
+
+  if (!USE_LOCAL_ROSTER) {
+    classSelectEl.innerHTML = '<option value="">-- 请选择班级 --</option>';
+    classSelectEl.disabled = true;
+    classSelectEl.style.display = 'none';
+    if (studentSelectEl) {
+      studentSelectEl.disabled = false;
+    }
+    return;
+  }
+
+  const classNames = Object.keys(BUILT_IN_STUDENTS_BY_CLASS);
+  classSelectEl.style.display = '';
+  classSelectEl.innerHTML = '<option value="">-- 请选择班级 --</option>';
+  classNames.forEach(name => {
+    const count = BUILT_IN_STUDENTS_BY_CLASS[name]?.length || 0;
+    const option = document.createElement('option');
+    option.value = name;
+    option.textContent = `${name} (${count}人)`;
+    classSelectEl.appendChild(option);
+  });
+
+  classSelectEl.disabled = classNames.length === 0;
+  if (studentSelectEl) {
+    studentSelectEl.disabled = true;
+    populateStudentOptions('');
+  }
+}
+
+function populateStudentOptions(className) {
+  if (!studentSelectEl) return;
+  studentSelectEl.innerHTML = '<option value="">-- 请选择学生 --</option>';
+  studentSelectEl.value = '';
+
+  if (!USE_LOCAL_ROSTER) {
+    studentSelectEl.disabled = false;
+    return;
+  }
+
+  const list = BUILT_IN_STUDENTS_BY_CLASS[className] || [];
+  list.forEach(student => {
+    const option = document.createElement('option');
+    option.value = student.id;
+    option.textContent = student.name;
+    option.dataset.className = className;
+    studentSelectEl.appendChild(option);
+  });
+
+  studentSelectEl.disabled = !className;
+}
 
 function resetPracticeState(type) {
   practiceState.type = type;
@@ -1214,6 +1647,12 @@ document.addEventListener('learning-assets-loaded', () => {
   assetsStatus = 'success';
 });
 
+if (classSelectEl) {
+  classSelectEl.addEventListener('change', event => {
+    populateStudentOptions(event.target.value);
+  });
+}
+
 if (practiceCloseBtn) {
   practiceCloseBtn.addEventListener('click', closePracticeModal);
 }
@@ -1231,17 +1670,22 @@ async function init() {
   const statusEl = document.getElementById('globalStatus');
   
   try {
-    // 初始化 LeanCloud
-    AV.init({
-      appId: CONFIG.appId,
-      appKey: CONFIG.appKey,
-      serverURL: CONFIG.serverURL
-    });
-    
-    isReady = true;
-    statusEl.className = 'status success';
-    statusEl.textContent = '✓ 系统已连接';
-    
+    if (USE_LOCAL_ROSTER) {
+      isReady = true;
+      statusEl.className = 'status success';
+      statusEl.textContent = '✓ 已加载内置学生名单';
+    } else {
+      // 初始化 LeanCloud
+      AV.init({
+        appId: CONFIG.appId,
+        appKey: CONFIG.appKey,
+        serverURL: CONFIG.serverURL
+      });
+      isReady = true;
+      statusEl.className = 'status success';
+      statusEl.textContent = '✓ 系统已连接';
+    }
+
     // 加载初始数据
     await loadStudents();
     updateStats();
@@ -1275,7 +1719,7 @@ async function init() {
   } catch (error) {
     assetsStatus = 'error';
     statusEl.className = 'status error';
-    statusEl.textContent = '✗ 连接失败: ' + error.message;
+    statusEl.textContent = '✗ 初始化失败: ' + error.message;
     console.error('初始化失败:', error);
   }
 }
@@ -1302,68 +1746,137 @@ function switchTab(tabName, trigger) {
 
 // 加载学生列表
 async function loadStudents() {
-  if (!isReady) return;
-  
+  if (!isReady && !USE_LOCAL_ROSTER) return;
+
+  populateClassOptions();
+
+  const selectEl = studentSelectEl;
+  const studentCountEl = document.getElementById('studentCount');
+  const totalStudentsEl = document.getElementById('totalStudents');
+
+  if (USE_LOCAL_ROSTER) {
+    allStudents = BUILT_IN_STUDENTS.slice();
+    updateStudentList(allStudents);
+
+    if (studentCountEl) studentCountEl.textContent = allStudents.length;
+    if (totalStudentsEl) totalStudentsEl.textContent = allStudents.length;
+
+    const addSection = document.getElementById('teacherAddSection');
+    if (addSection) addSection.style.display = 'none';
+    const batchSection = document.getElementById('teacherBatchSection');
+    if (batchSection) batchSection.style.display = 'none';
+    const rosterNotice = document.getElementById('teacherRosterNotice');
+    if (rosterNotice) {
+      rosterNotice.style.display = 'block';
+      rosterNotice.textContent = '学生名单已内置（31班、39班），若需调整请编辑 student_data.js。';
+    }
+    const localNotice = document.getElementById('teacherLocalNotice');
+    if (localNotice) localNotice.style.display = 'block';
+
+    return;
+  }
+
+  const localNotice = document.getElementById('teacherLocalNotice');
+  if (localNotice) localNotice.style.display = 'none';
+  const rosterNotice = document.getElementById('teacherRosterNotice');
+  if (rosterNotice) rosterNotice.style.display = 'none';
+
   try {
     const query = new AV.Query('Student');
     query.descending('createdAt');
     query.limit(1000);
     const students = await query.find();
-    
+
     allStudents = students;
-    
-    const selectEl = document.getElementById('studentSelect');
-    selectEl.innerHTML = '<option value="">-- 请选择 --</option>';
-    students.forEach(student => {
-      const option = document.createElement('option');
-      option.value = student.id;
-      option.textContent = student.get('name');
-      selectEl.appendChild(option);
-    });
-    
+
+    if (selectEl) {
+      selectEl.innerHTML = '<option value="">-- 请选择学生 --</option>';
+      students.forEach(student => {
+        const option = document.createElement('option');
+        option.value = student.id;
+        option.textContent = student.get('name');
+        selectEl.appendChild(option);
+      });
+    }
+
     updateStudentList(students);
-    document.getElementById('studentCount').textContent = students.length;
-    document.getElementById('totalStudents').textContent = students.length;
-    
+    if (studentCountEl) studentCountEl.textContent = students.length;
+    if (totalStudentsEl) totalStudentsEl.textContent = students.length;
+
   } catch (error) {
     console.error('加载学生失败:', error);
+    updateTeacherPracticeChart([]);
+    hideTeacherStudentDetail();
+    if (teacherPracticeChartEl) {
+      teacherPracticeChartEl.innerHTML = '<div class="log-empty">暂无法获取练习数据</div>';
+    }
   }
 }
 
 // 更新学生列表显示
 function updateStudentList(students) {
   const listEl = document.getElementById('studentList');
-  
-  if (!students.length) {
+  if (!listEl) return;
+
+  const entries = (students || []).map(student => {
+    const normalized = normalizeStudent(student);
+    if (!normalized || !normalized.name) return null;
+    return { raw: student, normalized };
+  }).filter(Boolean);
+
+  if (!entries.length) {
     listEl.innerHTML = `
       <div class="empty-state">
         <h3>暂无学生</h3>
-        <p>点击上方"批量导入"添加学生</p>
+        <p>${USE_LOCAL_ROSTER ? '当前内置名单为空，请检查 student_data.js 配置。' : '点击上方"批量导入"添加学生'}</p>
       </div>
     `;
+    updateTeacherPracticeChart([]);
+    hideTeacherStudentDetail();
     return;
   }
-  
+
   listEl.innerHTML = '';
-  students.forEach((student, index) => {
+  entries.forEach((entry, index) => {
+    const { raw, normalized } = entry;
     const item = document.createElement('div');
     item.className = 'student-item';
+    const badge = normalized.className ? `<span class="student-class-badge">${normalized.className}</span>` : '';
+    const deleteButton = USE_LOCAL_ROSTER ? '' : '<button class="btn-danger btn-small">删除</button>';
     item.innerHTML = `
       <div>
         <span class="student-number">${index + 1}.</span>
-        <span class="student-name">${student.get('name')}</span>
+        <span class="student-name">${normalized.name}</span>
+        ${badge}
       </div>
-      <button class="btn-danger btn-small" onclick="deleteStudent('${student.id}')">删除</button>
+      ${deleteButton}
     `;
+    if (!USE_LOCAL_ROSTER) {
+      const deleteBtn = item.querySelector('.btn-danger');
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', event => {
+          event.stopPropagation();
+          deleteStudent(normalized.id);
+        });
+      }
+    }
+    item.addEventListener('click', () => showTeacherStudentDetail(normalized));
     listEl.appendChild(item);
   });
+
+  updateTeacherPracticeChart(entries.map(entry => entry.normalized));
 }
 
 // 添加学生
 async function addStudent() {
   const input = document.getElementById('newStudentName');
   const name = input.value.trim();
-  
+
+  if (USE_LOCAL_ROSTER) {
+    alert('当前系统使用内置学生名单，如需新增请联系管理员更新 student_data.js。');
+    return;
+  }
+
   if (!name) {
     alert('请输入学生姓名');
     return;
@@ -1387,7 +1900,12 @@ async function addStudent() {
 async function batchImport() {
   const textarea = document.getElementById('batchNames');
   const names = textarea.value.trim().split('\n').filter(name => name.trim());
-  
+
+  if (USE_LOCAL_ROSTER) {
+    alert('当前系统使用内置学生名单，已无需批量导入。若需调整名单，请编辑 student_data.js。');
+    return;
+  }
+
   if (!names.length) {
     alert('请输入学生姓名');
     return;
@@ -1436,6 +1954,11 @@ async function batchImport() {
 
 // 删除学生
 async function deleteStudent(id) {
+  if (USE_LOCAL_ROSTER) {
+    alert('内置学生名单暂不支持在页面中删除，请在 student_data.js 中维护。');
+    return;
+  }
+
   if (!confirm('确定删除？')) return;
   
   try {
@@ -1449,6 +1972,11 @@ async function deleteStudent(id) {
 
 // 清空所有
 async function clearAll() {
+  if (USE_LOCAL_ROSTER) {
+    alert('当前使用内置学生名单，无需清空操作。');
+    return;
+  }
+
   if (!confirm('确定要清空所有学生？')) return;
   if (!confirm('此操作不可恢复，确定继续？')) return;
   
@@ -1461,6 +1989,9 @@ async function clearAll() {
     }
     
     alert('已清空所有学生');
+    Object.keys(teacherPracticeDataStore).forEach(key => delete teacherPracticeDataStore[key]);
+    updateTeacherPracticeChart([]);
+    hideTeacherStudentDetail();
     loadStudents();
     
   } catch (error) {
@@ -1470,16 +2001,23 @@ async function clearAll() {
 
 // 学生登录
 function studentLogin() {
-  const select = document.getElementById('studentSelect');
-  if (!select.value) {
+  if (USE_LOCAL_ROSTER && classSelectEl && !classSelectEl.value) {
+    alert('请选择班级');
+    return;
+  }
+
+  const select = studentSelectEl || document.getElementById('studentSelect');
+  if (!select || !select.value) {
     alert('请选择学生');
     return;
   }
-  
+
   const name = select.options[select.selectedIndex].text;
   currentStudent = name;
+  currentClass = classSelectEl ? classSelectEl.value || null : null;
   
-  document.getElementById('studentNameDisplay').textContent = name;
+  const display = currentClass ? `${currentClass} · ${name}` : name;
+  document.getElementById('studentNameDisplay').textContent = display;
   document.getElementById('studentWelcome').style.display = 'block';
 }
 
@@ -1495,6 +2033,9 @@ function startPractice(type) {
   const practiceType = type || 'word';
   target.searchParams.set('type', practiceType);
   target.searchParams.set('student', currentStudent);
+  if (currentClass) {
+    target.searchParams.set('class', currentClass);
+  }
   window.location.href = target.toString();
 }
 
@@ -2892,9 +3433,19 @@ function includesKeyword(value, keyword) {
 
 // 更新统计数据
 function updateStats() {
-  document.getElementById('activeToday').textContent = Math.floor(Math.random() * 10);
-  document.getElementById('practiceCount').textContent = Math.floor(Math.random() * 100);
-  document.getElementById('avgScore').textContent = Math.floor(Math.random() * 30) + 70;
+  const totalEl = document.getElementById('totalStudents');
+  const activeEl = document.getElementById('activeToday');
+  const practiceEl = document.getElementById('practiceCount');
+  const avgEl = document.getElementById('avgScore');
+
+  if (totalEl) {
+    const total = allStudents.length || BUILT_IN_STUDENTS.length;
+    totalEl.textContent = total;
+  }
+
+  if (activeEl) activeEl.textContent = 0;
+  if (practiceEl) practiceEl.textContent = 0;
+  if (avgEl) avgEl.textContent = 0;
 }
 
 window.addEventListener('DOMContentLoaded', init);
